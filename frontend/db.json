@@ -2,1123 +2,394 @@
   "properties": [
     {
       "id": 1,
-      "title": "PURVA SILVERSKY ELECTRONIC CITY",
-      "image": "https://picsum.photos/seed/purva/600/400",
-      "area": "1370 sqft to 3700 sqft",
-      "location": "Electronic City, Bangalore",
-      "possession": "Dec 2029 Onwards",
-      "priceRange": "₹1.25 Cr - ₹3.20 Cr",
-      "status": "Pre-Launch"
+      "slug": "purva-silversky-electronic-city",
+      "title": "Purva Silversky",
+      "category": "flat",
+      "status": "new",
+      "developer": "Puravankara",
+      "location": {
+        "area": "Electronic City",
+        "city": "Bangalore",
+        "address": "Electronic City Phase 1",
+        "latitude": 12.8456,
+        "longitude": 77.6603
+      },
+      "images": ["https://images.unsplash.com/photo-1545324418-cc1a3fa10c00"],
+      "area": "1200 – 1800 sqft",
+      "possession": "2026",
+      "price": {
+        "min": 9500000,
+        "max": 18000000,
+        "display": "₹95 L – ₹1.8 Cr"
+      },
+      "configuration": [],
+      "amenities": [],
+      "connectivity": { "metro": "3.2 km", "bus": "500 m", "railway": "14 km" }
     },
+
     {
       "id": 2,
-      "title": "BRIGADE ORCHARD",
-      "image": "https://picsum.photos/seed/brigade/600/400",
-      "area": "1200 sqft to 2400 sqft",
-      "location": "Devanahalli, Bangalore",
-      "possession": "Jun 2026 Onwards",
-      "priceRange": "₹85 L - ₹1.80 Cr",
-      "status": "New Launch"
+      "slug": "prestige-lakeside-habitat-whitefield",
+      "title": "Prestige Lakeside Habitat",
+      "category": "flat",
+      "status": "ready",
+      "developer": "Prestige Group",
+      "location": {
+        "area": "Whitefield",
+        "city": "Bangalore",
+        "address": "Varthur Road",
+        "latitude": 12.9719,
+        "longitude": 77.728
+      },
+      "images": [
+        "https://images.unsplash.com/photo-1572120360610-d971b9d7767c"
+      ],
+      "area": "1100 – 2200 sqft",
+      "possession": "Ready",
+      "price": {
+        "min": 11000000,
+        "max": 24000000,
+        "display": "₹1.1 Cr – ₹2.4 Cr"
+      },
+      "configuration": [],
+      "amenities": [],
+      "connectivity": {}
     },
+
     {
       "id": 3,
-      "title": "PRESTIGE CITY SARJAPUR",
-      "image": "https://picsum.photos/seed/prestige/600/400",
-      "area": "1100 sqft to 2200 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Mar 2027 Onwards",
-      "priceRange": "₹75 L - ₹1.60 Cr",
-      "status": "Under Construction"
+      "slug": "sobha-dream-acres-panathur",
+      "title": "Sobha Dream Acres",
+      "category": "flat",
+      "status": "new",
+      "developer": "Sobha Ltd",
+      "location": {
+        "area": "Panathur",
+        "city": "Bangalore",
+        "address": "Panathur Road",
+        "latitude": 12.9343,
+        "longitude": 77.6974
+      },
+      "images": [
+        "https://images.unsplash.com/photo-1598928506311-c55ded91a20c"
+      ],
+      "area": "1000 – 1500 sqft",
+      "possession": "2025",
+      "price": {
+        "min": 8500000,
+        "max": 14000000,
+        "display": "₹85 L – ₹1.4 Cr"
+      },
+      "amenities": [],
+      "connectivity": {},
+      "configuration": []
     },
     {
       "id": 4,
-      "title": "SOBHA ROYAL PAVILION",
-      "image": "https://picsum.photos/seed/sobha/600/400",
-      "area": "1300 sqft to 2500 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Ready to Move",
-      "priceRange": "₹1.10 Cr - ₹2.10 Cr",
-      "status": "Ready"
-    },
-    {
-      "id": 1,
-      "title": "PURVA SILVERSKY ELECTRONIC CITY",
-      "image": "https://picsum.photos/seed/purva/600/400",
-      "area": "1370 sqft to 3700 sqft",
-      "location": "Electronic City, Bangalore",
-      "possession": "Dec 2029 Onwards",
-      "priceRange": "₹1.25 Cr - ₹3.20 Cr",
-      "status": "Pre-Launch"
-    },
-    {
-      "id": 2,
-      "title": "BRIGADE ORCHARD",
-      "image": "https://picsum.photos/seed/brigade/600/400",
-      "area": "1200 sqft to 2400 sqft",
-      "location": "Devanahalli, Bangalore",
-      "possession": "Jun 2026 Onwards",
-      "priceRange": "₹85 L - ₹1.80 Cr",
-      "status": "New Launch"
-    },
-    {
-      "id": 3,
-      "title": "PRESTIGE CITY SARJAPUR",
-      "image": "https://picsum.photos/seed/prestige/600/400",
-      "area": "1100 sqft to 2200 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Mar 2027 Onwards",
-      "priceRange": "₹75 L - ₹1.60 Cr",
-      "status": "Under Construction"
-    },
-    {
-      "id": 4,
-      "title": "SOBHA ROYAL PAVILION",
-      "image": "https://picsum.photos/seed/sobha/600/400",
-      "area": "1300 sqft to 2500 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Ready to Move",
-      "priceRange": "₹1.10 Cr - ₹2.10 Cr",
-      "status": "Ready"
-    },
-    {
-      "id": 1,
-      "title": "PURVA SILVERSKY ELECTRONIC CITY",
-      "image": "https://picsum.photos/seed/purva/600/400",
-      "area": "1370 sqft to 3700 sqft",
-      "location": "Electronic City, Bangalore",
-      "possession": "Dec 2029 Onwards",
-      "priceRange": "₹1.25 Cr - ₹3.20 Cr",
-      "status": "Pre-Launch"
-    },
-    {
-      "id": 2,
-      "title": "BRIGADE ORCHARD",
-      "image": "https://picsum.photos/seed/brigade/600/400",
-      "area": "1200 sqft to 2400 sqft",
-      "location": "Devanahalli, Bangalore",
-      "possession": "Jun 2026 Onwards",
-      "priceRange": "₹85 L - ₹1.80 Cr",
-      "status": "New Launch"
-    },
-    {
-      "id": 3,
-      "title": "PRESTIGE CITY SARJAPUR",
-      "image": "https://picsum.photos/seed/prestige/600/400",
-      "area": "1100 sqft to 2200 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Mar 2027 Onwards",
-      "priceRange": "₹75 L - ₹1.60 Cr",
-      "status": "Under Construction"
-    },
-    {
-      "id": 4,
-      "title": "SOBHA ROYAL PAVILION",
-      "image": "https://picsum.photos/seed/sobha/600/400",
-      "area": "1300 sqft to 2500 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Ready to Move",
-      "priceRange": "₹1.10 Cr - ₹2.10 Cr",
-      "status": "Ready"
-    },
-    {
-      "id": 1,
-      "title": "PURVA SILVERSKY ELECTRONIC CITY",
-      "image": "https://picsum.photos/seed/purva/600/400",
-      "area": "1370 sqft to 3700 sqft",
-      "location": "Electronic City, Bangalore",
-      "possession": "Dec 2029 Onwards",
-      "priceRange": "₹1.25 Cr - ₹3.20 Cr",
-      "status": "Pre-Launch"
-    },
-    {
-      "id": 2,
-      "title": "BRIGADE ORCHARD",
-      "image": "https://picsum.photos/seed/brigade/600/400",
-      "area": "1200 sqft to 2400 sqft",
-      "location": "Devanahalli, Bangalore",
-      "possession": "Jun 2026 Onwards",
-      "priceRange": "₹85 L - ₹1.80 Cr",
-      "status": "New Launch"
-    },
-    {
-      "id": 3,
-      "title": "PRESTIGE CITY SARJAPUR",
-      "image": "https://picsum.photos/seed/prestige/600/400",
-      "area": "1100 sqft to 2200 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Mar 2027 Onwards",
-      "priceRange": "₹75 L - ₹1.60 Cr",
-      "status": "Under Construction"
-    },
-    {
-      "id": 4,
-      "title": "SOBHA ROYAL PAVILION",
-      "image": "https://picsum.photos/seed/sobha/600/400",
-      "area": "1300 sqft to 2500 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Ready to Move",
-      "priceRange": "₹1.10 Cr - ₹2.10 Cr",
-      "status": "Ready"
-    },
-    {
-      "id": 1,
-      "title": "PURVA SILVERSKY ELECTRONIC CITY",
-      "image": "https://picsum.photos/seed/purva/600/400",
-      "area": "1370 sqft to 3700 sqft",
-      "location": "Electronic City, Bangalore",
-      "possession": "Dec 2029 Onwards",
-      "priceRange": "₹1.25 Cr - ₹3.20 Cr",
-      "status": "Pre-Launch"
-    },
-    {
-      "id": 2,
-      "title": "BRIGADE ORCHARD",
-      "image": "https://picsum.photos/seed/brigade/600/400",
-      "area": "1200 sqft to 2400 sqft",
-      "location": "Devanahalli, Bangalore",
-      "possession": "Jun 2026 Onwards",
-      "priceRange": "₹85 L - ₹1.80 Cr",
-      "status": "New Launch"
-    },
-    {
-      "id": 3,
-      "title": "PRESTIGE CITY SARJAPUR",
-      "image": "https://picsum.photos/seed/prestige/600/400",
-      "area": "1100 sqft to 2200 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Mar 2027 Onwards",
-      "priceRange": "₹75 L - ₹1.60 Cr",
-      "status": "Under Construction"
-    },
-    {
-      "id": 4,
-      "title": "SOBHA ROYAL PAVILION",
-      "image": "https://picsum.photos/seed/sobha/600/400",
-      "area": "1300 sqft to 2500 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Ready to Move",
-      "priceRange": "₹1.10 Cr - ₹2.10 Cr",
-      "status": "Ready"
-    },
-    {
-      "id": 1,
-      "title": "PURVA SILVERSKY ELECTRONIC CITY",
-      "image": "https://picsum.photos/seed/purva/600/400",
-      "area": "1370 sqft to 3700 sqft",
-      "location": "Electronic City, Bangalore",
-      "possession": "Dec 2029 Onwards",
-      "priceRange": "₹1.25 Cr - ₹3.20 Cr",
-      "status": "Pre-Launch"
-    },
-    {
-      "id": 2,
-      "title": "BRIGADE ORCHARD",
-      "image": "https://picsum.photos/seed/brigade/600/400",
-      "area": "1200 sqft to 2400 sqft",
-      "location": "Devanahalli, Bangalore",
-      "possession": "Jun 2026 Onwards",
-      "priceRange": "₹85 L - ₹1.80 Cr",
-      "status": "New Launch"
-    },
-    {
-      "id": 3,
-      "title": "PRESTIGE CITY SARJAPUR",
-      "image": "https://picsum.photos/seed/prestige/600/400",
-      "area": "1100 sqft to 2200 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Mar 2027 Onwards",
-      "priceRange": "₹75 L - ₹1.60 Cr",
-      "status": "Under Construction"
-    },
-    {
-      "id": 4,
-      "title": "SOBHA ROYAL PAVILION",
-      "image": "https://picsum.photos/seed/sobha/600/400",
-      "area": "1300 sqft to 2500 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Ready to Move",
-      "priceRange": "₹1.10 Cr - ₹2.10 Cr",
-      "status": "Ready"
-    },
-    {
-      "id": 1,
-      "title": "PURVA SILVERSKY ELECTRONIC CITY",
-      "image": "https://picsum.photos/seed/purva/600/400",
-      "area": "1370 sqft to 3700 sqft",
-      "location": "Electronic City, Bangalore",
-      "possession": "Dec 2029 Onwards",
-      "priceRange": "₹1.25 Cr - ₹3.20 Cr",
-      "status": "Pre-Launch"
-    },
-    {
-      "id": 2,
-      "title": "BRIGADE ORCHARD",
-      "image": "https://picsum.photos/seed/brigade/600/400",
-      "area": "1200 sqft to 2400 sqft",
-      "location": "Devanahalli, Bangalore",
-      "possession": "Jun 2026 Onwards",
-      "priceRange": "₹85 L - ₹1.80 Cr",
-      "status": "New Launch"
-    },
-    {
-      "id": 3,
-      "title": "PRESTIGE CITY SARJAPUR",
-      "image": "https://picsum.photos/seed/prestige/600/400",
-      "area": "1100 sqft to 2200 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Mar 2027 Onwards",
-      "priceRange": "₹75 L - ₹1.60 Cr",
-      "status": "Under Construction"
-    },
-    {
-      "id": 4,
-      "title": "SOBHA ROYAL PAVILION",
-      "image": "https://picsum.photos/seed/sobha/600/400",
-      "area": "1300 sqft to 2500 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Ready to Move",
-      "priceRange": "₹1.10 Cr - ₹2.10 Cr",
-      "status": "Ready"
-    },
-    {
-      "id": 1,
-      "title": "PURVA SILVERSKY ELECTRONIC CITY",
-      "image": "https://picsum.photos/seed/purva/600/400",
-      "area": "1370 sqft to 3700 sqft",
-      "location": "Electronic City, Bangalore",
-      "possession": "Dec 2029 Onwards",
-      "priceRange": "₹1.25 Cr - ₹3.20 Cr",
-      "status": "Pre-Launch"
-    },
-    {
-      "id": 2,
-      "title": "BRIGADE ORCHARD",
-      "image": "https://picsum.photos/seed/brigade/600/400",
-      "area": "1200 sqft to 2400 sqft",
-      "location": "Devanahalli, Bangalore",
-      "possession": "Jun 2026 Onwards",
-      "priceRange": "₹85 L - ₹1.80 Cr",
-      "status": "New Launch"
-    },
-    {
-      "id": 3,
-      "title": "PRESTIGE CITY SARJAPUR",
-      "image": "https://picsum.photos/seed/prestige/600/400",
-      "area": "1100 sqft to 2200 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Mar 2027 Onwards",
-      "priceRange": "₹75 L - ₹1.60 Cr",
-      "status": "Under Construction"
-    },
-    {
-      "id": 4,
-      "title": "SOBHA ROYAL PAVILION",
-      "image": "https://picsum.photos/seed/sobha/600/400",
-      "area": "1300 sqft to 2500 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Ready to Move",
-      "priceRange": "₹1.10 Cr - ₹2.10 Cr",
-      "status": "Ready"
-    },
-    {
-      "id": 1,
-      "title": "PURVA SILVERSKY ELECTRONIC CITY",
-      "image": "https://picsum.photos/seed/purva/600/400",
-      "area": "1370 sqft to 3700 sqft",
-      "location": "Electronic City, Bangalore",
-      "possession": "Dec 2029 Onwards",
-      "priceRange": "₹1.25 Cr - ₹3.20 Cr",
-      "status": "Pre-Launch"
-    },
-    {
-      "id": 2,
-      "title": "BRIGADE ORCHARD",
-      "image": "https://picsum.photos/seed/brigade/600/400",
-      "area": "1200 sqft to 2400 sqft",
-      "location": "Devanahalli, Bangalore",
-      "possession": "Jun 2026 Onwards",
-      "priceRange": "₹85 L - ₹1.80 Cr",
-      "status": "New Launch"
-    },
-    {
-      "id": 3,
-      "title": "PRESTIGE CITY SARJAPUR",
-      "image": "https://picsum.photos/seed/prestige/600/400",
-      "area": "1100 sqft to 2200 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Mar 2027 Onwards",
-      "priceRange": "₹75 L - ₹1.60 Cr",
-      "status": "Under Construction"
-    },
-    {
-      "id": 4,
-      "title": "SOBHA ROYAL PAVILION",
-      "image": "https://picsum.photos/seed/sobha/600/400",
-      "area": "1300 sqft to 2500 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Ready to Move",
-      "priceRange": "₹1.10 Cr - ₹2.10 Cr",
-      "status": "Ready"
-    },
-    {
-      "id": 1,
-      "title": "PURVA SILVERSKY ELECTRONIC CITY",
-      "image": "https://picsum.photos/seed/purva/600/400",
-      "area": "1370 sqft to 3700 sqft",
-      "location": "Electronic City, Bangalore",
-      "possession": "Dec 2029 Onwards",
-      "priceRange": "₹1.25 Cr - ₹3.20 Cr",
-      "status": "Pre-Launch"
-    },
-    {
-      "id": 2,
-      "title": "BRIGADE ORCHARD",
-      "image": "https://picsum.photos/seed/brigade/600/400",
-      "area": "1200 sqft to 2400 sqft",
-      "location": "Devanahalli, Bangalore",
-      "possession": "Jun 2026 Onwards",
-      "priceRange": "₹85 L - ₹1.80 Cr",
-      "status": "New Launch"
-    },
-    {
-      "id": 3,
-      "title": "PRESTIGE CITY SARJAPUR",
-      "image": "https://picsum.photos/seed/prestige/600/400",
-      "area": "1100 sqft to 2200 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Mar 2027 Onwards",
-      "priceRange": "₹75 L - ₹1.60 Cr",
-      "status": "Under Construction"
-    },
-    {
-      "id": 4,
-      "title": "SOBHA ROYAL PAVILION",
-      "image": "https://picsum.photos/seed/sobha/600/400",
-      "area": "1300 sqft to 2500 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Ready to Move",
-      "priceRange": "₹1.10 Cr - ₹2.10 Cr",
-      "status": "Ready"
-    },
-    {
-      "id": 1,
-      "title": "PURVA SILVERSKY ELECTRONIC CITY",
-      "image": "https://picsum.photos/seed/purva/600/400",
-      "area": "1370 sqft to 3700 sqft",
-      "location": "Electronic City, Bangalore",
-      "possession": "Dec 2029 Onwards",
-      "priceRange": "₹1.25 Cr - ₹3.20 Cr",
-      "status": "Pre-Launch"
-    },
-    {
-      "id": 2,
-      "title": "BRIGADE ORCHARD",
-      "image": "https://picsum.photos/seed/brigade/600/400",
-      "area": "1200 sqft to 2400 sqft",
-      "location": "Devanahalli, Bangalore",
-      "possession": "Jun 2026 Onwards",
-      "priceRange": "₹85 L - ₹1.80 Cr",
-      "status": "New Launch"
-    },
-    {
-      "id": 3,
-      "title": "PRESTIGE CITY SARJAPUR",
-      "image": "https://picsum.photos/seed/prestige/600/400",
-      "area": "1100 sqft to 2200 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Mar 2027 Onwards",
-      "priceRange": "₹75 L - ₹1.60 Cr",
-      "status": "Under Construction"
-    },
-    {
-      "id": 4,
-      "title": "SOBHA ROYAL PAVILION",
-      "image": "https://picsum.photos/seed/sobha/600/400",
-      "area": "1300 sqft to 2500 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Ready to Move",
-      "priceRange": "₹1.10 Cr - ₹2.10 Cr",
-      "status": "Ready"
-    },
-    {
-      "id": 1,
-      "title": "PURVA SILVERSKY ELECTRONIC CITY",
-      "image": "https://picsum.photos/seed/purva/600/400",
-      "area": "1370 sqft to 3700 sqft",
-      "location": "Electronic City, Bangalore",
-      "possession": "Dec 2029 Onwards",
-      "priceRange": "₹1.25 Cr - ₹3.20 Cr",
-      "status": "Pre-Launch"
-    },
-    {
-      "id": 2,
-      "title": "BRIGADE ORCHARD",
-      "image": "https://picsum.photos/seed/brigade/600/400",
-      "area": "1200 sqft to 2400 sqft",
-      "location": "Devanahalli, Bangalore",
-      "possession": "Jun 2026 Onwards",
-      "priceRange": "₹85 L - ₹1.80 Cr",
-      "status": "New Launch"
-    },
-    {
-      "id": 3,
-      "title": "PRESTIGE CITY SARJAPUR",
-      "image": "https://picsum.photos/seed/prestige/600/400",
-      "area": "1100 sqft to 2200 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Mar 2027 Onwards",
-      "priceRange": "₹75 L - ₹1.60 Cr",
-      "status": "Under Construction"
-    },
-    {
-      "id": 4,
-      "title": "SOBHA ROYAL PAVILION",
-      "image": "https://picsum.photos/seed/sobha/600/400",
-      "area": "1300 sqft to 2500 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Ready to Move",
-      "priceRange": "₹1.10 Cr - ₹2.10 Cr",
-      "status": "Ready"
-    },
-    {
-      "id": 1,
-      "title": "PURVA SILVERSKY ELECTRONIC CITY",
-      "image": "https://picsum.photos/seed/purva/600/400",
-      "area": "1370 sqft to 3700 sqft",
-      "location": "Electronic City, Bangalore",
-      "possession": "Dec 2029 Onwards",
-      "priceRange": "₹1.25 Cr - ₹3.20 Cr",
-      "status": "Pre-Launch"
-    },
-    {
-      "id": 2,
-      "title": "BRIGADE ORCHARD",
-      "image": "https://picsum.photos/seed/brigade/600/400",
-      "area": "1200 sqft to 2400 sqft",
-      "location": "Devanahalli, Bangalore",
-      "possession": "Jun 2026 Onwards",
-      "priceRange": "₹85 L - ₹1.80 Cr",
-      "status": "New Launch"
-    },
-    {
-      "id": 3,
-      "title": "PRESTIGE CITY SARJAPUR",
-      "image": "https://picsum.photos/seed/prestige/600/400",
-      "area": "1100 sqft to 2200 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Mar 2027 Onwards",
-      "priceRange": "₹75 L - ₹1.60 Cr",
-      "status": "Under Construction"
-    },
-    {
-      "id": 4,
-      "title": "SOBHA ROYAL PAVILION",
-      "image": "https://picsum.photos/seed/sobha/600/400",
-      "area": "1300 sqft to 2500 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Ready to Move",
-      "priceRange": "₹1.10 Cr - ₹2.10 Cr",
-      "status": "Ready"
-    },
-    {
-      "id": 1,
-      "title": "PURVA SILVERSKY ELECTRONIC CITY",
-      "image": "https://picsum.photos/seed/purva/600/400",
-      "area": "1370 sqft to 3700 sqft",
-      "location": "Electronic City, Bangalore",
-      "possession": "Dec 2029 Onwards",
-      "priceRange": "₹1.25 Cr - ₹3.20 Cr",
-      "status": "Pre-Launch"
-    },
-    {
-      "id": 2,
-      "title": "BRIGADE ORCHARD",
-      "image": "https://picsum.photos/seed/brigade/600/400",
-      "area": "1200 sqft to 2400 sqft",
-      "location": "Devanahalli, Bangalore",
-      "possession": "Jun 2026 Onwards",
-      "priceRange": "₹85 L - ₹1.80 Cr",
-      "status": "New Launch"
-    },
-    {
-      "id": 3,
-      "title": "PRESTIGE CITY SARJAPUR",
-      "image": "https://picsum.photos/seed/prestige/600/400",
-      "area": "1100 sqft to 2200 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Mar 2027 Onwards",
-      "priceRange": "₹75 L - ₹1.60 Cr",
-      "status": "Under Construction"
-    },
-    {
-      "id": 4,
-      "title": "SOBHA ROYAL PAVILION",
-      "image": "https://picsum.photos/seed/sobha/600/400",
-      "area": "1300 sqft to 2500 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Ready to Move",
-      "priceRange": "₹1.10 Cr - ₹2.10 Cr",
-      "status": "Ready"
-    },
-    {
-      "id": 1,
-      "title": "PURVA SILVERSKY ELECTRONIC CITY",
-      "image": "https://picsum.photos/seed/purva/600/400",
-      "area": "1370 sqft to 3700 sqft",
-      "location": "Electronic City, Bangalore",
-      "possession": "Dec 2029 Onwards",
-      "priceRange": "₹1.25 Cr - ₹3.20 Cr",
-      "status": "Pre-Launch"
-    },
-    {
-      "id": 2,
-      "title": "BRIGADE ORCHARD",
-      "image": "https://picsum.photos/seed/brigade/600/400",
-      "area": "1200 sqft to 2400 sqft",
-      "location": "Devanahalli, Bangalore",
-      "possession": "Jun 2026 Onwards",
-      "priceRange": "₹85 L - ₹1.80 Cr",
-      "status": "New Launch"
-    },
-    {
-      "id": 3,
-      "title": "PRESTIGE CITY SARJAPUR",
-      "image": "https://picsum.photos/seed/prestige/600/400",
-      "area": "1100 sqft to 2200 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Mar 2027 Onwards",
-      "priceRange": "₹75 L - ₹1.60 Cr",
-      "status": "Under Construction"
-    },
-    {
-      "id": 4,
-      "title": "SOBHA ROYAL PAVILION",
-      "image": "https://picsum.photos/seed/sobha/600/400",
-      "area": "1300 sqft to 2500 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Ready to Move",
-      "priceRange": "₹1.10 Cr - ₹2.10 Cr",
-      "status": "Ready"
-    },
-    {
-      "id": 1,
-      "title": "PURVA SILVERSKY ELECTRONIC CITY",
-      "image": "https://picsum.photos/seed/purva/600/400",
-      "area": "1370 sqft to 3700 sqft",
-      "location": "Electronic City, Bangalore",
-      "possession": "Dec 2029 Onwards",
-      "priceRange": "₹1.25 Cr - ₹3.20 Cr",
-      "status": "Pre-Launch"
-    },
-    {
-      "id": 2,
-      "title": "BRIGADE ORCHARD",
-      "image": "https://picsum.photos/seed/brigade/600/400",
-      "area": "1200 sqft to 2400 sqft",
-      "location": "Devanahalli, Bangalore",
-      "possession": "Jun 2026 Onwards",
-      "priceRange": "₹85 L - ₹1.80 Cr",
-      "status": "New Launch"
-    },
-    {
-      "id": 3,
-      "title": "PRESTIGE CITY SARJAPUR",
-      "image": "https://picsum.photos/seed/prestige/600/400",
-      "area": "1100 sqft to 2200 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Mar 2027 Onwards",
-      "priceRange": "₹75 L - ₹1.60 Cr",
-      "status": "Under Construction"
-    },
-    {
-      "id": 4,
-      "title": "SOBHA ROYAL PAVILION",
-      "image": "https://picsum.photos/seed/sobha/600/400",
-      "area": "1300 sqft to 2500 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Ready to Move",
-      "priceRange": "₹1.10 Cr - ₹2.10 Cr",
-      "status": "Ready"
-    },
-    {
-      "id": 1,
-      "title": "PURVA SILVERSKY ELECTRONIC CITY",
-      "image": "https://picsum.photos/seed/purva/600/400",
-      "area": "1370 sqft to 3700 sqft",
-      "location": "Electronic City, Bangalore",
-      "possession": "Dec 2029 Onwards",
-      "priceRange": "₹1.25 Cr - ₹3.20 Cr",
-      "status": "Pre-Launch"
-    },
-    {
-      "id": 2,
-      "title": "BRIGADE ORCHARD",
-      "image": "https://picsum.photos/seed/brigade/600/400",
-      "area": "1200 sqft to 2400 sqft",
-      "location": "Devanahalli, Bangalore",
-      "possession": "Jun 2026 Onwards",
-      "priceRange": "₹85 L - ₹1.80 Cr",
-      "status": "New Launch"
-    },
-    {
-      "id": 3,
-      "title": "PRESTIGE CITY SARJAPUR",
-      "image": "https://picsum.photos/seed/prestige/600/400",
-      "area": "1100 sqft to 2200 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Mar 2027 Onwards",
-      "priceRange": "₹75 L - ₹1.60 Cr",
-      "status": "Under Construction"
-    },
-    {
-      "id": 4,
-      "title": "SOBHA ROYAL PAVILION",
-      "image": "https://picsum.photos/seed/sobha/600/400",
-      "area": "1300 sqft to 2500 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Ready to Move",
-      "priceRange": "₹1.10 Cr - ₹2.10 Cr",
-      "status": "Ready"
-    },
-    {
-      "id": 1,
-      "title": "PURVA SILVERSKY ELECTRONIC CITY",
-      "image": "https://picsum.photos/seed/purva/600/400",
-      "area": "1370 sqft to 3700 sqft",
-      "location": "Electronic City, Bangalore",
-      "possession": "Dec 2029 Onwards",
-      "priceRange": "₹1.25 Cr - ₹3.20 Cr",
-      "status": "Pre-Launch"
-    },
-    {
-      "id": 2,
-      "title": "BRIGADE ORCHARD",
-      "image": "https://picsum.photos/seed/brigade/600/400",
-      "area": "1200 sqft to 2400 sqft",
-      "location": "Devanahalli, Bangalore",
-      "possession": "Jun 2026 Onwards",
-      "priceRange": "₹85 L - ₹1.80 Cr",
-      "status": "New Launch"
-    },
-    {
-      "id": 3,
-      "title": "PRESTIGE CITY SARJAPUR",
-      "image": "https://picsum.photos/seed/prestige/600/400",
-      "area": "1100 sqft to 2200 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Mar 2027 Onwards",
-      "priceRange": "₹75 L - ₹1.60 Cr",
-      "status": "Under Construction"
-    },
-    {
-      "id": 4,
-      "title": "SOBHA ROYAL PAVILION",
-      "image": "https://picsum.photos/seed/sobha/600/400",
-      "area": "1300 sqft to 2500 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Ready to Move",
-      "priceRange": "₹1.10 Cr - ₹2.10 Cr",
-      "status": "Ready"
-    },
-    {
-      "id": 1,
-      "title": "PURVA SILVERSKY ELECTRONIC CITY",
-      "image": "https://picsum.photos/seed/purva/600/400",
-      "area": "1370 sqft to 3700 sqft",
-      "location": "Electronic City, Bangalore",
-      "possession": "Dec 2029 Onwards",
-      "priceRange": "₹1.25 Cr - ₹3.20 Cr",
-      "status": "Pre-Launch"
-    },
-    {
-      "id": 2,
-      "title": "BRIGADE ORCHARD",
-      "image": "https://picsum.photos/seed/brigade/600/400",
-      "area": "1200 sqft to 2400 sqft",
-      "location": "Devanahalli, Bangalore",
-      "possession": "Jun 2026 Onwards",
-      "priceRange": "₹85 L - ₹1.80 Cr",
-      "status": "New Launch"
-    },
-    {
-      "id": 3,
-      "title": "PRESTIGE CITY SARJAPUR",
-      "image": "https://picsum.photos/seed/prestige/600/400",
-      "area": "1100 sqft to 2200 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Mar 2027 Onwards",
-      "priceRange": "₹75 L - ₹1.60 Cr",
-      "status": "Under Construction"
-    },
-    {
-      "id": 4,
-      "title": "SOBHA ROYAL PAVILION",
-      "image": "https://picsum.photos/seed/sobha/600/400",
-      "area": "1300 sqft to 2500 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Ready to Move",
-      "priceRange": "₹1.10 Cr - ₹2.10 Cr",
-      "status": "Ready"
-    },
-    {
-      "id": 1,
-      "title": "PURVA SILVERSKY ELECTRONIC CITY",
-      "image": "https://picsum.photos/seed/purva/600/400",
-      "area": "1370 sqft to 3700 sqft",
-      "location": "Electronic City, Bangalore",
-      "possession": "Dec 2029 Onwards",
-      "priceRange": "₹1.25 Cr - ₹3.20 Cr",
-      "status": "Pre-Launch"
-    },
-    {
-      "id": 2,
-      "title": "BRIGADE ORCHARD",
-      "image": "https://picsum.photos/seed/brigade/600/400",
-      "area": "1200 sqft to 2400 sqft",
-      "location": "Devanahalli, Bangalore",
-      "possession": "Jun 2026 Onwards",
-      "priceRange": "₹85 L - ₹1.80 Cr",
-      "status": "New Launch"
-    },
-    {
-      "id": 3,
-      "title": "PRESTIGE CITY SARJAPUR",
-      "image": "https://picsum.photos/seed/prestige/600/400",
-      "area": "1100 sqft to 2200 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Mar 2027 Onwards",
-      "priceRange": "₹75 L - ₹1.60 Cr",
-      "status": "Under Construction"
-    },
-    {
-      "id": 4,
-      "title": "SOBHA ROYAL PAVILION",
-      "image": "https://picsum.photos/seed/sobha/600/400",
-      "area": "1300 sqft to 2500 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Ready to Move",
-      "priceRange": "₹1.10 Cr - ₹2.10 Cr",
-      "status": "Ready"
-    },
-    {
-      "id": 1,
-      "title": "PURVA SILVERSKY ELECTRONIC CITY",
-      "image": "https://picsum.photos/seed/purva/600/400",
-      "area": "1370 sqft to 3700 sqft",
-      "location": "Electronic City, Bangalore",
-      "possession": "Dec 2029 Onwards",
-      "priceRange": "₹1.25 Cr - ₹3.20 Cr",
-      "status": "Pre-Launch"
-    },
-    {
-      "id": 2,
-      "title": "BRIGADE ORCHARD",
-      "image": "https://picsum.photos/seed/brigade/600/400",
-      "area": "1200 sqft to 2400 sqft",
-      "location": "Devanahalli, Bangalore",
-      "possession": "Jun 2026 Onwards",
-      "priceRange": "₹85 L - ₹1.80 Cr",
-      "status": "New Launch"
-    },
-    {
-      "id": 3,
-      "title": "PRESTIGE CITY SARJAPUR",
-      "image": "https://picsum.photos/seed/prestige/600/400",
-      "area": "1100 sqft to 2200 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Mar 2027 Onwards",
-      "priceRange": "₹75 L - ₹1.60 Cr",
-      "status": "Under Construction"
-    },
-    {
-      "id": 4,
-      "title": "SOBHA ROYAL PAVILION",
-      "image": "https://picsum.photos/seed/sobha/600/400",
-      "area": "1300 sqft to 2500 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Ready to Move",
-      "priceRange": "₹1.10 Cr - ₹2.10 Cr",
-      "status": "Ready"
-    },
-    {
-      "id": 1,
-      "title": "PURVA SILVERSKY ELECTRONIC CITY",
-      "image": "https://picsum.photos/seed/purva/600/400",
-      "area": "1370 sqft to 3700 sqft",
-      "location": "Electronic City, Bangalore",
-      "possession": "Dec 2029 Onwards",
-      "priceRange": "₹1.25 Cr - ₹3.20 Cr",
-      "status": "Pre-Launch"
-    },
-    {
-      "id": 2,
-      "title": "BRIGADE ORCHARD",
-      "image": "https://picsum.photos/seed/brigade/600/400",
-      "area": "1200 sqft to 2400 sqft",
-      "location": "Devanahalli, Bangalore",
-      "possession": "Jun 2026 Onwards",
-      "priceRange": "₹85 L - ₹1.80 Cr",
-      "status": "New Launch"
-    },
-    {
-      "id": 3,
-      "title": "PRESTIGE CITY SARJAPUR",
-      "image": "https://picsum.photos/seed/prestige/600/400",
-      "area": "1100 sqft to 2200 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Mar 2027 Onwards",
-      "priceRange": "₹75 L - ₹1.60 Cr",
-      "status": "Under Construction"
-    },
-    {
-      "id": 4,
-      "title": "SOBHA ROYAL PAVILION",
-      "image": "https://picsum.photos/seed/sobha/600/400",
-      "area": "1300 sqft to 2500 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Ready to Move",
-      "priceRange": "₹1.10 Cr - ₹2.10 Cr",
-      "status": "Ready"
-    },
-    {
-      "id": 1,
-      "title": "PURVA SILVERSKY ELECTRONIC CITY",
-      "image": "https://picsum.photos/seed/purva/600/400",
-      "area": "1370 sqft to 3700 sqft",
-      "location": "Electronic City, Bangalore",
-      "possession": "Dec 2029 Onwards",
-      "priceRange": "₹1.25 Cr - ₹3.20 Cr",
-      "status": "Pre-Launch"
-    },
-    {
-      "id": 2,
-      "title": "BRIGADE ORCHARD",
-      "image": "https://picsum.photos/seed/brigade/600/400",
-      "area": "1200 sqft to 2400 sqft",
-      "location": "Devanahalli, Bangalore",
-      "possession": "Jun 2026 Onwards",
-      "priceRange": "₹85 L - ₹1.80 Cr",
-      "status": "New Launch"
-    },
-    {
-      "id": 3,
-      "title": "PRESTIGE CITY SARJAPUR",
-      "image": "https://picsum.photos/seed/prestige/600/400",
-      "area": "1100 sqft to 2200 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Mar 2027 Onwards",
-      "priceRange": "₹75 L - ₹1.60 Cr",
-      "status": "Under Construction"
-    },
-    {
-      "id": 4,
-      "title": "SOBHA ROYAL PAVILION",
-      "image": "https://picsum.photos/seed/sobha/600/400",
-      "area": "1300 sqft to 2500 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Ready to Move",
-      "priceRange": "₹1.10 Cr - ₹2.10 Cr",
-      "status": "Ready"
-    },
-    {
-      "id": 1,
-      "title": "PURVA SILVERSKY ELECTRONIC CITY",
-      "image": "https://picsum.photos/seed/purva/600/400",
-      "area": "1370 sqft to 3700 sqft",
-      "location": "Electronic City, Bangalore",
-      "possession": "Dec 2029 Onwards",
-      "priceRange": "₹1.25 Cr - ₹3.20 Cr",
-      "status": "Pre-Launch"
-    },
-    {
-      "id": 2,
-      "title": "BRIGADE ORCHARD",
-      "image": "https://picsum.photos/seed/brigade/600/400",
-      "area": "1200 sqft to 2400 sqft",
-      "location": "Devanahalli, Bangalore",
-      "possession": "Jun 2026 Onwards",
-      "priceRange": "₹85 L - ₹1.80 Cr",
-      "status": "New Launch"
-    },
-    {
-      "id": 3,
-      "title": "PRESTIGE CITY SARJAPUR",
-      "image": "https://picsum.photos/seed/prestige/600/400",
-      "area": "1100 sqft to 2200 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Mar 2027 Onwards",
-      "priceRange": "₹75 L - ₹1.60 Cr",
-      "status": "Under Construction"
-    },
-    {
-      "id": 4,
-      "title": "SOBHA ROYAL PAVILION",
-      "image": "https://picsum.photos/seed/sobha/600/400",
-      "area": "1300 sqft to 2500 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Ready to Move",
-      "priceRange": "₹1.10 Cr - ₹2.10 Cr",
-      "status": "Ready"
-    },
-    {
-      "id": 1,
-      "title": "PURVA SILVERSKY ELECTRONIC CITY",
-      "image": "https://picsum.photos/seed/purva/600/400",
-      "area": "1370 sqft to 3700 sqft",
-      "location": "Electronic City, Bangalore",
-      "possession": "Dec 2029 Onwards",
-      "priceRange": "₹1.25 Cr - ₹3.20 Cr",
-      "status": "Pre-Launch"
-    },
-    {
-      "id": 2,
-      "title": "BRIGADE ORCHARD",
-      "image": "https://picsum.photos/seed/brigade/600/400",
-      "area": "1200 sqft to 2400 sqft",
-      "location": "Devanahalli, Bangalore",
-      "possession": "Jun 2026 Onwards",
-      "priceRange": "₹85 L - ₹1.80 Cr",
-      "status": "New Launch"
-    },
-    {
-      "id": 3,
-      "title": "PRESTIGE CITY SARJAPUR",
-      "image": "https://picsum.photos/seed/prestige/600/400",
-      "area": "1100 sqft to 2200 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Mar 2027 Onwards",
-      "priceRange": "₹75 L - ₹1.60 Cr",
-      "status": "Under Construction"
-    },
-    {
-      "id": 4,
-      "title": "SOBHA ROYAL PAVILION",
-      "image": "https://picsum.photos/seed/sobha/600/400",
-      "area": "1300 sqft to 2500 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Ready to Move",
-      "priceRange": "₹1.10 Cr - ₹2.10 Cr",
-      "status": "Ready"
-    },
-    {
-      "id": 1,
-      "title": "PURVA SILVERSKY ELECTRONIC CITY",
-      "image": "https://picsum.photos/seed/purva/600/400",
-      "area": "1370 sqft to 3700 sqft",
-      "location": "Electronic City, Bangalore",
-      "possession": "Dec 2029 Onwards",
-      "priceRange": "₹1.25 Cr - ₹3.20 Cr",
-      "status": "Pre-Launch"
-    },
-    {
-      "id": 2,
-      "title": "BRIGADE ORCHARD",
-      "image": "https://picsum.photos/seed/brigade/600/400",
-      "area": "1200 sqft to 2400 sqft",
-      "location": "Devanahalli, Bangalore",
-      "possession": "Jun 2026 Onwards",
-      "priceRange": "₹85 L - ₹1.80 Cr",
-      "status": "New Launch"
-    },
-    {
-      "id": 3,
-      "title": "PRESTIGE CITY SARJAPUR",
-      "image": "https://picsum.photos/seed/prestige/600/400",
-      "area": "1100 sqft to 2200 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Mar 2027 Onwards",
-      "priceRange": "₹75 L - ₹1.60 Cr",
-      "status": "Under Construction"
-    },
-    {
-      "id": 4,
-      "title": "SOBHA ROYAL PAVILION",
-      "image": "https://picsum.photos/seed/sobha/600/400",
-      "area": "1300 sqft to 2500 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Ready to Move",
-      "priceRange": "₹1.10 Cr - ₹2.10 Cr",
-      "status": "Ready"
-    },
-    {
-      "id": 1,
-      "title": "PURVA SILVERSKY ELECTRONIC CITY",
-      "image": "https://picsum.photos/seed/purva/600/400",
-      "area": "1370 sqft to 3700 sqft",
-      "location": "Electronic City, Bangalore",
-      "possession": "Dec 2029 Onwards",
-      "priceRange": "₹1.25 Cr - ₹3.20 Cr",
-      "status": "Pre-Launch"
-    },
-    {
-      "id": 2,
-      "title": "BRIGADE ORCHARD",
-      "image": "https://picsum.photos/seed/brigade/600/400",
-      "area": "1200 sqft to 2400 sqft",
-      "location": "Devanahalli, Bangalore",
-      "possession": "Jun 2026 Onwards",
-      "priceRange": "₹85 L - ₹1.80 Cr",
-      "status": "New Launch"
-    },
-    {
-      "id": 3,
-      "title": "PRESTIGE CITY SARJAPUR",
-      "image": "https://picsum.photos/seed/prestige/600/400",
-      "area": "1100 sqft to 2200 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Mar 2027 Onwards",
-      "priceRange": "₹75 L - ₹1.60 Cr",
-      "status": "Under Construction"
-    },
-    {
-      "id": 4,
-      "title": "SOBHA ROYAL PAVILION",
-      "image": "https://picsum.photos/seed/sobha/600/400",
-      "area": "1300 sqft to 2500 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Ready to Move",
-      "priceRange": "₹1.10 Cr - ₹2.10 Cr",
-      "status": "Ready"
-    },
-    {
-      "id": 1,
-      "title": "PURVA SILVERSKY ELECTRONIC CITY",
-      "image": "https://picsum.photos/seed/purva/600/400",
-      "area": "1370 sqft to 3700 sqft",
-      "location": "Electronic City, Bangalore",
-      "possession": "Dec 2029 Onwards",
-      "priceRange": "₹1.25 Cr - ₹3.20 Cr",
-      "status": "Pre-Launch"
-    },
-    {
-      "id": 2,
-      "title": "BRIGADE ORCHARD",
-      "image": "https://picsum.photos/seed/brigade/600/400",
-      "area": "1200 sqft to 2400 sqft",
-      "location": "Devanahalli, Bangalore",
-      "possession": "Jun 2026 Onwards",
-      "priceRange": "₹85 L - ₹1.80 Cr",
-      "status": "New Launch"
-    },
-    {
-      "id": 3,
-      "title": "PRESTIGE CITY SARJAPUR",
-      "image": "https://picsum.photos/seed/prestige/600/400",
-      "area": "1100 sqft to 2200 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Mar 2027 Onwards",
-      "priceRange": "₹75 L - ₹1.60 Cr",
-      "status": "Under Construction"
-    },
-    {
-      "id": 4,
-      "title": "SOBHA ROYAL PAVILION",
-      "image": "https://picsum.photos/seed/sobha/600/400",
-      "area": "1300 sqft to 2500 sqft",
-      "location": "Sarjapur Road, Bangalore",
-      "possession": "Ready to Move",
-      "priceRange": "₹1.10 Cr - ₹2.10 Cr",
-      "status": "Ready"
+      "slug": "godrej-air-hoodi",
+      "title": "Godrej Air",
+      "category": "flat",
+      "status": "new",
+      "developer": "Godrej Properties",
+      "location": {
+        "area": "Hoodi",
+        "city": "Bangalore",
+        "address": "Hoodi Main Road",
+        "latitude": 12.9956,
+        "longitude": 77.7158
+      },
+      "images": [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914"
+      ],
+      "area": "900 – 1600 sqft",
+      "possession": "2025",
+      "price": {
+        "min": 9000000,
+        "max": 16000000,
+        "display": "₹90 L – ₹1.6 Cr"
+      },
+      "configuration": [],
+      "amenities": [],
+      "connectivity": {}
+    },
+
+    {
+      "id": 5,
+      "slug": "brigade-cornerstone-uttarahalli",
+      "title": "Brigade Cornerstone",
+      "category": "flat",
+      "status": "ready",
+      "developer": "Brigade Group",
+      "location": {
+        "area": "Uttarahalli",
+        "city": "Bangalore",
+        "address": "Uttarahalli Main Road",
+        "latitude": 12.9066,
+        "longitude": 77.545
+      },
+      "images": [
+        "https://images.unsplash.com/photo-1568605114967-8130f3a36994"
+      ],
+      "area": "1100 – 2000 sqft",
+      "possession": "Ready",
+      "price": {
+        "min": 10000000,
+        "max": 22000000,
+        "display": "₹1.0 Cr – ₹2.2 Cr"
+      },
+      "configuration": [],
+      "amenities": [],
+      "connectivity": {}
+    },
+    {
+      "id": 13,
+      "slug": "sobha-royal-pavilion-sarjapur",
+      "title": "Sobha Royal Pavilion",
+      "category": "villa",
+      "status": "ready",
+      "developer": "Sobha Ltd",
+      "location": {
+        "area": "Sarjapur Road",
+        "city": "Bangalore",
+        "address": "Sarjapur Road",
+        "latitude": 12.8584,
+        "longitude": 77.7812
+      },
+      "images": [
+        "https://images.unsplash.com/photo-1600585154340-be6161a56a0c"
+      ],
+      "area": "2500 – 4000 sqft",
+      "possession": "Ready",
+      "price": {
+        "min": 28000000,
+        "max": 45000000,
+        "display": "₹2.8 Cr – ₹4.5 Cr"
+      },
+      "configuration": [],
+      "amenities": [],
+      "connectivity": {}
+    },
+    {
+      "id": 21,
+      "slug": "shriram-chirping-woods-sarjapur",
+      "title": "Shriram Chirping Woods Villas",
+      "category": "villa",
+      "status": "ready",
+      "developer": "Shriram Properties",
+      "location": {
+        "area": "Sarjapur Road",
+        "city": "Bangalore",
+        "address": "Off Sarjapur Road",
+        "latitude": 12.8487,
+        "longitude": 77.7849
+      },
+      "images": [
+        "https://images.unsplash.com/photo-1613977257363-707ba9348227"
+      ],
+      "configuration": ["3 BHK", "4 BHK"],
+      "area": "2700 – 4100 sqft",
+      "possession": "Ready",
+      "price": {
+        "min": 29000000,
+        "max": 42000000,
+        "display": "₹2.9 Cr – ₹4.2 Cr"
+      },
+      "amenities": ["Green Living", "Jogging Track"],
+      "connectivity": { "metro": "5 km", "bus": "600 m", "railway": "12 km" }
+    },
+    {
+      "id": 22,
+      "slug": "prestige-glenwood-budigere",
+      "title": "Prestige Glenwood",
+      "category": "villa",
+      "status": "resale",
+      "developer": "Prestige Group",
+      "location": {
+        "area": "Budigere Cross",
+        "city": "Bangalore",
+        "address": "Budigere Road",
+        "latitude": 13.0453,
+        "longitude": 77.7472
+      },
+      "images": [
+        "https://images.unsplash.com/photo-1568605114967-8130f3a36994"
+      ],
+      "configuration": ["4 BHK"],
+      "area": "3300 – 5000 sqft",
+      "possession": "Immediate",
+      "price": {
+        "min": 38000000,
+        "max": 59000000,
+        "display": "₹3.8 Cr – ₹5.9 Cr"
+      },
+      "amenities": ["Large Lawns", "Clubhouse"],
+      "connectivity": { "metro": "7 km", "bus": "1 km", "railway": "14 km" }
+    },
+    {
+      "id": 23,
+      "slug": "concorde-napa-valley-kanakapura",
+      "title": "Concorde Napa Valley Villas",
+      "category": "villa",
+      "status": "new",
+      "developer": "Concorde Group",
+      "location": {
+        "area": "Kanakapura Road",
+        "city": "Bangalore",
+        "address": "Kanakapura Main Road",
+        "latitude": 12.7486,
+        "longitude": 77.5662
+      },
+      "images": [
+        "https://images.unsplash.com/photo-1598228723793-52759bba239c"
+      ],
+      "configuration": ["3 BHK", "4 BHK"],
+      "area": "2900 – 4300 sqft",
+      "possession": "2026",
+      "price": {
+        "min": 25000000,
+        "max": 41000000,
+        "display": "₹2.5 Cr – ₹4.1 Cr"
+      },
+      "amenities": ["Vineyard Living", "Nature Trails"],
+      "connectivity": { "metro": "8 km", "bus": "900 m", "railway": "16 km" }
+    },
+    {
+      "id": 24,
+      "slug": "sobha-lifestyle-legacy-devanahalli",
+      "title": "Sobha Lifestyle Legacy",
+      "category": "villa",
+      "status": "ready",
+      "developer": "Sobha",
+      "location": {
+        "area": "Devanahalli",
+        "city": "Bangalore",
+        "address": "Devanahalli North",
+        "latitude": 13.2321,
+        "longitude": 77.7148
+      },
+      "images": [
+        "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c"
+      ],
+      "configuration": ["4 BHK", "5 BHK"],
+      "area": "3600 – 6500 sqft",
+      "possession": "Ready",
+      "price": {
+        "min": 49000000,
+        "max": 82000000,
+        "display": "₹4.9 Cr – ₹8.2 Cr"
+      },
+      "amenities": ["Luxury Community", "Private Gardens"],
+      "connectivity": { "metro": "9 km", "bus": "1.2 km", "railway": "15 km" }
+    },
+    {
+      "id": 26,
+      "slug": "prestige-great-acres-sarjapur",
+      "title": "Prestige Great Acres",
+      "category": "plot",
+      "status": "upcoming",
+      "developer": "Prestige Group",
+      "location": {
+        "area": "Sarjapur",
+        "city": "Bangalore",
+        "address": "Sarjapur – Attibele Road",
+        "latitude": 12.8584,
+        "longitude": 77.7812
+      },
+      "images": [
+        "https://www.homznspace.com/wp-content/uploads/2021/08/Clubhouse-Prestige-Great-Acres-Prestige-Smart-City.jpg"
+      ],
+      "area": "1500 – 4000 sqft",
+      "possession": "2026",
+      "price": {
+        "min": 7000000,
+        "max": 18000000,
+        "display": "₹70 L – ₹1.8 Cr"
+      },
+      "configuration": [],
+      "amenities": [],
+      "connectivity": {}
+    },
+    {
+      "id": 27,
+      "slug": "brigade-golden-triangle-devanahalli",
+      "title": "Brigade Golden Triangle",
+      "category": "plot",
+      "status": "new",
+      "developer": "Brigade Group",
+      "location": {
+        "area": "Devanahalli",
+        "city": "Bangalore",
+        "address": "NH 44, Devanahalli",
+        "latitude": 13.2281,
+        "longitude": 77.7069
+      },
+      "images": [
+        "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee"
+      ],
+      "area": "1200 – 3000 sqft",
+      "possession": "2025",
+      "price": {
+        "min": 6000000,
+        "max": 15000000,
+        "display": "₹60 L – ₹1.5 Cr"
+      },
+      "amenities": ["Gated Layout", "Street Lighting"],
+      "connectivity": { "metro": "8 km", "bus": "1 km", "railway": "15 km" },
+      "configuration": []
+    },
+
+    {
+      "id": 37,
+      "slug": "lodha-mirabelle-phase-2",
+      "title": "Lodha Mirabelle Phase 2",
+      "category": "flat",
+      "status": "upcoming",
+      "developer": "Lodha Group",
+      "location": {
+        "area": "Hebbal",
+        "city": "Bangalore",
+        "address": "Hebbal Flyover",
+        "latitude": 13.0358,
+        "longitude": 77.597
+      },
+      "images": [
+        "https://images.unsplash.com/photo-1586105251261-72a756497a11"
+      ],
+      "area": "1300 – 2200 sqft",
+      "possession": "2028",
+      "price": {
+        "min": 14000000,
+        "max": 26000000,
+        "display": "₹1.4 Cr – ₹2.6 Cr"
+      },
+      "configuration": [],
+      "amenities": [],
+      "connectivity": {}
+    },
+
+    {
+      "id": 49,
+      "slug": "sobha-city-resale-thanisandra",
+      "title": "Sobha City 3BHK Resale",
+      "category": "flat",
+      "status": "resale",
+      "developer": "Sobha Ltd",
+      "location": {
+        "area": "Thanisandra",
+        "city": "Bangalore",
+        "address": "Thanisandra Main Road",
+        "latitude": 13.0605,
+        "longitude": 77.6335
+      },
+      "images": [
+        "https://images.unsplash.com/photo-1570129477492-45c003edd2be"
+      ],
+      "area": "1650 sqft",
+      "possession": "Immediate",
+      "price": { "min": 16000000, "max": 16000000, "display": "₹1.6 Cr" },
+      "configuration": [],
+      "amenities": [],
+      "connectivity": {}
     }
   ]
 }
