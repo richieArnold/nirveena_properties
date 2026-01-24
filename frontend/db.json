@@ -390,6 +390,254 @@
       "configuration": [],
       "amenities": [],
       "connectivity": {}
-    }
+    },
+    {
+      "id": 50,
+      "slug": "sobha-city-resale-thanisandra",
+      "title": "Sobha City 3BHK Resale",
+      "category": "Aparments",
+      "status": "resale",
+      "developer": "Sobha Ltd",
+      "location": {
+        "area": "Thanisandra",
+        "city": "Bangalore",
+        "address": "Thanisandra Main Road",
+        "latitude": 13.0605,
+        "longitude": 77.6335
+      },
+      "images": [
+        "https://images.unsplash.com/photo-1570129477492-45c003edd2be"
+      ],
+      "area": "1650 sqft",
+      "possession": "Immediate",
+      "price": { "min": 16000000, "max": 16000000, "display": "₹1.6 Cr" },
+      "configuration": [],
+      "amenities": [],
+      "connectivity": {}
+    },
+    {
+      "id": 51,
+      "slug": "brigade-golden-triangle-devanahalli",
+      "title": "Brigade Golden Triangle",
+      "category": "plot",
+      "status": "new",
+      "developer": "Brigade Group",
+      "location": {
+        "area": "Devanahalli",
+        "city": "Bangalore",
+        "address": "NH 44, Devanahalli",
+        "latitude": 13.2281,
+        "longitude": 77.7069
+      },
+      "images": [
+        "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee"
+      ],
+      "area": "1200 – 3000 sqft",
+      "possession": "2025",
+      "price": {
+        "min": 6000000,
+        "max": 15000000,
+        "display": "₹60 L – ₹1.5 Cr"
+      },
+      "amenities": ["Gated Layout", "Street Lighting"],
+      "connectivity": { "metro": "8 km", "bus": "1 km", "railway": "15 km" },
+      "configuration": []
+    },
+{
+  "id": 38,
+  "title": "Prestige City Phase 3",
+  "category": "flat",
+  "status": "upcoming",
+  "developer": "Prestige Group",
+  "location": {
+    "area": "Sarjapur Road",
+    "city": "Bangalore"
+  },
+  "images": ["https://images.unsplash.com/photo-1600607687939-ce8a6c25118c"],
+  "area": "1300 – 2400 sqft",
+  "possession": "2028",
+  "price": {
+    "min": 15000000,
+    "max": 28000000,
+    "display": "₹1.5 Cr – ₹2.8 Cr"
+  },
+  "configuration": ["2 BHK", "3 BHK", "4 BHK"]
+},
+{
+  "id": 39,
+  "title": "Sobha Silicon Oasis",
+  "category": "flat",
+  "status": "upcoming",
+  "developer": "Sobha Ltd",
+  "location": {
+    "area": "Whitefield",
+    "city": "Bangalore"
+  },
+  "images": ["https://images.unsplash.com/photo-1586105251261-72a756497a11"],
+  "area": "1400 – 2200 sqft",
+  "possession": "2029",
+  "price": {
+    "min": 16000000,
+    "max": 26000000,
+    "display": "₹1.6 Cr – ₹2.6 Cr"
+  },
+  "configuration": ["3 BHK", "4 BHK"]
+},
+{
+  "id": 52,
+  "title": "Prestige Shantiniketan 4BHK",
+  "category": "flat",
+  "status": "resale",
+  "developer": "Prestige Group",
+  "location": {
+    "area": "Whitefield",
+    "city": "Bangalore"
+  },
+  "images": ["https://images.unsplash.com/photo-1570129477492-45c003edd2be"],
+  "area": "2100 sqft",
+  "possession": "Immediate",
+  "price": {
+    "min": 22000000,
+    "max": 22000000,
+    "display": "₹2.2 Cr"
+  },
+  "configuration": ["4 BHK"]
+},
+{
+  "id": 28,
+  "title": "Godrej Nature Plus Plots",
+  "category": "plot",
+  "status": "new",
+  "developer": "Godrej Properties",
+  "location": {
+    "area": "Kanakapura Road",
+    "city": "Bangalore"
+  },
+  "images": ["https://images.unsplash.com/photo-1505775561242-727b7fba20f0"],
+  "area": "1200 – 4000 sqft",
+  "possession": "2026",
+  "price": {
+    "min": 8000000,
+    "max": 25000000,
+    "display": "₹80 L – ₹2.5 Cr"
+  }
+},
+{
+  "id": 29,
+  "title": "Mahindra Lifespaces Plots",
+  "category": "plot",
+  "status": "upcoming",
+  "developer": "Mahindra Group",
+  "location": {
+    "area": "Yelahanka",
+    "city": "Bangalore"
+  },
+  "images": ["https://images.unsplash.com/photo-1545324418-cc1a3fa10c00"],
+  "area": "1500 – 3500 sqft",
+  "possession": "2027",
+  "price": {
+    "min": 7500000,
+    "max": 18000000,
+    "display": "₹75 L – ₹1.8 Cr"
+  }
+},
+{
+  "id": 28,
+  "title": "Godrej Nature Plus Plots",
+  "category": "plot",
+  "status": "new",
+  "developer": "Godrej Properties",
+  "location": {
+    "area": "Kanakapura Road",
+    "city": "Bangalore"
+  },
+  "images": ["https://images.unsplash.com/photo-1505775561242-727b7fba20f0"],
+  "area": "1200 – 4000 sqft",
+  "possession": "2026",
+  "price": {
+    "min": 8000000,
+    "max": 25000000,
+    "display": "₹80 L – ₹2.5 Cr"
+  }
+},
+{
+  "id": 29,
+  "title": "Mahindra Lifespaces Plots",
+  "category": "plot",
+  "status": "upcoming",
+  "developer": "Mahindra Group",
+  "location": {
+    "area": "Yelahanka",
+    "city": "Bangalore"
+  },
+  "images": ["https://images.unsplash.com/photo-1545324418-cc1a3fa10c00"],
+  "area": "1500 – 3500 sqft",
+  "possession": "2027",
+  "price": {
+    "min": 7500000,
+    "max": 18000000,
+    "display": "₹75 L – ₹1.8 Cr"
+  }
+},
+{
+  "id": 38,
+  "title": "Prestige City Phase 3",
+  "category": "flat",
+  "status": "upcoming",
+  "developer": "Prestige Group",
+  "location": {
+    "area": "Sarjapur Road",
+    "city": "Bangalore"
+  },
+  "images": ["https://images.unsplash.com/photo-1600607687939-ce8a6c25118c"],
+  "area": "1300 – 2400 sqft",
+  "possession": "2028",
+  "price": {
+    "min": 15000000,
+    "max": 28000000,
+    "display": "₹1.5 Cr – ₹2.8 Cr"
+  },
+  "configuration": ["2 BHK", "3 BHK", "4 BHK"]
+},
+{
+  "id": 39,
+  "title": "Sobha Silicon Oasis",
+  "category": "flat",
+  "status": "upcoming",
+  "developer": "Sobha Ltd",
+  "location": {
+    "area": "Whitefield",
+    "city": "Bangalore"
+  },
+  "images": ["https://images.unsplash.com/photo-1586105251261-72a756497a11"],
+  "area": "1400 – 2200 sqft",
+  "possession": "2029",
+  "price": {
+    "min": 16000000,
+    "max": 26000000,
+    "display": "₹1.6 Cr – ₹2.6 Cr"
+  },
+  "configuration": ["3 BHK", "4 BHK"]
+},
+{
+  "id": 52,
+  "title": "Prestige Shantiniketan 4BHK",
+  "category": "flat",
+  "status": "resale",
+  "developer": "Prestige Group",
+  "location": {
+    "area": "Whitefield",
+    "city": "Bangalore"
+  },
+  "images": ["https://images.unsplash.com/photo-1570129477492-45c003edd2be"],
+  "area": "2100 sqft",
+  "possession": "Immediate",
+  "price": {
+    "min": 22000000,
+    "max": 22000000,
+    "display": "₹2.2 Cr"
+  },
+  "configuration": ["4 BHK"]
+}
   ]
 }
