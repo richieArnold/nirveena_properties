@@ -85,6 +85,38 @@ const amenities = [
   { id: 11, title: "Badminton Court", icon: SvgIcons.BadmintonCourt },
   { id: 12, title: "Basketball Court", icon: SvgIcons.BasketballCourt },
 ];
+// Enhanced animation variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2,
+    }
+  }
+};
+
+const cardVariants = {
+  hidden: { 
+    opacity: 0, 
+    y: 30,
+    scale: 0.8,
+    rotateX: -10
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    rotateX: 0,
+    transition: {
+      type: "spring",
+      stiffness: 100,
+      damping: 12,
+      duration: 0.6
+    }
+  }
+};
 
 const AmenitiesCard = ({ amenity, isActive }) => {
   const cardRef = useRef(null);
@@ -97,7 +129,11 @@ const AmenitiesCard = ({ amenity, isActive }) => {
         scale: isActive ? 1.1 : 0.9,
         y: isActive ? -10 : 0,
       }}
-      transition={{ duration: 0.3 }}
+      whileHover={{
+        scale: isActive ? 1.15 : 1,
+        transition: { duration: 0.2 }
+      }}
+      transition={{ duration: 0.3, type: "spring" }}
     >
       <div className={`
         relative p-6 text-center bg-white rounded-xl shadow-sm transition-all duration-300 border
@@ -115,11 +151,15 @@ const AmenitiesCard = ({ amenity, isActive }) => {
         
         {/* Icon */}
         <div className="mb-4">
-          <div className={`transition-colors duration-300 ${
-            isActive ? 'text-blue-600 scale-110' : 'text-blue-500'
-          }`}>
+          <motion.div 
+            className={`transition-colors duration-300 ${
+              isActive ? 'text-blue-600 scale-110' : 'text-blue-500'
+            }`}
+            whileHover={{ rotate: 5 }}
+            transition={{ type: "spring", stiffness: 200 }}
+          >
             <amenity.icon />
-          </div>
+          </motion.div>
         </div>
         
         {/* Main Title */}
@@ -140,7 +180,12 @@ const AmenitiesCard = ({ amenity, isActive }) => {
 
         {/* Active indicator */}
         {isActive && (
-          <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-linear-to-r from-blue-500 to-purple-500 rounded-full" />
+          <motion.div 
+            className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-linear-to-r from-blue-500 to-purple-500 rounded-full"
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 0.3 }}
+          />
         )}
       </div>
     </motion.div>
@@ -150,7 +195,12 @@ const AmenitiesCard = ({ amenity, isActive }) => {
 const Amenities = () => {
   const sectionRef = useRef(null);
   const scrollContainerRef = useRef(null);
-  const isInView = useInView(sectionRef, { once: true });
+  const isInView = useInView(sectionRef, { 
+    once: true, 
+    amount: 0.3, // Triggers when 30% of section is visible
+    margin: "-100px" // Starts animation a bit before section is fully in view
+  });
+  
   const [activeIndex, setActiveIndex] = useState(5); // Start with center item active
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
@@ -197,17 +247,25 @@ const Amenities = () => {
   return (
     <section ref={sectionRef} className="py-16 bg-linear-to-b from-gray-50 to-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
+        {/* Header with enhanced animations */}
         <motion.div
           className="text-center mb-12"
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 50 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
+          transition={{ 
+            duration: 0.8,
+            ease: "easeOut",
+            delay: 0.1
+          }}
         >
           <motion.h2
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.1 }}
+            transition={{ 
+              duration: 0.7,
+              ease: [0.22, 1, 0.36, 1], // Custom bezier curve for smooth animation
+              delay: 0.2
+            }}
             className="text-3xl md:text-4xl font-bold text-gray-900 mb-3"
           >
             <span className="bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -218,37 +276,62 @@ const Amenities = () => {
           <motion.div
             initial={{ opacity: 0, scaleX: 0 }}
             animate={isInView ? { opacity: 1, scaleX: 1 } : {}}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ 
+              duration: 0.8,
+              ease: "easeOut",
+              delay: 0.3
+            }}
             className="w-32 h-1 bg-linear-to-r from-blue-500 to-purple-500 mx-auto mb-6"
           />
           
           <motion.p
             initial={{ opacity: 0 }}
             animate={isInView ? { opacity: 1 } : {}}
-            transition={{ duration: 0.6, delay: 0.3 }}
+            transition={{ 
+              duration: 0.6,
+              delay: 0.4
+            }}
             className="text-gray-600 max-w-2xl mx-auto text-sm uppercase tracking-wider"
           >
             World-Class Facilities | Premium Experience
           </motion.p>
         </motion.div>
 
-        {/* Horizontal Scrolling Container */}
-        <div className="relative">
-          {/* Left Gradient Fade */}
-          <div className="absolute left-0 top-0 bottom-0 w-24 bg-linear-to-r from-gray-50 to-transparent z-10 pointer-events-none" />
+        {/* Horizontal Scrolling Container with staggered animation */}
+        <motion.div
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+          variants={containerVariants}
+          className="relative"
+        >
+          {/* Left Gradient Fade with animation */}
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            transition={{ delay: 0.5 }}
+            className="absolute left-0 top-0 bottom-0 w-24 bg-linear-to-r from-gray-50 to-transparent z-10 pointer-events-none"
+          />
           
-          {/* Right Gradient Fade */}
-          <div className="absolute right-0 top-0 bottom-0 w-24 bg-linear-to-l from-gray-50 to-transparent z-10 pointer-events-none" />
+          {/* Right Gradient Fade with animation */}
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            transition={{ delay: 0.5 }}
+            className="absolute right-0 top-0 bottom-0 w-24 bg-linear-to-l from-gray-50 to-transparent z-10 pointer-events-none"
+          />
           
-          {/* Horizontal Scroll Container - Hide scrollbar */}
-          <div 
+          {/* Horizontal Scroll Container */}
+          <motion.div 
             ref={scrollContainerRef}
             className="flex overflow-x-auto py-8 px-4 cursor-grab active:cursor-grabbing"
             style={{ 
-              scrollbarWidth: 'none', /* Firefox */
-              msOverflowStyle: 'none', /* IE and Edge */
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
               scrollBehavior: 'smooth'
             }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ delay: 0.6 }}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
@@ -264,43 +347,59 @@ const Amenities = () => {
             {/* Spacer for centering */}
             <div className="shrink-0 w-1/4 md:w-1/3" />
             
-            {/* Amenities Cards */}
+            {/* Amenities Cards with staggered animation */}
             {amenities.map((amenity, index) => (
-              <div 
+              <motion.div
                 key={amenity.id}
                 onClick={() => handleCardClick(index)}
                 className="cursor-pointer"
+                variants={cardVariants}
+                whileHover={{ 
+                  y: -5,
+                  transition: { duration: 0.2 }
+                }}
               >
                 <AmenitiesCard 
                   amenity={amenity} 
                   isActive={index === activeIndex}
                 />
-              </div>
+              </motion.div>
             ))}
             
             {/* Spacer for centering */}
             <div className="shrink-0 w-1/4 md:w-1/3" />
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
-        {/* Navigation Dots - Kept as indicator */}
-        <div className="flex justify-center gap-2 mt-8">
+        {/* Navigation Dots with animation */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ delay: 0.8 }}
+          className="flex justify-center gap-2 mt-8"
+        >
           {amenities.map((_, index) => (
-            <button
+            <motion.button
               key={index}
               onClick={() => setActiveIndex(index)}
               className="focus:outline-none"
+              whileHover={{ scale: 1.2 }}
+              whileTap={{ scale: 0.9 }}
             >
-              <div className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                index === activeIndex 
-                  ? 'w-8 bg-linear-to-r from-blue-500 to-purple-500' 
-                  : 'bg-gray-300 hover:bg-gray-400'
-              }`} />
-            </button>
+              <motion.div 
+                className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  index === activeIndex 
+                    ? 'w-8 bg-linear-to-r from-blue-500 to-purple-500' 
+                    : 'bg-gray-300 hover:bg-gray-400'
+                }`}
+                animate={isInView ? {
+                  opacity: 1,
+                  transition: { delay: 0.9 + index * 0.05 }
+                } : {}}
+              />
+            </motion.button>
           ))}
-        </div>
-        
-        {/* Bottom CTA section removed */}
+        </motion.div>
       </div>
     </section>
   );
