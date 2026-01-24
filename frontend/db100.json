@@ -1,0 +1,235 @@
+{
+  "properties": [
+    {
+      "id": 1,
+      "title": "Skyline Apartments",
+      "image": "https://picsum.photos/seed/apt1/600/400",
+      "area": "1200 - 1500 sqft",
+      "location": "Downtown, Bangalore",
+      "possession": "Dec 2026 Onwards",
+      "priceRange": "₹1.2 Cr - ₹1.8 Cr",
+      "type": "Apartments",
+      "status": "Under Construction"
+    },
+    {
+      "id": 2,
+      "title": "Greenview Apartments",
+      "image": "https://picsum.photos/seed/apt2/600/400",
+      "area": "1000 - 1400 sqft",
+      "location": "Whitefield, Bangalore",
+      "possession": "Jun 2027 Onwards",
+      "priceRange": "₹1.0 Cr - ₹1.5 Cr",
+      "type": "Apartments",
+      "status": "Pre-built"
+    },
+    {
+      "id": 3,
+      "title": "Lakeview Apartments",
+      "image": "https://picsum.photos/seed/apt3/600/400",
+      "area": "900 - 1300 sqft",
+      "location": "Electronic City, Bangalore",
+      "possession": "Mar 2027 Onwards",
+      "priceRange": "₹0.95 Cr - ₹1.4 Cr",
+      "type": "Apartments",
+      "status": "Pre-built"
+    },
+    {
+      "id": 4,
+      "title": "Sunrise Apartments",
+      "image": "https://picsum.photos/seed/apt4/600/400",
+      "area": "1100 - 1450 sqft",
+      "location": "Koramangala, Bangalore",
+      "possession": "Sep 2026 Onwards",
+      "priceRange": "₹1.1 Cr - ₹1.6 Cr",
+      "type": "Apartments",
+      "status": "Under Construction"
+    },
+    {
+      "id": 5,
+      "title": "Harmony Apartments",
+      "image": "https://picsum.photos/seed/apt5/600/400",
+      "area": "950 - 1350 sqft",
+      "location": "HSR Layout, Bangalore",
+      "possession": "Jan 2027 Onwards",
+      "priceRange": "₹1.0 Cr - ₹1.5 Cr",
+      "type": "Apartments",
+      "status": "Pre-built"
+    },
+    {
+      "id": 6,
+      "title": "Palmwood Villa",
+      "image": "https://picsum.photos/seed/villa1/600/400",
+      "area": "2500 - 4000 sqft",
+      "location": "Whitefield, Bangalore",
+      "possession": "Dec 2026 Onwards",
+      "priceRange": "₹3.5 Cr - ₹5 Cr",
+      "type": "Villas",
+      "status": "Under Construction"
+    },
+    {
+      "id": 7,
+      "title": "Riverfront Villa",
+      "image": "https://picsum.photos/seed/villa2/600/400",
+      "area": "3000 - 4500 sqft",
+      "location": "Sarjapur, Bangalore",
+      "possession": "Mar 2027 Onwards",
+      "priceRange": "₹4 Cr - ₹5.5 Cr",
+      "type": "Villas",
+      "status": "Under Construction"
+    },
+    {
+      "id": 8,
+      "title": "Greenwood Villa",
+      "image": "https://picsum.photos/seed/villa3/600/400",
+      "area": "2800 - 4200 sqft",
+      "location": "Electronic City, Bangalore",
+      "possession": "Jun 2026 Onwards",
+      "priceRange": "₹3.8 Cr - ₹5.2 Cr",
+      "type": "Villas",
+      "status": "Pre-built"
+    },
+    {
+      "id": 9,
+      "title": "Sunset Villa",
+      "image": "https://picsum.photos/seed/villa4/600/400",
+      "area": "2600 - 4000 sqft",
+      "location": "Bannerghatta, Bangalore",
+      "possession": "Dec 2026 Onwards",
+      "priceRange": "₹3.6 Cr - ₹4.8 Cr",
+      "type": "Villas",
+      "status": "Pre-built"
+    },
+    {
+      "id": 10,
+      "title": "Harmony Villa",
+      "image": "https://picsum.photos/seed/villa5/600/400",
+      "area": "2700 - 4300 sqft",
+      "location": "HSR Layout, Bangalore",
+      "possession": "Feb 2027 Onwards",
+      "priceRange": "₹3.7 Cr - ₹5 Cr",
+      "type": "Villas",
+      "status": "Under Construction"
+    },
+    {
+      "id": 11,
+      "title": "Green Meadows Plot",
+      "image": "https://picsum.photos/seed/plot1/600/400",
+      "area": "1200 - 2000 sqft",
+      "location": "Kanakapura, Bangalore",
+      "possession": "Ready to Move",
+      "priceRange": "₹50 L - ₹90 L",
+      "type": "Plots",
+      "status": "Ready to Move"
+    },
+    {
+      "id": 12,
+      "title": "Sunrise Plot",
+      "image": "https://picsum.photos/seed/plot2/600/400",
+      "area": "1500 - 2500 sqft",
+      "location": "Devanahalli, Bangalore",
+      "possession": "Ready to Move",
+      "priceRange": "₹60 L - ₹1 Cr",
+      "type": "Plots",
+      "status": "Ready to Move"
+    },
+    {
+      "id": 13,
+      "title": "Lakeview Plot",
+      "image": "https://picsum.photos/seed/plot3/600/400",
+      "area": "1300 - 2300 sqft",
+      "location": "Whitefield, Bangalore",
+      "possession": "Ready to Move",
+      "priceRange": "₹55 L - ₹95 L",
+      "type": "Plots",
+      "status": "Ready to Move"
+    },
+    {
+      "id": 14,
+      "title": "Harmony Plot",
+      "image": "https://picsum.photos/seed/plot4/600/400",
+      "area": "1400 - 2200 sqft",
+      "location": "Electronic City, Bangalore",
+      "possession": "Ready to Move",
+      "priceRange": "₹60 L - ₹1 Cr",
+      "type": "Plots",
+      "status": "Ready to Move"
+    },
+    {
+      "id": 15,
+      "title": "Sunset Plot",
+      "image": "https://picsum.photos/seed/plot5/600/400",
+      "area": "1250 - 2100 sqft",
+      "location": "HSR Layout, Bangalore",
+      "possession": "Ready to Move",
+      "priceRange": "₹55 L - ₹95 L",
+      "type": "Plots",
+      "status": "Ready to Move"
+    },
+    {
+      "id": 16,
+      "title": "Skyline Heights",
+      "image": "https://picsum.photos/seed/up1/600/400",
+      "area": "1000 - 1500 sqft",
+      "location": "Whitefield, Bangalore",
+      "possession": "Dec 2027 Onwards",
+      "priceRange": "₹1.2 Cr - ₹1.8 Cr",
+      "type": "Apartments",
+      "status": "Upcoming Project"
+    },
+    {
+      "id": 17,
+      "title": "Riverfront Residency",
+      "image": "https://picsum.photos/seed/up2/600/400",
+      "area": "900 - 1400 sqft",
+      "location": "Sarjapur, Bangalore",
+      "possession": "Mar 2028 Onwards",
+      "priceRange": "₹1 Cr - ₹1.5 Cr",
+      "type": "Apartments",
+      "status": "Upcoming Project"
+    },
+    {
+      "id": 18,
+      "title": "Greenwood Estate",
+      "image": "https://picsum.photos/seed/up3/600/400",
+      "area": "950 - 1450 sqft",
+      "location": "Electronic City, Bangalore",
+      "possession": "Jun 2028 Onwards",
+      "priceRange": "₹1.05 Cr - ₹1.6 Cr",
+      "type": "Apartments",
+      "status": "Upcoming Project"
+    },
+    {
+      "id": 19,
+      "title": "Sunrise Residency",
+      "image": "https://picsum.photos/seed/up4/600/400",
+      "area": "1000 - 1500 sqft",
+      "location": "Koramangala, Bangalore",
+      "possession": "Sep 2027 Onwards",
+      "priceRange": "₹1.2 Cr - ₹1.7 Cr",
+      "type": "Apartments",
+      "status": "Upcoming Project"
+    },
+    {
+      "id": 20,
+      "title": "Harmony Residency",
+      "image": "https://picsum.photos/seed/up5/600/400",
+      "area": "950 - 1400 sqft",
+      "location": "HSR Layout, Bangalore",
+      "possession": "Jan 2028 Onwards",
+      "priceRange": "₹1.1 Cr - ₹1.5 Cr",
+      "type": "Apartments",
+      "status": "Upcoming Project"
+    },
+    {
+      "id": 21,
+      "title": "Cityview Apartments (Resale)",
+      "image": "https://picsum.photos/seed/resale1/600/400",
+      "area": "1100 - 1400 sqft",
+      "location": "Downtown, Bangalore",
+      "possession": "Ready to Move",
+      "priceRange": "₹1 Cr - ₹1.3 Cr",
+      "type": "Apartments",
+      "status": "Resale"
+    }
+  ]
+}

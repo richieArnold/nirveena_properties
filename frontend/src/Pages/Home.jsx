@@ -1,9 +1,21 @@
 import React from 'react'
+import Hero from '../components/Home/Hero'
+import PropertyTabs from '../components/Home/PropertyTabs'
+import Contact from '../components/Home/Contact'
+import Testimonial from '../components/Home/Testimonial'
+import Stats from '../components/Home/Stats'
+import Amenities from '../components/Home/Amenities'
 
 const Home = () => {
   return (
-    <div className='flex mt-14 mb-14 justify-center items-center'>
-        <h1 className='text-3xl text-red-500'>Hello world !</h1>
+    <div>
+      <Hero/>
+      <PropertyTabs/>
+      <Amenities/>
+      <Testimonial/>
+      <Stats/>
+      <Contact/>
+
     </div>
   )
 }
