@@ -1,0 +1,17 @@
+img
+{
+		filter: saturate(1.2) contrast(1.1) brightness(1.05);
+}
+
+/**** SANKALP ***/
+
+#main > div > div > div > section.elementor-section.elementor-top-section.elementor-element.elementor-element-2c3797dd.elementor-section-items-top.elementor-section-height-min-height.elementor-section-boxed.elementor-section-height-default
+{
+    filter: saturate(1.2) contrast(1.1) brightness(1.05);
+}
+
+/** LANDING PAGES TOP BANNER ***/
+.background-image-holder.imageheightadjuster.fadeIn
+{
+	filter: saturate(105%);
+}

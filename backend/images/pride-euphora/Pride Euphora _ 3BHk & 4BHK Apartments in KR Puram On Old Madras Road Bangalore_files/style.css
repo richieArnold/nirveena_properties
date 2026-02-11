@@ -1,0 +1,82 @@
+#otpfield{width:50%!important}.body-content{position:relative;margin:30px 0 0 20px;border-top:#53a5d6 4px solid}.btnAction:disabled,.btnAction[disabled]{border:1px solid #999;background-color:#ccc;color:#666}#prechatbutton{visibility:hidden;float:right;color:#fff;padding-right:10px}#form-outer{z-index:9999999999;position:fixed;right:10px;bottom:0;background:#f7f7f7;border:0px solid #0059a1;border-top-left-radius:8px;border-top-right-radius:8px}#error-msg{color:red}#valid-msg{color:#00c900}.hide{display:none}input.error{border:1px solid #ff7c7c}#btn-logo{background:#F79102;padding-top:6px;padding-bottom:6px;color:white;}#btn-logo-rest-body{background:#f7f7f7;padding:10px}.demoInputBox{border:solid 1px #5f7d8b!important;width:100%;margin-bottom:6px!important;padding:5px!important;border-radius:5px;display:block;height:34px!important;font-size: 17px;}.demoInputBox::-webkit-input-placeholder{color:#757575}.demoInputBox:-moz-placeholder{color:#757575;opacity:1}.demoInputBox::-moz-placeholder{color:#757575;opacity:1}.demoInputBox:-ms-input-placeholder{color:#757575}.demoInputBox2::-webkit-input-placeholder{color:#757575}.demoInputBox2:-moz-placeholder{color:#757575;opacity:1}.demoInputBox2::-moz-placeholder{color:#757575;opacity:1}.demoInputBox2:-ms-input-placeholder{color:#757575}.btnAction{background:#4afa59;border:solid 1px #4afa59;border-radius:5px;color:#000;padding:5px;width:100%;padding:10px;font-size:14px;cursor:pointer;font-weight:800}#btn-contact{width:280px;background:#F79102;display:block;cursor:pointer;text-align:center;padding:5px 0;font-size:17px;color:#fff;border-top-left-radius:5px;border-top-right-radius:5px;vertical-align:middle;font-weight:600;padding-top:10px}.txt-content{text-align:left;padding:50px 20px}#mail-status{height:40px}#mail-status p{border-radius:5px;color:#545454;padding:10px;border-radius:5px;display:block;font-size:14px;padding:10px;border-radius:5px;display:block}#mail-status p.success{background:#c7e0c7;border:solid 1px #268c26}#mail-status p.error{background:#f7dddd;border:solid 1px #dc9d9d}.intl-tel-input.allow-dropdown input, .intl-tel-input.allow-dropdown input[type=tel], .intl-tel-input.allow-dropdown input[type=text], .intl-tel-input.separate-dial-code input, .intl-tel-input.separate-dial-code input[type=tel], .intl-tel-input.separate-dial-code input[type=text] { height: 34px !important;;border: solid 1px #5f7d8b!important;font-size: 17px;} 
+@media only screen and (min-width: 768px) {
+ #frm-contact{background:#f7f7f7;display:none;height:341px;width:280px;}
+  #form-outer{  width: 280px;right:10px;}
+  #phonediv2{display:none !important;}
+}
+@media only screen and (max-width: 768px) {
+ #frm-contact{background:#f7f7f7;display:none;height:341px;width:100%;}
+ #form-outer{  width: 100%;right:0px;left:0px;}
+
+}
+.addadnime {
+	
+}
+.addadnime1 {
+	 -moz-transition:all 0.5s ease-in-out;
+    -webkit-transition:all 0.5s ease-in-out;
+    -o-transition:all 0.5s ease-in-out;
+    -ms-transition:all 0.5s ease-in-out;
+    transition:all 0.5s ease-in-out;
+  -webkit-animation: NAME-YOUR-ANIMATION normal 5s  infinite ease-in-out;  /* Safari 4+ */
+  -moz-animation: NAME-YOUR-ANIMATION normal 5s infinite ease-in-out;  /* Fx 5+ */
+  -o-animation: NAME-YOUR-ANIMATION normal 5s infinite ease-in-out;  /* Opera 12+ */
+  animation: NAME-YOUR-ANIMATION normal 5s infinite ease-in-out;  /* IE 10+, Fx 29+ */
+}
+
+@-webkit-keyframes NAME-YOUR-ANIMATION {
+  0% {
+    background-color: rgba(237, 174, 0,1);
+
+  }
+   19% {
+    background-color: rgba(237, 174, 0,0.9);
+
+  }
+   29% {
+    background-color: rgba(195, 143, 0,0.8);
+
+  }
+
+
+  60% {
+    background-color: rgba(195, 143, 0,0.75);
+
+  }
+  70% {
+    background-color: rgba(195, 143, 0,0.8);
+
+  }
+  80% {
+   background-color: rgba(195, 143, 0,0.9);
+
+  }
+  100% {
+   background-color: rgba(237, 174, 0,1);
+
+  }
+}
+a:focus, a:hover { text-decoration: none !important; }
+
+.demoInputBox{
+	font-family: 'Opensans', Arial, Helvetica, sans-serif !important;
+}
+.demoInputBox::-webkit-input-placeholder {
+  font-family: 'Opensans', Arial, Helvetica, sans-serif !important;
+}
+
+.demoInputBox:-ms-input-placeholder {
+  font-family: 'Opensans', Arial, Helvetica, sans-serif !important;
+}
+
+.demoInputBox:-moz-placeholder {
+  font-family: 'Opensans', Arial, Helvetica, sans-serif !important;
+}
+
+.demoInputBox::-moz-placeholder {
+  font-family: 'Opensans', Arial, Helvetica, sans-serif !important;
+}
+
+.demoInputBox::placeholder{
+    font-family: 'Opensans', Arial, Helvetica, sans-serif !important;
+}

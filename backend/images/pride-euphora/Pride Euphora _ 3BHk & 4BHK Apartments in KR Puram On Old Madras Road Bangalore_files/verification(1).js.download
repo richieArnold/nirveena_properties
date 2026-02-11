@@ -1,0 +1,259 @@
+//createCookie("otpverified", "true1", "208333"); 
+var input = document.querySelector("#phonenumb"),
+    iti = window.intlTelInput(input, {
+        preferredCountries: ["in", "us", "gb"],
+        initialCountry: "in",
+        customPlaceholder: function (e, t) {
+            return "91" == t.dialCode && (e = (e = e.replace(/^0+/, "")).replace(/\D/g, "")), "e.g. " + e;
+        },
+    });
+function otpvislogic() {
+    var e = iti.getSelectedCountryData(),
+        t = iti.getNumber();
+    t = (t = t.replace(/\D/g, "")).replace(/^0+/, "");
+    var o = document.getElementById("otpdone");
+    if ("true1" == accessCookie("otpverified")) {
+        var a = document.getElementById("otpdiv");
+        return (o.value = "true"), (a.style.display = "none"), 1;
+    }
+    if ("91" !== e.dialCode) {
+        a = document.getElementById("otpdiv");
+        return (o.value = "true"), (a.style.display = "none"), 1;
+    }
+    return "91" == e.dialCode && 12 != t.length
+        ? (((a = document.getElementById("otpdiv")).style.display = "block"), (o.value = "pending"), 0)
+        : "91" == e.dialCode && 12 == t.length
+        ? (((a = document.getElementById("otpdiv")).style.display = "block"), (o.value = "pending"), 0)
+        : void 0;
+}
+function otpvislogic_countrychange() {
+    (document.getElementById("otpdiv").style.display = "none"), $("#userName").css("background-color", ""), $("#userEmail").css("background-color", ""), $("#phonenumb").css("background-color", "");
+}
+function sendOTP() {
+    valid = validateContact();
+    var e = 0;
+    if ((valid && (e = otpvislogic()), valid && 0 == e)) {
+        $(".error").html("").hide();
+        var t = $("#phonenumb").val();
+        gtag("event", "conversion", { send_to: "AW-11554504908/lxhhCMCVvaEbEMyBz4Ur" });
+        t = (t = t.replace(/\D/g, "")).replace(/^0+/, "");
+        var o = 0;
+        if (
+            (accessCookie("opprequestcount")
+                ? ((o = accessCookie("opprequestcount")), deleteCookie("opprequestcount"), createCookie("opprequestcount", (o = parseInt(o) + 1), "0.0208333"))
+                : createCookie("opprequestcount", "1", "0.0608333"),
+            o > 20)
+        )
+            (document.querySelector("#otp-messages").innerHTML = "Limit Execeeded"),
+                $("#otpfield").css("background-color", "#98FB98"),
+                createCookie("otpverified", "true1", "0.0208333"),
+                (document.getElementById("otpdiv").style.display = "none"),
+                startChat("");
+        else if (10 == t.length && null != t) {
+            var a = { mobile_number: t, action: "send_otp" },
+                r = new Date().getTime();
+            $.ajax({
+                url: "https://livesquare.in/livesq/pridechatotp/controller.php?timestamp=" + r,
+                type: "POST",
+                data: a,
+                success: function (e) {
+                    sendContact("EMAIL"), e.indexOf("accepted for delivery") > -1 && (document.querySelector("#otp-messages").innerHTML = "OTP Sent. Please Verify.");
+                },
+            });
+        } else $(".error").html("Please enter a valid number!"), $(".error").show();
+    }
+    valid && 1 == e && startChat("BOTH");
+}
+function verifyOTP() {
+    valid = validateContact();
+    var e = $("#phonenumb").val();
+    if (((e = (e = e.replace(/\D/g, "")).replace(/^0+/, "")), valid)) {
+        $(".error").html("").hide(), $(".success").html("").hide();
+        var t = $("#otpfield").val(),
+            o = { otp: t, mobile_number: e, action: "verify_otp" };
+        if (4 == t.length && null != t) {
+            var a = new Date().getTime();
+            $.ajax({
+                url: "https://livesquare.in/livesq/pridechatotp/controller.php?timestamp=" + a,
+                type: "POST",
+                data: o,
+                success: function (e) {
+                    e.indexOf("Verified") > -1
+                        ? ((document.querySelector("#otp-messages").innerHTML = "Verified"), $("#otpfield").css("background-color", "#98FB98"), createCookie("otpverified", "true1", "0.0208333"), startChat(""))
+                        : ((document.querySelector("#otp-messages").innerHTML = "Failed"), $("#otpfield").css("background-color", "#f7dddd"), deleteCookie("otpverified"));
+                },
+                error: function () {
+                    alert("ss");
+                },
+            });
+        } else (document.querySelector("#otp-messages").innerHTML = "Failed"), deleteCookie("otpverified"), $("#otpfield").css("background-color", "#f7dddd");
+    }
+}
+function createCookie(e, t, o) {
+    var a = new Date();
+    a.setTime(a.getTime() + 24 * o * 60 * 60 * 1e3), (document.cookie = e + "=" + t + "; expires=" + a.toGMTString());
+}
+function accessCookie(e) {
+    for (var t = e + "=", o = document.cookie.split(";"), a = 0; a < o.length; a++) {
+        var r = o[a].trim();
+        if (0 == r.indexOf(t)) return r.substring(t.length, r.length);
+    }
+    return "";
+}
+function deleteCookie(e) {
+    document.cookie = "cookiename= ; expires = Thu, 01 Jan 1970 00:00:00 GMT";
+}
+function sendContact(e) {
+    var t;
+    t = validateContact();
+    var o = !1,
+        a = iti.getSelectedCountryData();
+    (accessCookie("otpverified") && "true1" === accessCookie("otpverified")) || "91" != a.dialCode || (o = !1),
+        accessCookie("otpverified") && "true1" == accessCookie("otpverified") && "91" == a.dialCode && (o = !0),
+        "91" !== a.dialCode && ((o = !0), (e = "BOTH"));
+    var r = $("#phonenumb").val().replace(/\D/g, "");
+    r = r.replace(/^0+/, "");
+    var n = "Euphora";
+    if (
+        (("EMAIL" != e && "BOTH" != e && "ONLYCRM" != e) ||
+            ("undefined" != typeof gtag &&
+                dataLayer &&
+                "function" == typeof dataLayer.push &&
+                gtag("event", "Pre Chat Form", { event: "Pre Chat Form", event_category: "Pre Chat Form", event_action: "Prechat Form Filled", event_label: "Prechat Form Filled", event_value: 1, value: 1 }) &&
+                gtag("event", "conversion", { send_to: "AW-11554504908/lxhhCMCVvaEbEMyBz4Ur" })),
+        window.location.href && window.location.href.indexOf("projects/euphora") > -1 && (n = "Euphora"),
+        window.location.href && window.location.href.indexOf("projects/euphora") > -1 && (n = "Euphora"),
+        window.location.href && window.location.href.indexOf("projects/euphora") > -1 && (n = "Euphora"),
+        ("EMAIL" != e && "BOTH" != e && "ONLYCRM" != e) ||
+            ("function" == typeof __gaTracker && __gaTracker("send", "event", "Pre Chat Form", "Prechat Form Filled", "Prechat Form Filled", 1),
+            gtag("event", "conversion", { send_to: "AW-11554504908/lxhhCMCVvaEbEMyBz4Ur" }),
+            "function" == typeof ga && ga("send", "event", "Pre Chat Form", "Prechat Form Filled", "Prechat Form Filled", 1)),
+        t && o && "EMAIL" != e)
+    ) {
+        var i = new Date().getTime(),
+            c = ""; 
+
+        document.getElementById("transcriptid") && (c = document.getElementById("transcriptid").value),
+            $.ajax({
+                url: "https://livesquare.in/livesq/pridechatotp/contact_mail.php?timestamp=" + i,
+                type: "POST",
+                data:
+                    "userName=" +
+                    $("#userName").val() +
+                    "&userEmail=" +
+                    $("#userEmail").val() +
+                    "&phone=" +
+                    r +
+                    "&project=" +
+                    n +
+                    "&country=" +
+                    a.name +
+                    "&sourcerverified=websiteform&weburl=" +
+                    encodeURIComponent(document.referrer) +
+                    "&countrycode=" +
+                    a.dialCode +
+                    "&transcriptid=" +
+                    c +
+                    "&typecon=" +
+                    e,
+                success: function (e) {
+					//setTimeout(ajaxCallback, 2e4);
+                    if(window.location.href && window.location.href.indexOf("contactform-offer") > -1)
+                    {
+                        window.top.location.href = "https://prideeuphora.net/apartments-kr-puram-old-madras-road-bangalore/thank-you-success.html";
+                    }
+                    else{
+                        window.top.location.href = "https://prideeuphora.net/apartments-kr-puram-old-madras-road-bangalore/thank-you-success.html";
+                    }
+					
+                },
+                error: function () {},
+            });
+            $("body").append("<p style='color: white; text-align: center; font-family: sans-serif; font-weight: bold;'>Please Wait Redirecting...</p>");
+    }
+    t &&
+        "EMAIL" == e &&
+        ((i = new Date().getTime()),
+        (c = ""),
+        document.getElementById("transcriptid") && (c = document.getElementById("transcriptid").value),
+        $.ajax({
+            url: "https://livesquare.in/livesq/pridechatotp/contact_mail.php?timestamp=" + i,
+            type: "POST",
+            data:
+                "userName=" +
+                $("#userName").val() +
+                "&userEmail=" +
+                $("#userEmail").val() +
+                "&phone=" +
+                r +
+                "&project=" +
+                n +
+                "&country=" +
+                a.name +
+                "&sourcerverified=websiteform&weburl=" +
+                encodeURIComponent(document.referrer) +
+                "&typecon=" +
+                e +
+                "&transcriptid=" +
+                c +
+                "&countrycode=" +
+                a.dialCode,
+            success: function (e) {
+                setTimeout(ajaxCallback, 2e4);
+            },
+            error: function () {},
+        }));
+}
+function startChat(e) {
+    var t,
+        o = "ONLYCRM";
+    "BOTH" == e && (o = e), (t = validateContact());
+    var a = !1,
+        r = iti.getSelectedCountryData();
+    (accessCookie("otpverified") && "true1" === accessCookie("otpverified")) || "91" != r.dialCode || (a = !1),
+        accessCookie("otpverified") && "true1" == accessCookie("otpverified") && "91" == r.dialCode && (a = !0),
+        "91" !== r.dialCode && (a = !0),
+        t && a && ($("#frm-contact").slideUp("fast"), sendContact(o));
+}
+function ajaxCallback() {}
+function validateContact() {
+    var e = !0;
+    $("#userName").css("background-color", ""),
+        $("#userEmail").css("background-color", ""),
+        $("#phonenumb").css("background-color", ""),
+        $("#userName").val() ? $("#userName").css("background-color", "#98FB98") : ($("#userName").css("background-color", "#f7dddd"), (e = !1)),
+        $("#userEmail").val() &&
+        $("#userEmail")
+            .val()
+            .match(/^([\w-\.]+@([\w-]+\.)+[\w-]{2,4})?$/)
+            ? $("#userEmail").css("background-color", "#98FB98")
+            : ($("#userEmail").css("background-color", "#f7dddd"), (e = !1));
+    var t = document.querySelector("#phonenumb"),
+        o = document.querySelector("#error-msg");
+    document.querySelector("#valid-msg"), reset();
+    var a = "";
+    if ((a = t.value.replace(/\D/g, "")).trim()) {
+        var r = iti.getSelectedCountryData();
+        ("91" !== r.dialCode && a.length > 4) || ("91" == r.dialCode && 10 == a.replace(/^0+/, "").length) ? $("#phonenumb").css("background-color", "#98FB98") : ((e = !1), $("#phonenumb").css("background-color", "#f7dddd"), alert("Phone Number Should Be 10-Digits!"), t.classList.add("error"));
+    } else (e = !1), t.classList.add("error"), $("#phonenumb").css("background-color", "#f7dddd"), alert("Phone Number Should Be 10-Digits!"),(o.innerHTML = "Invalid number");
+    return t.addEventListener("change", reset), t.addEventListener("keyup", reset), e;
+}
+function reset() {
+    var e = document.querySelector("#phonenumb"),
+        t = document.querySelector("#error-msg"),
+        o = document.querySelector("#valid-msg");
+    e.classList.remove("error"), (t.innerHTML = ""), t.classList.add("hide"), o.classList.add("hide");
+}
+window.intlTelInputGlobals.loadUtils("https://prideeuphora.net/apartments-kr-puram-old-madras-road-bangalore/pridechatotpnew/js/utils.js"),
+    input.addEventListener("countrychange", function () {
+        otpvislogic_countrychange();
+    }),
+    $(document).ready(function () {
+        $("#btn-contact").on("click", function () {
+            $("#frm-contact").is(":hidden") ? ($("#frm-contact").slideDown("slow"), $("#prechatbutton").css("visibility", "visible")) : ($("#frm-contact").slideUp("slow"), $("#prechatbutton").css("visibility", "hidden"));
+        }),
+            setTimeout(function () {
+                $("#frm-contact").is(":hidden") && $("#btn-contact").trigger("click");
+            }, 600000);
+    });
+ 

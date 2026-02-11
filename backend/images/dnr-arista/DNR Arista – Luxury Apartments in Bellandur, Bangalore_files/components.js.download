@@ -1,0 +1,2424 @@
+(function ($) {
+
+'use strict';
+
+/*!==========================================================================
+ * ==========================================================================
+ * ==========================================================================
+ *
+ * Kinsey – AJAX Agency WordPress Theme
+ *
+ * [Table of Contents]
+ *
+ * 1. Arts Hover
+ * 2. Button Circles
+ * 3. Form
+ * 4. Scroll Down
+ * 5. Mobile Bar Height
+ * 6. Debounce
+ * 7. Get Color Values
+ * 8. Run On High Performance GPU
+ * 9. Sanitize Selector
+ * 10. Header
+ * 11. Load Slider Menu
+ * 12. Preloader
+ * 13. Section Content
+ * 14. Section Masthead
+ *
+ * ==========================================================================
+ * ==========================================================================
+ * ==========================================================================
+ */
+
+/**
+ * Try to use high performance GPU on dual-GPU systems
+ */
+runOnHighPerformanceGPU();
+
+/**
+ * GSAP: turn off console warnings
+ * and include plugins
+ */
+gsap.config({
+	nullTargetWarn: false
+});
+gsap.registerPlugin(DrawSVGPlugin);
+gsap.registerPlugin(ScrollTrigger);
+
+/**
+ * Global Vars
+ */
+window.$document = $(document);
+window.$window = $(window);
+window.$body = $('body');
+window.$html = $('html');
+window.$pageHeader = $('#page-header');
+window.$pagePreloader = $('#js-preloader');
+window.$pageWrapper = $('#page-wrapper');
+window.$pageContent = $('.page-wrapper__content');
+window.$transitionCurtain = $('#js-page-transition-curtain');
+window.$blockingCurtain = $('#js-page-blocking-curtain');
+window.$barbaWrapper = $('[data-barba="wrapper"]');
+window.$cursor = $('#js-arts-cursor');
+window.$spinner = $('#js-spinner');
+window.$adminBar = $('#wpadminbar');
+
+if (typeof window.setGoogleMapLoaded === 'undefined') {
+	window.setGoogleMapLoaded = function () { };
+}
+
+if (typeof window.googleMapLoaded === 'undefined') {
+	window.googleMapLoaded = new Promise((resolve) => {
+		window.setGoogleMapLoaded = resolve;
+	});
+}
+
+/**
+ * Don't save scroll position
+ * after AJAX transition
+ */
+if ('scrollRestoration' in history) {
+	history.scrollRestoration = 'manual';
+}
+
+/**
+ * Default Template Options
+ */
+if (typeof window.theme === 'undefined') {
+	window.theme = {
+		ajax: {
+			isRunning: false,
+			enabled: true,
+			customJS: '',
+			preventRules: '', // jQuery selectors of the elements to exclude them from AJAX transitions
+			evalInlineContainerScripts: true,
+			loadMissingScripts: true,
+			loadMissingStyles: true,
+			updateContentNodes: '',
+			updateWidgetContents: false,
+			updateElementorHeaderContents: true,
+			updateScriptNodes: '',
+			updateHeadNodes: '',
+			emulateJQueryReadyEvent: false
+		},
+		animations: {
+			triggerHook: 0.15,
+			timeScale: { // slow down or speed up the animations
+				onScrollReveal: 1.0,
+				overlayMenuOpen: 1.0,
+				overlayMenuClose: 1.5,
+				preloader: 1.0,
+				ajaxFlyingImageTransition: 1.0,
+				ajaxCurtainTransition: 1.0
+			}
+		},
+		cursorFollower: {
+			enabled: true,
+			highlight: {
+				scale: 1.5
+			},
+			arrows: {
+				distance: 45
+			},
+			trailing: 8,
+			animationDuration: 0.25
+		},
+		mobileBarFix: {
+			enabled: true,
+			update: true
+		},
+		isFirstLoad: true,
+		isSliderMenuLoaded: false,
+		isCustomizerPreview: false
+	}
+}
+/* Start Preloader */
+window.kinsey.loading = new Preloader();
+window.kinsey.loading.start();
+
+/**
+ * Page Load Strategy
+ */
+if (window.theme.elementor.isEditor) {
+	window.$window.on('elementor/frontend/init', function () {
+		new window.kinsey.components.Animations();
+
+		initComponentsOnce({
+			scope: elementor.$previewContents,
+			scrollToHashElement: false
+		});
+
+		initComponents({
+			scope: elementor.$previewContents,
+			scrollToHashElement: false
+		});
+	});
+} else {
+	document.addEventListener('DOMContentLoaded', (e) => {
+		new window.kinsey.components.Animations();
+
+		// init on each AJAX transition
+		if (e.detail) {
+			initComponents(e.detail);
+		} else { // init only on initial page load
+			window.scrollTo(0, 0, { behavior: 'instant' });
+
+			initComponentsOnce({
+				scope: window.$document
+			});
+
+			initComponents({
+				scope: window.$document
+			});
+
+			window.kinsey.loading.finish();
+		}
+	});
+}
+
+/**
+ * Init Template Components
+ * You can init your custom scripts here
+ * in that function
+ */
+function initComponents({
+	scope = window.$document,
+	container = window.$pageWrapper,
+	scrollToHashElement = true
+}) {
+
+	const
+		isElementorBuiltPage = window.$body.hasClass('elementor-built'),
+		isElementorBuiltPost = window.$body.hasClass('elementor-built') && window.$body.hasClass('single-post'),
+		hasElementorFrontend = typeof window.elementorFrontend !== 'undefined',
+		$sectionMasthead = scope.find('.section-masthead:not(.d-none):not(.js-cancel-init)'),
+		$ajaxCommentsArea = scope.find('.js-ajax-comments-area'),
+		$sectionFixedReveal = scope.find('[data-arts-fixed-reveal]:not(.section-nav-projects)'),
+		$sectionContent = scope.find('.section-content'),
+		$buttonCircles = scope.find('.js-button-circles'),
+		$sectionGrid = scope.find('.section-grid'),
+		$scrollDown = scope.find('[data-arts-scroll-down]'),
+		$unitedGalleries = scope.find('.js-gallery-united');
+
+	if ($sectionMasthead.length && ((!isElementorBuiltPage || isElementorBuiltPost) && window.$body.hasClass('elementor-page')) || !hasElementorFrontend) {
+		$sectionMasthead.each(function () {
+			new window.kinsey.components.SectionMasthead({
+				target: $(this),
+				scope
+			});
+		});
+	}
+
+	// // mobile bottom bar height fix
+	if (window.theme.mobileBarFix.enabled) {
+		new MobileBarHeight({
+			target: $('.mobile-bar-height'),
+			scope
+		});
+	}
+
+	if ($sectionGrid.length && (!isElementorBuiltPage || isElementorBuiltPost)) {
+		window.kinsey.components.AssetsManager
+			.loadSectionGrid()
+			.finally(() => {
+				$sectionGrid.each(function () {
+					new window.kinsey.components.SectionGrid({
+						target: $(this),
+						scope
+					});
+				});
+			});
+	}
+
+	if ($sectionFixedReveal.length) {
+		window.kinsey.components.AssetsManager
+			.loadSectionFixedReveal()
+			.finally(() => {
+				$sectionFixedReveal.each(function () {
+					new window.kinsey.components.SectionFixedReveal({
+						target: $(this),
+						scope
+					});
+				});
+			});
+	}
+
+	if ($buttonCircles.length) {
+		$buttonCircles.each(function () {
+			new window.kinsey.components.ButtonCircles({
+				target: $(this),
+				scope
+			});
+		});
+	}
+
+	if ($ajaxCommentsArea.length) {
+		window.kinsey.components.AssetsManager
+			.load(window.theme.assets['comments-js'])
+			.finally(() => {
+				$ajaxCommentsArea.each(function () {
+					new window.kinsey.components.Comments({
+						target: $(this),
+						scope
+					});
+				});
+			});
+	}
+
+	if ($sectionContent.length && (!isElementorBuiltPage || isElementorBuiltPost)) {
+		$sectionContent.each(function () {
+			new window.kinsey.components.SectionContent({
+				target: $(this),
+				scope
+			});
+		});
+	}
+
+	if (!window.theme.elementor.isEditor && $unitedGalleries.length) {
+		$unitedGalleries.each(function () {
+			const
+				$unitedGallery = $(this),
+				$innerGalleries = $unitedGallery.find('.js-gallery'),
+				nonce = $innerGalleries.first().attr('data-nonce');
+
+			if ($innerGalleries.length && nonce) {
+				window.kinsey.components.AssetsManager
+					.loadPhotoswipe(nonce)
+					.finally(() => {
+						new window.kinsey.components.PswpGallery({
+							target: $unitedGallery,
+							scope,
+							options: {
+								history: false,
+								showAnimationDuration: 300,
+							}
+						});
+					});
+			}
+		});
+	}
+
+	if ($scrollDown.length) {
+		$scrollDown.each(function () {
+			new window.kinsey.components.ScrollDown({
+				target: $(this),
+				scope,
+				duration: 0.6
+			});
+		})
+	}
+
+	new Form({
+		target: scope,
+		scope
+	});
+
+	// refresh animation triggers
+	// for Waypoints library
+	if (typeof Waypoint !== 'undefined') {
+		Waypoint.refreshAll();
+	}
+
+	// custom JS code
+	if (window.theme.ajax.customJS) {
+		try {
+			window.eval(window.theme.ajax.customJS);
+		} catch (error) {
+			console.warn(error);
+		}
+	}
+	// scroll to anchor from URL hash
+	if (scrollToHashElement) {
+		if (window.$pagePreloader.is(':visible')) {
+			window.$window.one('arts/preloader/end', () => {
+				Promise.all(window.kinsey.promises).finally(() => {
+					window.kinsey.components.Scroll.scrollToAnchorFromHash(600);
+				});
+			});
+		} else {
+			Promise.all(window.kinsey.promises).finally(() => {
+				window.kinsey.components.Scroll.scrollToAnchorFromHash(600);
+			});
+		}
+	}
+
+	// Attempt to load slider menu
+	if (window.$pageHeader.length && !window.theme.isSliderMenuLoaded) {
+		loadSliderMenu(window.$document);
+	}
+}
+
+/**
+ * Init Template Components
+ * only once after the initial
+ * page load
+ */
+function initComponentsOnce({
+	scope = window.$document,
+	container = window.$pageWrapper
+}) {
+	if (!window.$cursor || !window.$cursor.length || window.Modernizr.touchevents) {
+		window.$html.addClass('no-cursorfollower');
+	}
+
+	// Run AJAX navigation
+	if (window.theme.ajax.enabled && window.$barbaWrapper.length && !window.theme.elementor.isEditor) {
+		window.kinsey.components.AssetsManager.loadPJAX();
+	}
+
+	// Run page header
+	window.theme.header = new Header({
+		target: window.$pageHeader,
+		scope
+	});
+}
+
+/*!========================================================================
+	1. Arts Hover
+	======================================================================!*/
+window.kinsey.components.ArtsHover = class ArtsHover extends window.kinsey.components.BaseComponent {
+	constructor({
+		target,
+		scope
+	}) {
+		super({
+			target,
+			scope
+		});
+	}
+
+	set() {
+		this.hoverClass = this.$target.data('arts-hover-class') || null;
+		this.$trigger = this.$target.find('[data-arts-hover="trigger"]');
+	}
+
+	run() {
+		this._bindEvents();
+	}
+
+	mount() {
+		return new Promise((resolve) => resolve(true));
+	}
+
+	_bindEvents() {
+		this.$trigger
+			.on('mouseenter touchstart', () => {
+				this.$target.addClass(this.hoverClass);
+			})
+			.on('mouseleave touchend', () => {
+				this.$target.removeClass(this.hoverClass);
+			});
+	}
+}
+
+/*!========================================================================
+	2. Button Circles
+	======================================================================!*/
+window.kinsey.components.ButtonCircles = class ButtonCircles extends window.kinsey.components.BaseComponent {
+	constructor({
+		target,
+		scope
+	}) {
+		super({
+			target,
+			scope
+		});
+	}
+
+	set() {
+		this.$circles = this.$target.find('.circle');
+		this.timeline = new gsap.timeline();
+
+		this.timeline.set(this.$circles, {
+			drawSVG: '0% 0%'
+		});
+	}
+
+	run() {
+		this.bindEvents();
+	}
+
+	bindEvents() {
+		this.$target
+			.on('mouseenter touchstart', () => {
+				this.timeline
+					.clear()
+					.staggerTo(this.$circles, 0.6, {
+						drawSVG: '0% 100%',
+						ease: 'power4.out'
+					}, 0.05);
+			})
+			.on('mouseleave touchend', () => {
+				this.timeline
+					.clear()
+					.staggerTo(this.$circles, 0.6, {
+						drawSVG: '0% 0%',
+						ease: 'power4.out'
+					}, 0.05);
+			});
+	}
+}
+
+/*!========================================================================
+	3. Form
+	======================================================================!*/
+class Form {
+	constructor({
+		scope,
+		target
+	}) {
+		this.$scope = scope;
+		this.$target = target;
+
+		if (this.$scope.length) {
+			this.set();
+			this.run();
+		}
+	}
+
+	set() {
+		this.input = '.input-float__input';
+		this.inputClassNotEmpty = 'input-float__input_not-empty';
+		this.inputClassFocused = 'input-float__input_focused';
+		this.$inputs = this.$scope.find(this.input);
+	}
+
+	run() {
+		this._floatLabels();
+		this._bindEvents();
+
+		if (typeof window.theme !== 'undefined' && window.theme.contactForm7.customModals) {
+			if ($('.wpcf7-form').length) {
+				window.kinsey.components.AssetsManager.loadBootstrapModal().finally(() => this._attachModalsEvents());
+			}
+		}
+	}
+
+	_floatLabels() {
+		const self = this;
+
+		if (!this.$inputs || !this.$inputs.length) {
+			return false;
+		}
+
+		this.$inputs.each(function () {
+			const
+				$el = $(this),
+				$controlWrap = $el.parent('.wpcf7-form-control-wrap');
+
+			// not empty value
+			if ($el.val()) {
+				$el.addClass(self.inputClassNotEmpty);
+				$controlWrap.addClass(self.inputClassNotEmpty);
+				// empty value
+			} else {
+				$el.removeClass([self.inputClassFocused, self.inputClassNotEmpty]);
+				$controlWrap.removeClass([self.inputClassFocused, self.inputClassNotEmpty]);
+			}
+
+			// has placeholder & empty value
+			if ($el.attr('placeholder') && !$el.val()) {
+				$el.addClass(self.inputClassNotEmpty);
+				$controlWrap.addClass(self.inputClassNotEmpty);
+			}
+		});
+
+	}
+
+	_bindEvents() {
+		const self = this;
+
+		this.$scope
+			.off('focusin')
+			.on('focusin', self.input, function () {
+				const
+					$el = $(this),
+					$controlWrap = $el.parent('.wpcf7-form-control-wrap');
+
+				$el.addClass(self.inputClassFocused).removeClass(self.inputClassNotEmpty);
+				$controlWrap.addClass(self.inputClassFocused).removeClass(self.inputClassNotEmpty);
+
+			})
+			.off('focusout')
+			.on('focusout', self.input, function () {
+
+				const
+					$el = $(this),
+					$controlWrap = $el.parent('.wpcf7-form-control-wrap');
+
+				// not empty value
+				if ($el.val()) {
+					$el.removeClass(self.inputClassFocused).addClass(self.inputClassNotEmpty);
+					$controlWrap.removeClass(self.inputClassFocused).addClass(self.inputClassNotEmpty);
+				} else {
+					// has placeholder & empty value
+					if ($el.attr('placeholder')) {
+						$el.addClass(self.inputClassNotEmpty);
+						$controlWrap.addClass(self.inputClassNotEmpty);
+					}
+
+					$el.removeClass(self.inputClassFocused);
+					$controlWrap.removeClass(self.inputClassFocused);
+				}
+
+			});
+
+	}
+
+	_attachModalsEvents() {
+		window.$document
+			.off('wpcf7submit')
+			.on('wpcf7beforesubmit', (e) => {
+				const
+					$form = $(e.target),
+					$submit = $form.find('[type="submit"]');
+
+				$form.addClass('pointer-events-none');
+				window.$body.addClass('cursor-progress');
+
+
+				if ($submit.length) {
+					const
+						$title = $submit.find('.button__label-hover .button__title'),
+						$icons = $submit.find('.button__icon');
+
+					$title.data('original-title', $title.text());
+
+					$submit.addClass('button_hovered');
+					$title.html('<svg class="spinner spinner_small" width="65px" height="65px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg"><circle class="spinner__path" fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33" r="30"></circle></svg>');
+
+					if ($icons.length) {
+						gsap.set($icons, {
+							autoAlpha: 0
+						});
+					}
+				}
+
+				// Set loading cursor follower
+				if (window.$cursor && window.$cursor.length) {
+					window.$cursor.trigger('startLoading');
+				}
+			})
+			.on('wpcf7submit', (e) => {
+
+				const
+					$modal = $('#modalContactForm7'),
+					$form = $(e.target),
+					$submit = $form.find('[type="submit"]');
+				let template;
+
+				$modal.modal('dispose').remove();
+
+				if (e.detail.apiResponse.status === 'mail_sent') {
+
+					template = this._getModalTemplate({
+						icon: 'icon-success.svg',
+						message: e.detail.apiResponse.message,
+					});
+
+					this._createModal({
+						template,
+						onDismiss: () => {
+							$(e.target).find(this.input).parent().val('').removeClass(this.inputClassFocused).removeClass(this.inputClassNotEmpty);
+						}
+					});
+				}
+
+				if (e.detail.apiResponse.status === 'mail_failed') {
+					template = this._getModalTemplate({
+						icon: 'icon-error.svg',
+						message: e.detail.apiResponse.message
+					});
+
+					this._createModal({
+						template
+					});
+				}
+
+				$form.removeClass('pointer-events-none');
+				window.$body.removeClass('cursor-progress');
+
+				// Hide loading cursor follower
+				if (window.$cursor && window.$cursor.length) {
+					window.$cursor.trigger('finishLoading');
+				}
+
+				if ($submit.length) {
+					const
+						$title = $submit.find('.button__label-hover .button__title'),
+						originalTitle = $title.data('original-title'),
+						$icons = $submit.find('.button__icon');
+
+					$submit.removeClass('button_hovered');
+
+					if ($title.length && originalTitle) {
+						$title.text(originalTitle);
+					}
+
+					if ($icons.length) {
+						gsap.set($icons, {
+							clearProps: 'opacity,visibility'
+						});
+					}
+				}
+
+			});
+	}
+
+	_getModalTemplate({
+		icon,
+		message
+	}) {
+		return `
+      <div class="modal fade" id="modalContactForm">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content radius-img">
+            <div class="modal__close" data-dismiss="modal"><img src="${window.theme.themeURL}/img/modal/icon-close.svg"/></div>
+              <header class="text-center mb-1">
+								<img src="${window.theme.themeURL}/img/modal/${icon}" width="80px" height="80px" alt=""/>
+                <p class="modal__message h4"><strong>${message}</strong></p>
+              </header>
+							<button type="button" class="button button_solid bg-dark-1 button_fullwidth" data-dismiss="modal"><span class="button__label button__label-normal"><span class="button__title">OK</span></span><span class="button__label button__label-hover"><span class="button__title">OK</span></span>
+							</button>
+          </div>
+        </div>
+      </div>
+    `;
+	}
+
+	_createModal({
+		template,
+		onDismiss
+	}) {
+
+		if (!template) {
+			return false;
+		}
+
+		let $modal;
+		window.$body.append(template);
+		$modal = $('#modalContactForm');
+
+		$modal.modal('show');
+		$modal.on('hidden.bs.modal', () => {
+			if (typeof onDismiss === 'function') {
+				onDismiss();
+			}
+			$modal.modal('dispose').remove();
+		});
+	}
+}
+
+/*!========================================================================
+	4. Scroll Down
+	======================================================================!*/
+window.kinsey.components.ScrollDown = class ScrollDown extends window.kinsey.components.BaseComponent {
+	constructor({
+		target,
+		scope,
+		duration = 0.6
+	}) {
+		super({
+			target,
+			scope
+		})
+
+		this.duration = parseFloat(duration);
+	}
+
+	run() {
+		this._bindEvents();
+	}
+
+	_bindEvents() {
+		this.$target.on('click', (e) => {
+			e.preventDefault();
+			this._scrollDown();
+		});
+	}
+
+	_scrollDown() {
+		window.kinsey.components.Scroll.scrollTo({
+			x: 0,
+			y: window.innerHeight + Math.min(0, -window.$pageHeader.height()),
+			duration: this.duration
+		});
+	}
+}
+
+/*!========================================================================
+	5. Mobile Bar Height
+	======================================================================!*/
+class MobileBarHeight extends window.kinsey.components.BaseComponent {
+	constructor({
+		target,
+		scope
+	}) {
+		super({
+			target,
+			scope
+		});
+		this.vh = 0;
+		this.mqPointer = window.matchMedia(`(hover: hover) and (pointer: fine)`);
+		this._setVh();
+
+		if (window.theme.mobileBarFix.update) {
+			this._bindEvents();
+		}
+	}
+
+	_setVh() {
+		this.vh = document.documentElement.clientHeight * 0.01;
+		document.documentElement.style.setProperty('--fix-bar-vh', `${this.vh}px`);
+	}
+
+	_bindEvents() {
+		this.attachResponsiveResize({
+			callback: this.debounce(this._setVh.bind(this), 250),
+			autoDetachOnTransitionStart: false
+		});
+	}
+
+	attachResponsiveResize({
+		callback,
+		immediateCall = true,
+		autoDetachOnTransitionStart = true
+	} = {}) {
+		if (typeof callback !== 'function') {
+			return;
+		}
+
+		const self = this;
+		const cb = callback.bind(callback);
+
+		function changeHandlerVW(event) {
+			if (this.lastVW !== window.innerWidth) {
+				this.lastVW = window.innerWidth;
+				cb();
+			}
+		}
+
+		function changeHandlerVH(event) {
+			if (this.lastVH !== window.innerHeight) {
+				this.lastVH = window.innerHeight;
+				cb();
+			}
+		}
+
+		const
+			cbWidth = changeHandlerVW.bind(changeHandlerVW),
+			cbHeight = changeHandlerVH.bind(changeHandlerVH);
+
+		function changeHandler(event, runCallback = false) {
+			if (event.matches) {
+				window.addEventListener('resize', cbHeight, false);
+			} else {
+				window.removeEventListener('resize', cbHeight, false);
+			}
+
+			if (!!runCallback) {
+				cb();
+			}
+		}
+
+		function clear() {
+			window.removeEventListener('resize', cbWidth, false);
+			window.removeEventListener('resize', cbHeight, false);
+
+			if (typeof self.mqPointer.removeEventListener === 'function') {
+				self.mqPointer.removeEventListener('change', changeHandler);
+			} else {
+				self.mqPointer.removeListener(changeHandler);
+			}
+		}
+
+		window.addEventListener('resize', cbWidth, false);
+
+		changeHandler({ matches: self.mqPointer.matches }, immediateCall);
+
+		if (typeof self.mqPointer.addEventListener === 'function') {
+			self.mqPointer.addEventListener('change', changeHandler);
+		} else {
+			self.mqPointer.addListener(changeHandler);
+		}
+
+		if (!!autoDetachOnTransitionStart) {
+			document.addEventListener('arts/barba/transition/start', clear, { once: true });
+		}
+
+		return { clear };
+	}
+}
+
+/*!========================================================================
+	6. Debounce
+	======================================================================!*/
+function debounce(func, wait, immediate) {
+	let timeout;
+
+	return () => {
+		let
+			context = this,
+			args = arguments;
+
+		let later = () => {
+			timeout = null;
+
+			if (!immediate) {
+				func.apply(context, args)
+			};
+		};
+
+		let callNow = immediate && !timeout;
+
+		clearTimeout(timeout);
+
+		timeout = setTimeout(later, wait);
+
+		if (callNow) {
+			func.apply(context, args)
+		};
+	};
+}
+
+/*!========================================================================
+	7. Get Color Values
+	======================================================================!*/
+// return array of [r,g,b,a] from any valid color. if failed returns undefined
+function getColorValues(color) {
+
+	// empty argument
+	if (color === '') {
+		return;
+	}
+
+	// transparent color
+	if (color.toLowerCase() === 'transparent') {
+		return [0, 0, 0, 0];
+	}
+
+	// HEX
+	if (color[0] === '#') {
+		if (color.length < 7) {
+			// convert #RGB and #RGBA to #RRGGBB and #RRGGBBAA
+			color = '#' + color[1] + color[1] + color[2] + color[2] + color[3] + color[3] + (color.length > 4 ? color[4] + color[4] : '');
+		}
+
+		return [parseInt(color.substr(1, 2), 16),
+			parseInt(color.substr(3, 2), 16),
+			parseInt(color.substr(5, 2), 16),
+			color.length > 7 ? parseInt(color.substr(7, 2), 16) / 255 : 1
+		];
+	}
+	// RGB
+	if (color.indexOf('rgb') === -1) {
+		// convert named colors
+		let temp_elem = document.body.appendChild(document.createElement('fictum')); // intentionally use unknown tag to lower chances of css rule override with !important
+		let flag = 'rgb(1, 2, 3)'; // this flag tested on chrome 59, ff 53, ie9, ie10, ie11, edge 14
+
+		temp_elem.style.color = flag;
+
+		if (temp_elem.style.color !== flag) {
+			return; // color set failed - some monstrous css rule is probably taking over the color of our object
+		}
+
+		temp_elem.style.color = color;
+		if (temp_elem.style.color === flag || temp_elem.style.color === '') {
+			return; // color parse failed
+		}
+
+		color = getComputedStyle(temp_elem).color;
+		document.body.removeChild(temp_elem);
+	}
+
+	// RGBA
+	if (color.indexOf('rgb') === 0) {
+		if (color.indexOf('rgba') === -1) {
+			color += ',1'; // convert 'rgb(R,G,B)' to 'rgb(R,G,B)A' which looks awful but will pass the regxep below
+			return color.match(/[\.\d]+/g).map(function (a) {
+				return +a;
+			});
+		}
+	}
+}
+
+/*!========================================================================
+	8. Run On High Performance GPU
+	======================================================================!*/
+function runOnHighPerformanceGPU() {
+	const webGLCanvas = document.getElementById('js-webgl');
+
+	// don't run on mobile devices
+	if (!window.Modernizr.touchevents && webGLCanvas) {
+		webGLCanvas.getContext('webgl', {
+			powerPreference: 'high-performance'
+		});
+	}
+}
+
+/*!========================================================================
+	9. Sanitize Selector
+	======================================================================!*/
+function sanitizeSelector(string) {
+	if (!string || !string.length) {
+		return false;
+	}
+
+	return string
+		.replace(/(\r\n|\n|\r)/gm, '') // remove tabs, spaces
+		.replace(/(\\n)/g, '') // remove lines breaks
+		.replace(/^[,\s]+|[,\s]+$/g, '') // remove redundant commas
+		.replace(/\s*,\s*/g, ','); // remove duplicated commas
+}
+
+/*!========================================================================
+	10. Header
+	======================================================================!*/
+class Header extends window.kinsey.components.BaseComponent {
+	constructor({
+		target,
+		scope
+	}) {
+		super({
+			target,
+			scope
+		});
+	}
+
+	set() {
+		this.$controls = this.$target.find('.header__controls');
+		this.$stickyHeader = this.$target.filter('.js-header-sticky');
+		this.$burger = this.$target.find('#js-burger');
+		this.$overlay = this.$target.find('.header__wrapper-overlay-menu');
+		this.$maskRevealOverlay = this.$overlay.find('.mask-reveal');
+		this.$wrapperMenu = this.$target.find('.header__wrapper-menu');
+		this.burgerOpenClass = 'header__burger_opened';
+		this.$headerColumns = this.$target.find('.header__col');
+		this.$headerLeft = this.$target.find('.header__col-left, .header__col-right');
+		this.$overlayWidgets = this.$target.find('.header__wrapper-overlay-widgets');
+		this.$allLinksOverlay = this.$target.find('.menu-overlay a');
+		this.$allLinksClassic = this.$target.find('.menu a');
+		this.$wrapperSlider = this.$target.find('.header__wrapper-slider');
+		this.$headerLabelSubmenu = this.$target.find('.js-header-label-submenu');
+		this.$infoLabel = this.$target.find('.header__overlay-menu-info');
+
+		this.color = this._getColorTheme();
+		this.colorSaved = this.color;
+
+		// Menu
+		this.$menu = this.$target.find('.js-menu');
+		this.$menuOverlay = this.$overlay.find('.js-menu-overlay');
+		this.$menuLinks = this.$overlay.find('.menu-overlay > li > a');
+		this.$menuColumn = this.$overlay.find('.header__menu-column');
+		this.$menuSmoothScrollingContainer = this.$overlay.find('.js-header-smooth-scroll-container');
+		this.$menuGradientTop = this.$overlay.find('.header__menu-gradient_top');
+		this.$menuGradientBottom = this.$overlay.find('.header__menu-gradient_bottom');
+		this.selectedClass = 'selected';
+		this.openClass = 'opened';
+		this.currentMenuItemClass = 'current-menu-item';
+		this.currentMenuAncestorClass = 'current-menu-ancestor';
+		this.menuItemHasChildrenClass = 'menu-item-has-children';
+		this.hoverClassOverlay = 'menu-overlay_hover';
+		this.hoverClassClassic = 'menu_hover';
+
+		// Submenu
+		this.$submenu = this.$overlay.find('.menu-overlay .sub-menu');
+		this.$submenuButton = $('#js-submenu-back');
+		this.$submenuOpeners = this.$overlay.find(`.${this.menuItemHasChildrenClass} > a`);
+		this.$submenuLinks = this.$submenu.find('> li > a');
+		this.currentSubmenuLabel = '';
+		this.prevSubmenuLabel = '';
+
+		// Sticky
+		this.stickyScene = undefined;
+		this.stickyClass = 'header_sticky';
+		this.stickyTimeline = new gsap.timeline();
+
+		// Scrollbar
+		this.SB = undefined;
+
+		// Lock
+		this.lockClass = 'pointer-events-none';
+		this.unlockClass = 'pointer-events-auto';
+
+		this.labelTimeline = new gsap.timeline();
+
+		this.setMenu();
+		this._setMenusHover();
+	}
+
+	run() {
+		if (typeof this.stickyScene !== 'undefined') {
+			this.stickyScene.refresh();
+			this.stickyScene.disable();
+		}
+
+		this.timeline = new gsap.timeline();
+		this._correctTopOffset();
+		this._stick();
+		this._bindEvents();
+		this._handleAnchors();
+		this._runSmoothScrollOverlayMenu();
+		this._setGradientBackgrounds();
+		this._closeOnResizeIfClassicLayout();
+	}
+
+	setBurger(open = false) {
+		if (open) {
+			this.$target.addClass(this.openClass);
+			this.$burger.addClass(this.burgerOpenClass);
+		} else {
+			this.$target.removeClass(this.openClass);
+			this.$burger.removeClass(this.burgerOpenClass);
+		}
+	}
+
+	setMenu() {
+
+		if (this.$headerColumns.length) {
+			gsap.set(this.$headerColumns, {
+				clearProps: 'all'
+			});
+		}
+
+		if (this.$wrapperSlider.length) {
+			gsap.set(this.$wrapperSlider, {
+				autoAlpha: 0
+			});
+		}
+
+		if (this.$overlay.length) {
+			gsap.set(this.$overlay, {
+				autoAlpha: 0,
+				display: 'none',
+				clearProps: 'transform'
+			});
+		}
+
+		if (this.$menuOverlay.length) {
+			this.$menuOverlay.removeClass(this.lockClass).addClass(this.unlockClass);
+		}
+
+		if (this.$submenu.length) {
+			gsap.set(this.$submenu, {
+				autoAlpha: 0
+			});
+			this.$submenu.removeClass(this.unlockClass).addClass(this.lockClass);
+		}
+
+		if (this.$submenuButton.length) {
+			gsap.set(this.$submenuButton, {
+				autoAlpha: 0
+			});
+		}
+
+		this.$submenu.removeClass(this.openClass);
+		this.$target.removeClass(this.openClass);
+		this.$burger.removeClass(this.burgerOpenClass);
+
+		if (this.$menuLinks.length) {
+			gsap.effects.setLines(this.$menuLinks, {
+				autoAlpha: 1,
+				y: '-100%'
+			});
+		}
+
+		if (this.$submenuLinks.length) {
+			gsap.effects.setLines(this.$submenuLinks, {
+				autoAlpha: 1,
+				y: '-100%'
+			});
+		}
+
+		if (this.$overlayWidgets.length) {
+			gsap.set(this.$overlayWidgets, {
+				autoAlpha: 0,
+				y: -30
+			});
+		}
+
+		if (this.$infoLabel.length) {
+			gsap.set(this.$infoLabel, {
+				x: -30,
+				autoAlpha: 0
+			});
+		}
+
+		this.$wrapperMenu.scrollTop(0);
+
+		if (typeof this.SB !== 'undefined') {
+			this.SB.scrollTo(0, 0);
+		}
+	}
+
+	openMenu() {
+		const timeScale = parseFloat(window.theme.animations.timeScale.overlayMenuOpen) || 1;
+
+		return this.timeline
+			.clear()
+			.set(this.$overlay, {
+				autoAlpha: 1,
+				display: 'block',
+				y: () => this._getOverlayTopOffsetInAbsoluteHeaderSmoothScroling()
+			})
+			.add([() => {
+				this._setTransition(true);
+
+				// save current color theme which
+				// can be different from the initial one
+				this.colorSaved = this._getColorTheme();
+				this.el.dispatchEvent(new CustomEvent('menuOpenStart'));
+				this._unstick();
+				this._updateThemeHeader({
+					text: this.color.overlay.text
+				});
+			}])
+			.set(window.$adminBar, {
+				position: 'fixed',
+			})
+			.animateMask(this.$maskRevealOverlay, {
+				scale: 1,
+				direction: 'down'
+			}, 'start')
+			.to(this.$headerLeft, {
+				duration: 1.2,
+				x: 30,
+				autoAlpha: 0,
+				ease: 'expo.inOut'
+			}, 'start')
+			.to(this.$infoLabel, {
+				duration: 1.2,
+				x: 0,
+				delay: 0.1,
+				autoAlpha: 1,
+				ease: 'expo.inOut'
+			}, 'start')
+			.add(() => {
+				this.$target.addClass(this.openClass);
+			}, '-=0.6')
+			.add([
+				gsap.effects.animateLines(this.$menuLinks, {
+					stagger: {
+						amount: 0.3,
+						from: 'end'
+					},
+					duration: 1.2,
+					ease: 'power4.out'
+				}),
+				gsap.to(this.$overlayWidgets, {
+					autoAlpha: this._isMediumScreen() ? 1 : 0,
+					y: this._isMediumScreen() ? 0 : 30,
+					duration: 1.2,
+					ease: 'power4.out'
+				}),
+			], '-=1.0')
+			.to(this.$wrapperSlider, {
+				autoAlpha: 1,
+				duration: 1.8
+			}, 'start')
+			.add(() => {
+				this.el.dispatchEvent(new CustomEvent('menuOpenEnd'));
+				this._setTransition(false);
+			}, '-=0.6')
+			.timeScale(timeScale);
+	}
+
+	closeMenu(force = false, cb) {
+
+		if (!this.$target.hasClass(this.openClass) && !force) {
+			return this.timeline;
+		}
+
+		const
+			$submenuLinksCurrent = this.$submenu.filter(`.${this.openClass}`).find(this.$submenuLinks),
+			timeScale = parseFloat(window.theme.animations.timeScale.overlayMenuClose) || 1;
+
+		return this.timeline
+			.clear()
+			.add(() => {
+				this._setTransition(true);
+				this.el.dispatchEvent(new CustomEvent('menuCloseStart'));
+				this._stick();
+
+				if (this.$stickyHeader.length && window.pageYOffset >= 1) {
+					this.$stickyHeader.addClass(this.stickyClass);
+
+					// restore theme header from the saved version
+					this._updateThemeHeader({
+						theme: this.colorSaved.sticky.theme,
+						text: this.colorSaved.sticky.text
+					});
+				} else {
+					this._updateThemeHeader({
+						text: this.colorSaved.normal.text
+					});
+				}
+			})
+			.to(this.$wrapperSlider, {
+				autoAlpha: 0,
+				duration: 1.8
+			}, 'start')
+			.hideMask(this.$maskRevealOverlay, {
+				scale: 1,
+				direction: 'down',
+			}, 'start')
+			.set(window.$adminBar, {
+				clearProps: 'position'
+			})
+			.to(this.$headerLeft, {
+				duration: 1.2,
+				x: 0,
+				delay: 0.1,
+				autoAlpha: 1,
+				ease: 'expo.inOut'
+			}, 'start')
+			.to(this.$infoLabel, {
+				duration: 1.2,
+				x: -30,
+				autoAlpha: 0
+			}, 'start')
+			.to(this.$submenuButton, {
+				x: -10,
+				autoAlpha: 0,
+				duration: 0.3
+			}, 'start')
+			.add(() => {
+				this.$target.removeClass(this.openClass);
+			}, '-=0.9')
+			.add([
+				gsap.effects.hideLines([$submenuLinksCurrent, this.$menuLinks], {
+					stagger: {
+						amount: 0,
+						from: 'end'
+					},
+					y: '100%',
+					duration: 0.6,
+				}),
+				gsap.to(this.$overlayWidgets, {
+					autoAlpha: 0,
+					duration: 0.6,
+					y: -30,
+					ease: 'power4.out'
+				})
+			], 'start')
+			.add(() => {
+				if (typeof cb === 'function') {
+					cb();
+				}
+				this.el.dispatchEvent(new CustomEvent('menuCloseEnd'));
+				this.setMenu();
+				this._setTransition(false);
+			}, '-=0.6')
+			.timeScale(timeScale);
+	}
+
+	closeMenuTransition(force = false, cb) {
+
+		if (!this.$target.hasClass(this.openClass) && !force) {
+			return this.timeline;
+		}
+
+		const
+			tl = new gsap.timeline(),
+			$submenuLinksCurrent = this.$submenu.filter(`.${this.openClass}`).find(this.$submenuLinks),
+			timeScale = window.theme.animations.timeScale.overlayMenuClose || 1;
+
+		return tl
+			.add(() => {
+				this._setTransition(true);
+				this.el.dispatchEvent(new CustomEvent('menuCloseStart'));
+				this.setBurger(false);
+			})
+			.to(this.$wrapperSlider, {
+				autoAlpha: 0,
+				duration: 1.8
+			}, 'start')
+			.hideMask(this.$maskRevealOverlay, {
+				scale: 1,
+				direction: 'down',
+			}, 'start')
+			.set(window.$adminBar, {
+				clearProps: 'position'
+			})
+			.to(this.$headerLeft, {
+				duration: 1.2,
+				x: 0,
+				delay: 0.1,
+				autoAlpha: 1,
+				ease: 'expo.inOut'
+			}, 'start')
+			.to(this.$infoLabel, {
+				duration: 1.2,
+				x: -30,
+				autoAlpha: 0
+			}, 'start')
+			.to(this.$submenuButton, {
+				x: -10,
+				autoAlpha: 0,
+				duration: 0.3
+			}, 'start')
+			.add(() => {
+				this.$target.removeClass(this.openClass);
+			}, '-=0.9')
+			.add([
+				gsap.effects.hideLines([$submenuLinksCurrent, this.$menuLinks], {
+					stagger: {
+						amount: 0,
+						from: 'end'
+					},
+					y: '100%',
+					duration: 0.6,
+				}),
+				gsap.to(this.$overlayWidgets, {
+					autoAlpha: 0,
+					y: -30,
+					duration: 0.6,
+					ease: 'power4.out'
+				})
+			], 'start')
+			.add(() => {
+				if (typeof cb === 'function') {
+					cb();
+				}
+				this.el.dispatchEvent(new CustomEvent('menuCloseEnd'));
+				this.setMenu();
+				this._setTransition(false);
+			})
+			.timeScale(timeScale);
+	}
+
+	_bindEvents() {
+		const self = this;
+
+		if (window.$adminBar.length) {
+			window.$window.on('resize', this.debounce(() => {
+				this._correctTopOffset();
+			}, 250));
+		}
+
+		if (this.$burger.length) {
+			this.$burger.off('click').on('click', (e) => {
+				e.preventDefault();
+
+				if (this._isInTransition()) {
+					return;
+				}
+
+				if (this.$burger.hasClass(this.burgerOpenClass)) {
+					this.closeMenu();
+					this.$burger.removeClass(this.burgerOpenClass);
+				} else {
+					this.openMenu();
+					this.$burger.addClass(this.burgerOpenClass);
+				}
+			});
+		}
+
+		if (this.$submenuOpeners.length) {
+			this.$submenuOpeners.on('click', function (e) {
+				if (self._isInTransition()) {
+					e.preventDefault();
+					return;
+				}
+
+				const
+					$el = $(this),
+					$currentMenu = $el.parents('ul'),
+					$submenu = $el.next('.sub-menu');
+
+				if ($submenu.length) {
+					e.preventDefault();
+
+					$el.addClass(self.linkSelectedClass);
+
+					self._openSubmenu({
+						submenu: $submenu,
+						currentMenu: $currentMenu
+					});
+
+					self._updateLabel({
+						text: $el.find('.menu-overlay__heading').text()
+					});
+				}
+			});
+		}
+
+		if (this.$submenuButton.length) {
+			this.$submenuButton.on('click', (e) => {
+				e.preventDefault();
+
+				if (self._isInTransition()) {
+					return;
+				}
+
+				const $submenu = this.$submenu.filter(`.${this.openClass}`),
+					$prevMenu = $submenu.parent('li').parent('ul');
+
+				self._closeSubmenu({
+					submenu: $submenu,
+					currentMenu: $prevMenu
+				});
+
+				self._updateLabel({
+					text: $prevMenu.siblings('a').find('.menu-overlay__heading').text()
+				});
+			});
+		}
+
+		// Customizer & Elementor preview options update
+		this.$target
+			.on('update', () => {
+				this._unstick();
+				this.set();
+				this.stickyScene = undefined;
+				this.timeline.clear();
+				this._stick();
+				this._setTransition(false);
+				this._setGradientBackgrounds();
+			})
+			.on('updateOverlayMenu', () => {
+				this.color = this._getColorTheme();
+				this._setGradientBackgrounds();
+			})
+			.on('updateSubmenuLabel', () => {
+				this.$headerLabelSubmenu = this.$target.find('.js-header-label-submenu');
+				this.$infoLabel = this.$target.find('.header__overlay-menu-info');
+
+				if (this.$headerLabelSubmenu.length) {
+					this._updateLabel({
+						text: this.currentSubmenuLabel
+					});
+				}
+			});
+
+		window.$window
+			.on('arts/barba/transition/start', () => {
+				this._unstick();
+				this._setTransition(true);
+			})
+			.on('arts/barba/transition/end', () => {
+				this.$controls.removeClass('pointer-events-none');
+				this.color = this._getColorTheme();
+				this.stickyScene = undefined;
+				this.timeline.clear();
+				this._stick();
+				this._setTransition(false);
+				this._handleAnchors();
+				this._setGradientBackgrounds();
+				this._closeOnResizeIfClassicLayout();
+			});
+	}
+
+	isOverlayOpened() {
+		return this.$target.hasClass(this.openClass);
+	}
+
+	_getColorTheme() {
+		return {
+			normal: {
+				text: this.$target.attr('data-arts-theme-text') || 'dark'
+			},
+			sticky: {
+				theme: this.$stickyHeader.attr('data-arts-header-sticky-theme') || null,
+				text: this.$stickyHeader.attr('data-arts-header-sticky-theme-text') || 'dark'
+			},
+			overlay: {
+				text: this.$target.attr('data-arts-header-overlay-theme-text') || 'dark'
+			}
+		};
+	}
+
+	_updateThemeHeader({
+		theme,
+		removeTheme,
+		text,
+	}) {
+		if (theme) {
+			this.$target.addClass(theme);
+		}
+
+		if (text) {
+			this.$target.attr('data-arts-theme-text', text);
+		}
+
+		if (removeTheme) {
+			this.$target.removeClass(removeTheme);
+		}
+	}
+
+	_isMediumScreen() {
+		return window.Modernizr.mq('(max-width: 991px)');
+	}
+
+	_isInTransition() {
+		return this.$target.attr('data-arts-header-animation') === 'intransition';
+	}
+
+	_setTransition(inTransition = true) {
+		return this.$target.attr('data-arts-header-animation', inTransition ? 'intransition' : '');
+	}
+
+	_correctTopOffset() {
+		if (typeof window.SB !== 'undefined' && this.$target.attr('data-arts-scroll-absolute')) {
+			return;
+		}
+
+		const top = window.$adminBar.length ? window.$adminBar.height() : 0;
+
+		if (top > 0) {
+			gsap.to(this.$target, {
+				duration: 0.6,
+				top
+			});
+		}
+	}
+
+	_getOverlayTopOffsetInAbsoluteHeaderSmoothScroling() {
+		const
+			isAbsolutePosition = gsap.getProperty(this.target, 'position') === 'absolute',
+			top = window.$adminBar.length ? window.$adminBar.height() : 0;
+
+		if (isAbsolutePosition && typeof window.SB !== 'undefined') {
+			return window.SB.offset.y - top;
+		}
+
+		return 0;
+	}
+
+	_stick() {
+		if (!this.$stickyHeader.length) {
+			return;
+		}
+
+		if (this.stickyScene) {
+			this.stickyScene.refresh(true);
+			this.stickyScene.enable();
+			return;
+		}
+
+		const classesToggle = [this.color.sticky.theme, this.stickyClass].join(' ');
+
+		this.stickyScene = ScrollTrigger.create({
+			start: 2,
+			end: 'bottom center',
+			scrub: true,
+			onEnter: () => {
+				this._updateThemeHeader({
+					theme: classesToggle,
+					text: this.color.sticky.text
+				});
+			},
+			onLeaveBack: () => {
+				this._updateThemeHeader({
+					removeTheme: classesToggle,
+					text: this.color.normal.text
+				});
+			}
+		});
+	}
+
+	_unstick() {
+		if (!this.$stickyHeader.length || !this.stickyScene) {
+			return;
+		}
+
+		const classesToggle = [this.color.sticky.theme, this.stickyClass].join(' ');
+
+		this.stickyScene.disable();
+		this._updateThemeHeader({
+			removeTheme: classesToggle
+		});
+	}
+
+	_openSubmenu({
+		submenu,
+		currentMenu
+	}) {
+		const
+			$currentLinks = currentMenu.find('> li > a .menu-overlay__item-wrapper'),
+			$submenuLinks = submenu.find('> li > a .menu-overlay__item-wrapper');
+
+		this.timeline
+			.clear()
+			.add(() => {
+				this._setTransition(true);
+				this.$submenu.removeClass(this.openClass);
+				submenu.not(this.$menuOverlay).addClass(this.openClass);
+
+				this.$submenu.not(submenu).removeClass(this.unlockClass).addClass(this.lockClass);
+				submenu.removeClass(this.lockClass).addClass(this.unlockClass);
+
+				if (typeof this.SB !== 'undefined') {
+					this.SB.track.yAxis.hide();
+					this.SB.track.update();
+				}
+
+				if (this.$submenu.hasClass(this.openClass)) {
+					this.$menuOverlay.removeClass(this.unlockClass).addClass(this.lockClass);
+
+					gsap.to(this.$submenuButton, {
+						autoAlpha: 1,
+						x: 0,
+						duration: 0.3
+					});
+
+					if (this._isMediumScreen()) {
+						gsap.to(this.$overlayWidgets, {
+							autoAlpha: 0,
+							y: 30,
+							duration: 1.2,
+							ease: 'power4.out',
+						});
+					}
+				} else {
+					this.$menuOverlay.removeClass(this.lockClass).addClass(this.unlockClass);
+
+					gsap.to(this.$submenuButton, {
+						autoAlpha: 0,
+						x: -10,
+						duration: 0.3
+					});
+
+					gsap.to(this.$overlayWidgets, {
+						autoAlpha: 1,
+						y: 0,
+						duration: 1.2,
+						ease: 'power4.out',
+					});
+				}
+			})
+			.set(submenu, {
+				autoAlpha: 1,
+				zIndex: 100
+			})
+			.add(gsap.effects.hideLines($currentLinks, {
+				stagger: {
+					amount: 0.2,
+					from: 'end'
+				},
+				y: '100%',
+				duration: 1.2,
+				ease: 'power4.out'
+			}))
+			.add(gsap.effects.animateLines($submenuLinks, {
+				stagger: {
+					amount: 0.2,
+					from: 'end'
+				},
+				duration: 1.2,
+				ease: 'power4.out',
+				onStart: () => {
+					this.$wrapperMenu.scrollTop(0);
+					// reset virtual scroll position
+					if (typeof this.SB !== 'undefined') {
+						this.SB.scrollTo(0, 0);
+						this.SB.track.yAxis.hide();
+					}
+				},
+			}), '-=0.9')
+			.add(() => {
+				this.$menuLinks.removeClass(this.openClass);
+				this._setTransition(false);
+			}, '-=0.6')
+			.timeScale(1.25);
+	}
+
+	_closeSubmenu({
+		submenu,
+		currentMenu
+	}) {
+		const
+			$currentLinks = currentMenu.find('> li > a .menu-overlay__item-wrapper'),
+			$submenuLinks = submenu.find('> li > a .menu-overlay__item-wrapper');
+
+		this.timeline
+			.clear()
+			.add(() => {
+				this._setTransition(true);
+				this.$submenu.removeClass(this.openClass);
+				currentMenu.not(this.$menuOverlay).addClass(this.openClass);
+
+				this.$submenu.not(currentMenu).removeClass(this.unlockClass).addClass(this.lockClass);
+				currentMenu.removeClass(this.lockClass).addClass(this.unlockClass);
+
+				if (typeof this.SB !== 'undefined') {
+					this.SB.track.yAxis.hide();
+					this.SB.track.update();
+				}
+
+				if (this.$submenu.hasClass(this.openClass)) {
+					this.$menuOverlay.removeClass(this.unlockClass).addClass(this.lockClass);
+
+					gsap.to(this.$submenuButton, {
+						autoAlpha: 1,
+						x: 0,
+						duration: 0.3
+					});
+
+					gsap.to(this.$overlayWidgets, {
+						autoAlpha: 0,
+						y: -30,
+						duration: 1.2,
+						ease: 'power4.out',
+					});
+
+				} else {
+					this.$menuOverlay.removeClass(this.lockClass).addClass(this.unlockClass);
+
+					gsap.to(this.$submenuButton, {
+						autoAlpha: 0,
+						x: -10,
+						duration: 0.3
+					});
+
+					if (this._isMediumScreen()) {
+						gsap.to(this.$overlayWidgets, {
+							autoAlpha: 1,
+							y: 0,
+							duration: 1.2,
+							ease: 'power4.out',
+						});
+					}
+				}
+			})
+			.set(submenu, {
+				zIndex: -1
+			})
+			.add(gsap.effects.setLines($currentLinks, {
+				y: '100%'
+			}), 'start')
+			.add(gsap.effects.hideLines($submenuLinks, {
+				stagger: {
+					amount: 0.1,
+					from: 'start'
+				},
+				y: '-100%',
+				duration: 1.2,
+				ease: 'power4.out'
+			}))
+			.add(
+				gsap.effects.animateLines($currentLinks, {
+					stagger: {
+						amount: 0.2,
+						from: 'start'
+					},
+					duration: 1.2,
+					ease: 'power4.out',
+					onStart: () => {
+						this.$wrapperMenu.scrollTop(0);
+						// reset virtual scroll position
+						if (typeof this.SB !== 'undefined') {
+							this.SB.scrollTo(0, 0);
+							this.SB.track.yAxis.hide();
+						}
+					},
+				}), '-=0.9')
+			.set(submenu, {
+				autoAlpha: 0,
+			})
+			.add(() => {
+				this._setTransition(false);
+			}, '-=0.6')
+			.timeScale(1.25);
+	}
+
+	_handleAnchors() {
+
+		const self = this;
+
+		// overlay anchor links
+		this.$allLinksOverlay.filter('a[href*="#"]:not([href="#"]):not([href*="#elementor-action"])').each(function () {
+			const
+				$current = $(this),
+				url = $current.attr('href');
+
+			self._scrollToAnchorFromMenu({
+				element: $current,
+				url,
+				menu: 'overlay'
+			});
+		});
+
+		// classic menu anchor links
+		this.$allLinksClassic.filter('a[href*="#"]:not([href="#"]):not([href*="#elementor-action"])').each(function () {
+			const
+				$current = $(this),
+				url = $current.attr('href');
+
+			self._scrollToAnchorFromMenu({
+				element: $current,
+				url,
+				menu: 'classic'
+			});
+		});
+
+	}
+
+	_scrollToAnchorFromMenu({
+		element,
+		url,
+		menu = 'classic'
+	}) {
+		if (!url || !element) {
+			return;
+		}
+
+		const filteredUrl = url.substring(url.indexOf('#'));
+
+		try {
+			if (filteredUrl.length) {
+				const $el = window.$pageWrapper.find(filteredUrl);
+
+				if ($el.length) {
+					element.on('click', (e) => {
+						e.stopPropagation();
+						e.preventDefault();
+
+						if (menu === 'classic') {
+							window.kinsey.components.Scroll.scrollTo({
+								y: $el.offset().top - this.$target.innerHeight(),
+								duration: 0.8
+							});
+						}
+
+						if (menu === 'overlay') {
+							this.closeMenu(false, () => {
+								window.kinsey.components.Scroll.scrollTo({
+									y: $el.offset().top - this.$target.innerHeight(),
+									duration: 0.8
+								});
+							});
+						}
+					});
+
+				} else {
+					element.off('click');
+				}
+			}
+		} catch (error) {
+			console.error('Error when handling menu anchor links: ' + error);
+		}
+
+	}
+
+	_runSmoothScrollOverlayMenu() {
+		if (!window.Modernizr.touchevents && this.$menuSmoothScrollingContainer.length && typeof window.Scrollbar !== 'undefined') {
+			this._initSmoothScroll();
+		}
+	}
+
+	_initSmoothScroll() {
+		const options = typeof arts_ss_settings !== 'undefined' ? arts_ss_settings.options : {};
+
+		if (typeof DisableScrollPlugin !== 'undefined') {
+			window.Scrollbar.use(DisableScrollPlugin);
+		}
+
+		if (typeof options.plugins !== 'undefined' && typeof options.plugins.edgeEasing !== 'undefined' && typeof SoftscrollPlugin !== 'undefined') {
+			window.Scrollbar.use(SoftscrollPlugin);
+		}
+
+		this.SB = window.Scrollbar.init(this.$menuSmoothScrollingContainer[0], options);
+	}
+
+	_setGradientBackgrounds() {
+		if (this.$menuGradientTop.length) {
+			this.$menuGradientTop.each(function () {
+				const
+					$this = $(this),
+					ancestorRGB = getColorValues($this.parent().css('background-color'));
+
+				if (ancestorRGB) {
+					gsap.set($this, {
+						background: `linear-gradient(0deg, rgba(${ancestorRGB[0]}, ${ancestorRGB[1]}, ${ancestorRGB[2]}, 0) 0%, rgba(${ancestorRGB[0]}, ${ancestorRGB[1]}, ${ancestorRGB[2]}, 1) 100%)`
+					});
+				}
+			});
+		}
+
+		if (this.$menuGradientBottom.length) {
+			this.$menuGradientBottom.each(function () {
+				const
+					$this = $(this),
+					ancestorRGB = getColorValues($this.parent().css('background-color'));
+
+				if (ancestorRGB) {
+					gsap.set($this, {
+						background: `linear-gradient(180deg, rgba(${ancestorRGB[0]}, ${ancestorRGB[1]}, ${ancestorRGB[2]}, 0) 0%, rgba(${ancestorRGB[0]}, ${ancestorRGB[1]}, ${ancestorRGB[2]}, 1) 100%)`
+					});
+				}
+			});
+		}
+	}
+
+	_updateLabel({
+		text = 'text'
+	}) {
+		if (this.$headerLabelSubmenu.length) {
+			this.currentSubmenuLabel = text;
+
+			this.labelTimeline
+				.clear()
+				.to(this.$headerLabelSubmenu, {
+					y: '-50%',
+					autoAlpha: 0,
+					duration: 0.3,
+					onComplete: () => {
+						this.$headerLabelSubmenu.text(text);
+					}
+				})
+				.fromTo(this.$headerLabelSubmenu, {
+					y: '50%',
+					autoAlpha: 0
+				}, {
+					y: '0%',
+					autoAlpha: 1,
+					duration: 0.3,
+					immediateRender: false
+				});
+		}
+	}
+
+	_setMenusHover() {
+		const self = this;
+
+		if (this.$allLinksOverlay.length) {
+			this.$allLinksOverlay
+				.on('mouseenter touchstart', function () {
+					self.$menuOverlay.addClass(self.hoverClassOverlay);
+				})
+				.on('mouseleave touchend', function () {
+					self.$menuOverlay.removeClass(self.hoverClassOverlay);
+				});
+		}
+
+		if (this.$allLinksClassic.length) {
+			this.$allLinksClassic
+				.on('mouseenter touchstart', function () {
+					self.$menu.addClass(self.hoverClassClassic);
+				})
+				.on('mouseleave touchend', function () {
+					self.$menu.removeClass(self.hoverClassClassic);
+				})
+				.on('click', function (e) {
+					const $currentTarget = $(e.currentTarget);
+
+					self.$menu.find(`.${self.currentMenuItemClass}`).removeClass(`${self.currentMenuItemClass}`);
+					self.$menu.find(`.${self.currentMenuAncestorClass}`).removeClass(`${self.currentMenuAncestorClass}`);
+					$currentTarget.parent().addClass(`${self.currentMenuItemClass}`);
+					$currentTarget.parents(`.${self.menuItemHasChildrenClass}`).last().addClass(`${self.currentMenuAncestorClass}`);
+				});
+		}
+	}
+
+	_closeOnResizeIfClassicLayout() {
+		if (!this.$menu.length || !this.$menuOverlay.length || !this.$burger.length) {
+			return;
+		}
+
+		window.$window.on('resize', this.debounce(() => {
+			if (this.$menu.is(':visible') && !this.$burger.is(':visible') && this.isOverlayOpened()) {
+				this.closeMenu();
+			}
+		}, 250));
+	}
+}
+
+/*!========================================================================
+	11. Load Slider Menu
+	======================================================================!*/
+function loadSliderMenu($scope) {
+	if (!$scope || window.theme.isSliderMenuLoaded === true) {
+		return;
+	}
+
+	const
+		$sliderMenuColumn = $scope.find('.header__slider-column'),
+		$sliderMenu = $scope.find('.js-slider-menu');
+
+	// Slider exists
+	if ($sliderMenuColumn.length && $sliderMenu.length) {
+
+		// Slider exists but yet displayed
+		if (!window.Modernizr.mq('(min-width: 992px)')) {
+
+			// Watch if it will be displayed later
+			window.$window.on('resize orientationchange', debounce(load, 500));
+		} else { // Slider exists and displayed – load immediately
+			load();
+		}
+	}
+
+	function load() {
+		// Slider column became visible
+		if (window.Modernizr.mq('(min-width: 992px)')) {
+			window.$window.off('resize orientationchange', this);
+
+			window.kinsey.components.AssetsManager
+				.loadSliderMenu()
+				.finally(() => {
+					$sliderMenu.each(function () {
+						new window.kinsey.components.SliderMenu({
+							target: $(this),
+							scope: $scope
+						});
+					});
+
+					window.$pageHeader.trigger('sliderInit');
+
+					// Set flag
+					window.theme.isSliderMenuLoaded = true;
+				});
+		}
+	}
+}
+
+/*!========================================================================
+	12. Preloader
+	======================================================================!*/
+function Preloader() {
+	let
+		tl = new gsap.timeline(),
+		$counter = $('.js-preloader__counter'),
+		$content = $('.js-preloader__content'),
+		backgroundSizeHeight,
+		counter = {
+			width: 'auto',
+			val: 0
+		},
+		value = _addZeros(0, 2) + '%';
+
+	this.start = function () {
+		window.dispatchEvent(new CustomEvent('arts/preloader/start'));
+
+		if (!window.$pagePreloader.length) {
+			return;
+		}
+
+		tl
+			.to($content, {
+				y: 0,
+				duration: 0.3,
+				autoAlpha: 1,
+				ease: 'power3.out',
+			}, '0');
+
+		if ($counter.length) {
+			backgroundSizeHeight = $counter.css('background-size').split(' ')[1];
+
+			// get maximum possible width to prevent shaking during the animation
+			$counter.text('100%');
+
+			// save width
+			counter.width = $counter.width();
+
+			// restore counter value
+			$counter.text(value);
+
+			// hard set the width
+			gsap.set($counter, {
+				width: counter.width
+			});
+
+			tl
+				.to($counter, {
+					duration: 0.3,
+					autoAlpha: 1,
+					y: 0,
+					ease: 'power3.out',
+				}, '0')
+				.to(counter, {
+					onUpdate: () => {
+						value = parseFloat(counter.val).toFixed(0);
+						value = _addZeros(value, 2);
+						$counter.text(value + '%');
+					},
+					val: 100,
+					duration: 20,
+					ease: 'power3.out',
+				});
+		}
+
+	}
+
+	this.finish = function () {
+		return new Promise((resolve) => {
+			const timeScale = parseFloat(window.theme.animations.timeScale.preloader) || 1;
+
+			if (!window.$pagePreloader.length) {
+				window.dispatchEvent(new CustomEvent('arts/preloader/end'));
+				return;
+			}
+
+			tl
+				.clear()
+				.add([
+					gsap.to($content, {
+						y: 0,
+						autoAlpha: 1,
+						ease: 'power3.out',
+						duration: 0.3,
+						overwrite: true
+					}),
+					gsap.to($counter, {
+						y: 0,
+						autoAlpha: 1,
+						ease: 'power3.out',
+						duration: 0.3,
+						overwrite: true
+					})
+				])
+				.add([
+					gsap.to($counter, {
+						onStart: () => {
+							$counter.removeClass('preloader__counter_started');
+						},
+						backgroundSize: `100% ${backgroundSizeHeight}`,
+						duration: 2.4 / timeScale,
+						ease: 'expo.inOut'
+					}),
+					gsap.to(counter, {
+						onUpdate: () => {
+							value = parseFloat(counter.val).toFixed(0);
+							value = _addZeros(value, 2);
+							$counter.text(value + '%');
+						},
+						val: 100,
+						duration: 2.4 / timeScale,
+						ease: 'expo.inOut'
+					})
+				])
+				.set($counter, {
+					backgroundPosition: '100% 100%',
+				})
+				.to($counter, {
+					backgroundSize: `0% ${backgroundSizeHeight}`,
+					duration: 1.2,
+					ease: 'expo.inOut',
+				})
+				.add([
+					gsap.effects.hideMask(window.$pagePreloader, {
+						duration: 1.2,
+						scale: 1,
+						direction: 'down',
+					}),
+					gsap.to($counter, {
+						y: -50,
+						autoAlpha: 0,
+						duration: 0.3,
+						onComplete: () => {
+							window.kinsey.components.Scroll.scrollToTop();
+							window.$pagePreloader.addClass('preloader_ended');
+						}
+					}),
+					gsap.to($content, {
+						y: -50,
+						autoAlpha: 0,
+						duration: 0.3,
+						delay: 0.1
+					}),
+				], '-=0.3')
+				.set(window.$pagePreloader, {
+					display: 'none'
+				})
+				.add(() => {
+					window.dispatchEvent(new CustomEvent('arts/preloader/end'));
+					resolve(true);
+				}, '-=0.3');
+		});
+	}
+
+	function _addZeros(value, zeros) {
+		while (value.toString().length < zeros) {
+			value = '0' + value;
+		}
+
+		return value;
+	}
+
+	if (window.$pagePreloader.length) {
+		window.$window.on('arts/preloader/preview', () => {
+			window.$pagePreloader.removeClass('preloader_ended');
+
+			gsap.set(window.$pagePreloader, {
+				clearProps: 'all'
+			});
+
+			gsap.effects.animateMask(window.$pagePreloader, {
+				duration: 0
+			});
+
+			$counter.addClass('preloader__counter_started');
+
+			gsap.set($counter, {
+				clearProps: 'all'
+			});
+
+			gsap.set($content, {
+				clearProps: 'all'
+			});
+		});
+	}
+}
+
+/*!========================================================================
+	13. Section Content
+	======================================================================!*/
+window.kinsey.components.SectionContent = class SectionContent extends window.kinsey.components.BaseComponent {
+	constructor({
+		target,
+		scope
+	}) {
+		super({
+			target,
+			scope
+		});
+	}
+}
+
+/*!========================================================================
+	14. Section Masthead
+	======================================================================!*/
+window.kinsey.components.SectionMasthead = class SectionMasthead extends window.kinsey.components.BaseComponent {
+	constructor({
+		target,
+		scope,
+		afterMount,
+		afterRun
+	}) {
+		super({
+			target,
+			scope,
+			afterRun,
+			afterMount
+		});
+	}
+
+	set() {
+		this.$inner = this.$target.find('.section-masthead__inner');
+		this.$maskReveal = this.$target.find('.mask-reveal');
+		this.$heading = this.$target.find('.section-masthead__heading');
+		this.$category = this.$target.find('.section-masthead__category');
+		this.$subheading = this.$target.find('.section-masthead__subheading');
+		this.$background = this.$target.find('.section__bg');
+		this.$divider = this.$target.find('.section-masthead__meta-divider');
+		this.$button = this.$target.find('.section-masthead__button');
+		this.$scrollDown = this.$target.find('.section-masthead__wrapper-scroll-down');
+		this.$overlay = this.$target.find('.section-masthead__overlay');
+
+		if (this.$target.hasClass('section-masthead_fixed')) {
+			this._fixMasthead();
+		}
+	}
+
+	animateIn() {
+		const
+			$heading = this.$heading.not('.js-transition-animated'),
+			$maskReveal = this.$maskReveal.not('.js-transition-animated'),
+			$background = this.$background.not('.js-transition-animated');
+
+		this.timeline
+			.animateText($heading, {
+				duration: 1.2,
+				stagger: {
+					amount: 0.3,
+					from: 'left'
+				}
+			})
+			.add([
+				gsap.effects.animateText(this.$category, {
+					duration: 0.6,
+					stagger: {
+						amount: 0.3,
+						from: 'left'
+					}
+				}),
+				gsap.effects.animateText(this.$subheading, {
+					duration: 0.6,
+					stagger: {
+						amount: 0.3,
+						from: 'left'
+					}
+				}),
+				gsap.effects.animateHeadline(this.$divider, {
+					// duration: 0.6,
+				})
+			], $heading.length ? '-=0.8' : '0.2')
+			.add([
+				gsap.effects.animateMask($maskReveal, {
+					direction: 'down'
+				}),
+				gsap.effects.animateScale($background, {
+					direction: 'down'
+				}),
+				gsap.fromTo(this.$overlay, {
+					autoAlpha: 0,
+					immediateRender: true
+				}, {
+					autoAlpha: 1,
+					duration: 0.6
+				}),
+				gsap.effects.animateJump(this.$scrollDown)
+			], '-=1.2');
+
+	}
+
+	animateOut() {
+		this.timelineOut.add([
+			gsap.effects.hideText(this.$target, {
+				stagger: 0
+			}),
+			gsap.effects.hideHeadline(this.$divider),
+			gsap.effects.hideMask(this.$maskReveal),
+			gsap.effects.hideScale(this.$background)
+		], '0');
+
+	}
+
+	_getFixedScrollingDistance() {
+		if (typeof window.SB !== 'undefined') {
+			return window.SB.containerEl.scrollHeight;
+		} else {
+			return Math.max(
+				document.body.scrollHeight, document.documentElement.scrollHeight,
+				document.body.offsetHeight, document.documentElement.offsetHeight,
+				document.body.clientHeight, document.documentElement.clientHeight
+			);
+		}
+	}
+
+	_fixMasthead() {
+		if (typeof window.SB === 'undefined') {
+
+			ScrollTrigger.create({
+				pin: true,
+				pinType: 'fixed',
+				pinSpacing: false,
+				invalidateOnRefresh: true,
+				anticipatePin: 1,
+				trigger: this.$target,
+				scrub: true,
+				start: () => 'top top',
+				end: () => this._getFixedScrollingDistance(),
+			});
+		}
+
+		ScrollTrigger.create({
+			animation: gsap.fromTo(this.$inner, {
+				autoAlpha: 1,
+				y: 0
+			}, {
+				autoAlpha: 0,
+				y: '-10%'
+			}),
+			start: `top+=${window.innerHeight} bottom`,
+			end: `top+=${window.innerHeight * 1.33} bottom`,
+			scrub: true,
+			trigger: window.$pageContent,
+			invalidateOnRefresh: true
+		});
+	}
+}
+
+
+})(jQuery);

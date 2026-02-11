@@ -1,0 +1,895 @@
+if (
+  window.location.hostname.includes("saivendevelopers.com11") ||
+  window.location.hostname.includes("grandus.in11") ||
+  window.location.hostname.includes("souloftheseasons.nbrgroup.in11") ||
+  window.location.hostname.includes("trendsquaresworldofgardens.com11") ||
+  window.location.hostname.includes("codenamelifeisgreen.com11") ||
+  window.location.hostname.includes("elegantatmos.in11") ||
+   window.location.hostname.includes("atmos.elegantbuildersanddevelopers.com11") ||
+  window.location.hostname.includes("poetryofearth11")
+) {
+(() => {
+  // ---- Config ----
+  const NAMES = [
+  "Mr. Aarav Verma","Mr. Vihaan Sharma","Mr. Advait Nair","Mr. Arjun Reddy","Mr. Ishaan Gupta",
+  "Mr. Karthik Iyer","Mr. Rohan Mehta","Mr. Siddharth Rao","Mr. Yuvraj Singh","Mr. Manish Kumar",
+  "Mr. Vikram Desai","Mr. Amit Bansal","Mr. Rahul Bhatt","Mr. Neeraj Sethi","Mr. Ankit Malhotra",
+  "Ms. Aanya Kapoor","Ms. Diya Nair","Ms. Ishita Rao","Ms. Kavya Menon","Ms. Meera Kulkarni",
+  "Ms. Nisha Gupta","Ms. Riya Singh","Ms. Sana Khan","Ms. Shruti Sharma","Ms. Tanvi Patel",
+  "Ms. Ananya Iyer","Ms. Priya Reddy","Ms. Simran Kaur","Ms. Pooja Verma","Ms. Neha Agarwal",
+  "Mr. Harsh Vardhan","Mr. Saurabh Jain","Mr. Abhishek Tiwari","Mr. Nitin Chauhan","Mr. Deepak Yadav",
+  "Mr. Amitesh Prasad","Mr. Raghav Bhatia","Mr. Parth Khandelwal","Mr. Jayant Joshi","Mr. Akash Sinha",
+  "Mr. Chirag Goel","Mr. Rajat Kapoor","Mr. Pranav Mittal","Mr. Siddhant Ghosh","Mr. Akhil Menon",
+  "Ms. Ayesha Khan","Ms. Bhavna Choudhary","Ms. Charu Joshi","Ms. Divya Nambiar","Ms. Ekta Sinha",
+  "Ms. Garima Tandon","Ms. Hina Batra","Ms. Ira Malhotra","Ms. Juhi Saxena","Ms. Kiran Thakur",
+  "Ms. Lavanya Nair","Ms. Megha Gupta","Ms. Namrata Das","Ms. Ojasvi Reddy","Ms. Parul Kapoor",
+  "Ms. Reema Chopra","Ms. Shalini Singh","Ms. Trisha Banerjee","Ms. Urmi Patel","Ms. Vidhi Desai",
+  "Ms. Zoya Ahmed","Ms. Anushka Sharma","Ms. Kritika Verma","Ms. Pallavi Mehta","Ms. Ritika Malhotra",
+  "Ms. Sneha Iyer","Ms. Tanya Rao","Ms. Vandana Menon","Ms. Yamini Reddy","Ms. Sanya Kapoor",
+  "Mr. Devansh Gupta","Mr. Ishan Malhotra","Mr. Mohit Bansal","Mr. Naveen Reddy","Mr. Prateek Sharma",
+  "Mr. Rajat Malhotra","Mr. Sahil Khanna","Mr. Tarun Goyal","Mr. Uday Singh","Mr. Varun Kapoor",
+  "Mr. Anirudh Rao","Mr. Bhavesh Patel","Mr. Chandan Nair","Mr. Darshan Mehta","Mr. Eshan Iyer",
+  "Mr. Faisal Khan","Mr. Gaurav Sharma","Mr. Hemant Kumar","Mr. Inderjeet Singh","Mr. Jai Prakash",
+  "Mr. Kunal Sethi","Mr. Lokesh Sharma","Mr. Mayank Agarwal","Mr. Nikhil Bhatia","Mr. Om Prakash"
+];
+  const ACTIONS = [
+    "viewed the floor plan",
+    "downloaded the brochure",
+    "booked a site visit",
+    "unlocked the price",
+    "downloaded floorplans",
+    "scheduled a callback"
+  ];
+  const WHEN = ["just now","moments ago","a few seconds ago"];
+
+  const CORNER = "top-left";       // keep as requested
+  const SCROLL_TRIGGER_PX = 160;   // first-fold threshold
+  const DISPLAY_MS = 3000;         // stays visible ~3s
+  const INTERVAL_MIN_MS = 10000;   // at least 10s between nudges
+  const INTERVAL_MAX_MS = 14000;   // slight randomness
+  const MAX_STACK = 1;             // calm UI
+  const MAX_PER_SESSION = 8;       // 7–8 per session
+
+  // ---- Styles ----
+  const css = `
+  .spn-container{position:fixed;z-index:217;pointer-events:none;padding:8px}
+  .spn-container.top-left{top:10px;left:10px}
+  .spn-container.top-right{top:10px;right:10px}
+  .spn-nudge{
+    pointer-events:auto; display:flex; align-items:center; gap:8px;
+    background:rgba(17,17,17,.42); color:rgba(255,255,255,.92); border-radius:12px;
+    box-shadow:0 6px 20px rgba(0,0,0,.12); padding:7px 9px;
+    backdrop-filter:saturate(140%) blur(4px); -webkit-backdrop-filter:saturate(140%) blur(4px);
+    max-width:min(86vw,300px); font:500 12.5px/1.25 system-ui,-apple-system,Segoe UI,Roboto;
+    transform:translateY(-10px); opacity:0; transition:transform .24s ease,opacity .24s ease;
+  }
+  .spn-nudge.show{opacity:1; transform:translateY(0)}
+  .spn-avatar{flex:0 0 20px; height:20px; width:20px; border-radius:999px;
+    display:grid; place-items:center; background:rgba(255,255,255,.10)}
+  .spn-avatar svg{height:12px;width:12px;opacity:.9}
+  .spn-copy b{font-weight:700}
+  .spn-close{margin-left:6px; opacity:.6; cursor:pointer; border:0; background:transparent;
+    color:#fff; font-size:16px; line-height:1; padding:0 2px}
+  @media (max-width:480px){ .spn-nudge{font-size:12px; max-width:84vw;} }`;
+  if (!document.getElementById("spn-style")) {
+    const s = document.createElement("style"); s.id = "spn-style"; s.textContent = css; document.head.appendChild(s);
+  }
+
+  // ---- Container ----
+  let container = document.getElementById("spn-container");
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "spn-container";
+    container.className = `spn-container ${CORNER}`;
+    document.body.appendChild(container);
+  }
+
+  // ---- Helpers ----
+  const rng = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+  const pick = arr => arr[rng(0, arr.length - 1)];
+
+  // ---- State ----
+  let running = false;
+  let started = false;
+  let sessionCount = 0;
+  let nextTimer = null;
+
+  function scheduleNext(delayMs){
+    clearTimeout(nextTimer);
+    nextTimer = setTimeout(() => {
+      if (!running) return;
+      if (sessionCount >= MAX_PER_SESSION) { stopCycle(); return; }
+      createNudge();
+      sessionCount++;
+      scheduleNext(rng(INTERVAL_MIN_MS, INTERVAL_MAX_MS));
+    }, delayMs);
+  }
+
+  function startCycle(){
+    if (running || sessionCount >= MAX_PER_SESSION) return;
+    running = true;
+    scheduleNext(rng(INTERVAL_MIN_MS, INTERVAL_MAX_MS));
+  }
+
+  function stopCycle(){
+    running = false;
+    clearTimeout(nextTimer);
+    nextTimer = null;
+    clearAll();
+  }
+
+  function clearAll(){
+    [...container.children].forEach((el)=>hideNudge(el, true));
+  }
+
+  function createNudge(){
+    if (document.hidden) return;
+    if (container.children.length >= MAX_STACK) return;
+
+    const name = pick(NAMES);
+    const action = pick(ACTIONS);
+    const when = pick(WHEN);
+
+    const n = document.createElement("div");
+    n.className = "spn-nudge";
+    n.setAttribute("role","status");
+    n.setAttribute("aria-live","polite");
+    n.style.marginTop = "8px";
+
+    const avatar = document.createElement("div");
+    avatar.className = "spn-avatar";
+    avatar.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M12 12c2.9 0 5.25-2.69 5.25-6S14.9 0 12 0 6.75 2.24 6.75 6 9.1 12 12 12Zm0 1.8c-4.6 0-8.5 2.31-8.5 5.3V21H20.5v-1.9c0-2.99-3.9-5.3-8.5-5.3Z"/></svg>`;
+
+    const copy = document.createElement("div");
+    copy.className = "spn-copy";
+    copy.innerHTML = `<b>${name}</b> ${action} ${when}.`;
+
+    const close = document.createElement("button");
+    close.className = "spn-close"; close.setAttribute("aria-label","Hide notification"); close.textContent = "×";
+    close.addEventListener("click",(e)=>{ e.stopPropagation(); hideNudge(n); });
+
+    n.appendChild(avatar); n.appendChild(copy); n.appendChild(close);
+
+    container.appendChild(n);
+    requestAnimationFrame(()=> n.classList.add("show"));
+
+    let hideId = setTimeout(()=>hideNudge(n), DISPLAY_MS);
+    n.addEventListener("mouseenter", ()=>clearTimeout(hideId));
+    n.addEventListener("mouseleave", ()=> hideId = setTimeout(()=>hideNudge(n), DISPLAY_MS));
+    setTimeout(()=>{ if (document.body.contains(n)) hideNudge(n); }, DISPLAY_MS + 2000);
+  }
+
+  function hideNudge(el, immediate=false){
+    if (!el) return;
+    if (immediate) { el.remove(); return; }
+    el.classList.remove("show");
+    setTimeout(()=> el.remove(), 220);
+  }
+
+  // ---- Scroll gating ----
+  function handleScrollGate(){
+    const y = window.scrollY || document.documentElement.scrollTop || 0;
+    if (y >= SCROLL_TRIGGER_PX) {
+      if (!started) started = true;
+      startCycle();
+    } else {
+      stopCycle();
+    }
+  }
+
+  window.addEventListener('scroll', ()=>requestAnimationFrame(handleScrollGate), {passive:true});
+  window.addEventListener('load', handleScrollGate);
+})();
+}
+
+
+
+ 
+ 
+ // ===== Padding for same-origin contactform iframes (embedded + popup) =====
+ /*
+ (() => {
+  const ALLOW_HOSTS = [];
+  if (ALLOW_HOSTS.length && !ALLOW_HOSTS.includes(location.hostname)) return;
+ 
+   const FLAG = 'data-contactform-padding';
+ 
+   const looksLikeContactForm = (frame) => {
+     try {
+       const idc = ((frame.id||'') + ' ' + (frame.className||'') + ' ' + (frame.name||'')).toLowerCase();
+       if (idc.includes('contactform')) return true;
+ 
+       const src = frame.getAttribute('src') || '';
+       if (!src) return false;
+       const u = new URL(src, location.href);
+       return u.origin === location.origin && /contactform/i.test(u.pathname);
+     } catch { return false; }
+   };
+ 
+   const inject = (frame) => {
+     try {
+       const doc = frame.contentDocument;
+       if (!doc || doc.head?.querySelector(`style[${FLAG}]`)) return;
+ 
+       const style = doc.createElement('style');
+       style.setAttribute(FLAG, '1');
+       // Body-only padding: gives focus outlines room without touching your styles
+       style.textContent = 'body{margin:0!important;padding:3px!important;box-sizing:border-box}';
+       (doc.head || doc.documentElement).appendChild(style);
+ 
+       // Nudge auto-resizers if present
+       try { frame.contentWindow.postMessage({type:'vf-please-height'}, '*'); } catch {}
+     } catch {   }
+   };
+ 
+   const attachLoadHandler = (frame) => {
+     frame.addEventListener('load', () => {
+       if (looksLikeContactForm(frame)) inject(frame);
+     });
+   };
+ 
+   const handle = (frame) => {
+     attachLoadHandler(frame);
+ 
+     // Immediate try (already loaded)
+     if (looksLikeContactForm(frame) && frame.contentDocument && frame.contentDocument.readyState !== 'loading') {
+       inject(frame);
+     }
+ 
+     // If popup sets src later, watch attribute changes and re-try
+     new MutationObserver(() => {
+       if (looksLikeContactForm(frame)) {
+         if (frame.contentDocument && frame.contentDocument.readyState !== 'loading') inject(frame);
+       }
+     }).observe(frame, { attributes: true, attributeFilter: ['src','id','class','name'] });
+   };
+ 
+   // Existing iframes
+   document.querySelectorAll('iframe').forEach(handle);
+ 
+   // Future iframes (popups, dynamic inserts)
+   new MutationObserver((muts) => {
+     muts.forEach(m => m.addedNodes.forEach(n => {
+       if (n.nodeType !== 1) return;
+       if (n.tagName === 'IFRAME') handle(n);
+       n.querySelectorAll?.('iframe').forEach(handle);
+     }));
+   }).observe(document.documentElement, { childList: true, subtree: true });
+ })();
+
+*/
+
+
+
+////
+
+
+
+document.addEventListener('DOMContentLoaded', function () {
+  "use strict";
+
+  // =========================================================
+  // 100% SAFE SCOPE: ONLY touches the on-page form inside this container
+  // =========================================================
+  var container = document.getElementById('btn-logo-rest-body');
+  if (!container) return;
+
+  // Optional fields
+  var userNameInput  = container.querySelector('#userName');
+  var userEmailInput = container.querySelector('#userEmail');
+
+  // Required for phone logic
+  var phoneInput = container.querySelector('#phonenumb');
+  if (!phoneInput) return;
+
+  // =========================================================
+  // A) AUTOCOMPLETE (safe: only sets if missing or "off")
+  // =========================================================
+  function setAutoEl(el, val) {
+    if (!el) return;
+    var cur = '';
+    try { cur = (el.getAttribute('autocomplete') || '').toLowerCase().trim(); } catch (e) {}
+    if (!cur || cur === 'off') {
+      try { el.setAttribute('autocomplete', val); } catch (e) {}
+      try { el.autocomplete = val; } catch (e) {}
+    }
+  }
+
+  setAutoEl(userNameInput,  'name');
+  setAutoEl(userEmailInput, 'email');
+  setAutoEl(phoneInput,     'tel');
+
+  // If the parent FORM is autocomplete=off, it can block autofill
+  try {
+    if (phoneInput.form) {
+      var fcur = (phoneInput.form.getAttribute('autocomplete') || '').toLowerCase().trim();
+      if (fcur === 'off') phoneInput.form.setAttribute('autocomplete', 'on');
+    }
+  } catch (e) {}
+
+  // Extra safe hints
+  try { phoneInput.setAttribute('inputmode', 'tel'); } catch (e) {}
+  try { phoneInput.setAttribute('autocapitalize', 'off'); } catch (e) {}
+  try { phoneInput.setAttribute('spellcheck', 'false'); } catch (e) {}
+
+  // =========================================================
+  // HARD GUARD: only proceed if this is actually intl-tel-input
+  // =========================================================
+  var itiWrap = null;
+  try { itiWrap = (typeof phoneInput.closest === 'function') ? phoneInput.closest('.intl-tel-input, .iti') : null; } catch (e) {}
+  if (!itiWrap) return; // <-- prevents any helper injection / stripping on plain tel inputs
+
+  // =========================================================
+  // B) DIAL READ (NO GUESSWORK)
+  // =========================================================
+  function onlyDigits(s) { return String(s || '').replace(/\D+/g, ''); }
+
+  function findSelectedFlagForInput(input) {
+    try {
+      var wrap = (typeof input.closest === 'function') ? input.closest('.intl-tel-input, .iti') : null;
+      if (!wrap) return null;
+      return wrap.querySelector('.selected-flag, .iti__selected-flag');
+    } catch (e) { return null; }
+  }
+
+  function dialFromFlagTitle(flagEl) {
+    try {
+      if (!flagEl) return '';
+      var title = (flagEl.getAttribute && flagEl.getAttribute('title')) || '';
+      if (!title) return '';
+      var m = title.match(/:\s*\+?\s*([\d\s]+)\s*$/); // "...: +91"
+      if (!m) return '';
+      var dial = onlyDigits(String(m[1] || '').replace(/\s+/g, ''));
+      return dial || '';
+    } catch (e) { return ''; }
+  }
+
+  // =========================================================
+  // C) ISD HELPER INJECTION (outside iti wrapper, stable)
+  // =========================================================
+  function ensureIsdHelper(input) {
+    try {
+      var inputId = input.id || 'phonenumb';
+
+      var existing = container.querySelector('input[data-isd-helper="1"][data-for="' + inputId + '"]');
+      if (existing) return existing;
+
+      var helper = document.createElement('input');
+      helper.type = 'tel';
+      helper.inputMode = 'tel';
+      helper.tabIndex = -1;
+      helper.setAttribute('aria-hidden', 'true');
+
+      helper.name = 'isd_helper_' + Math.random().toString(36).slice(2, 9);
+      helper.id   = 'isd_helper_' + Math.random().toString(36).slice(2, 9);
+      helper.setAttribute('autocomplete', 'tel-country-code');
+
+      helper.setAttribute('data-isd-helper', '1');
+      helper.setAttribute('data-for', inputId);
+
+      // off-screen but present (NOT display:none)
+      helper.style.position = 'absolute';
+      helper.style.left = '-9999px';
+      helper.style.top = '0';
+      helper.style.width = '1px';
+      helper.style.height = '1px';
+      helper.style.opacity = '0.01';
+      helper.style.pointerEvents = 'none';
+
+      // Insert OUTSIDE iti wrapper so plugin never removes it
+      var wrap = (typeof input.closest === 'function') ? input.closest('.intl-tel-input, .iti') : null;
+      if (wrap && wrap.parentNode) wrap.parentNode.insertBefore(helper, wrap.nextSibling);
+      else if (input.parentNode) input.parentNode.insertBefore(helper, input.nextSibling);
+      else container.appendChild(helper);
+
+      return helper;
+    } catch (e) { return null; }
+  }
+
+  function syncHelperWithFlag(input, helper) {
+    if (!input || !helper) return;
+    var flag = findSelectedFlagForInput(input);
+    var dial = dialFromFlagTitle(flag);
+    if (!dial) return; // no dial => do nothing
+    helper.value = '+' + dial;
+  }
+
+  // =========================================================
+  // D) SUBMIT-ONLY DUPLICATE ISD CLEANUP (NO GUESSWORK)
+  // =========================================================
+  function stripDialIfExactMatch_submitOnly(input) {
+    if (!input) return;
+
+    var raw = String(input.value || '').trim();
+    if (!raw || raw.charAt(0) !== '+') return;
+
+    var flag = findSelectedFlagForInput(input);
+    var dial = dialFromFlagTitle(flag);
+    if (!dial) return;
+
+    var digits = onlyDigits(raw);
+    if (digits.indexOf(dial) !== 0) return;
+    if (digits.length <= dial.length) return;
+
+    var national = digits.slice(dial.length).replace(/^0+/, '');
+    if (!national) return;
+
+    input.value = national;
+  }
+
+  // =========================================================
+  // E) WIRE UP (ONLY submit actions)
+  // =========================================================
+  var isdHelper = ensureIsdHelper(phoneInput);
+  syncHelperWithFlag(phoneInput, isdHelper);
+
+  try {
+    phoneInput.addEventListener('countrychange', function () {
+      syncHelperWithFlag(phoneInput, isdHelper);
+    }, true);
+  } catch (e) {}
+
+  function cleanupOnSubmit() {
+    syncHelperWithFlag(phoneInput, isdHelper);
+    stripDialIfExactMatch_submitOnly(phoneInput);
+  }
+
+  // Button in this container only
+  var btn = container.querySelector('#myBtn');
+  if (btn) btn.addEventListener('click', cleanupOnSubmit, true);
+
+  // Form that contains THIS phoneInput only
+  try {
+    var form = (typeof phoneInput.closest === 'function') ? phoneInput.closest('form') : null;
+    if (form) {
+      form.addEventListener('submit', cleanupOnSubmit, true);
+
+      form.addEventListener('click', function (ev) {
+        var t = ev && ev.target;
+        if (!t) return;
+        var tag = (t.tagName || '').toUpperCase();
+        var type = (t.type || '').toLowerCase();
+        if ((tag === 'BUTTON' && type === 'submit') || (tag === 'INPUT' && type === 'submit')) cleanupOnSubmit();
+      }, true);
+    }
+  } catch (e) {}
+});
+
+
+/* =========================================================
+   QUICK FILL (ON-PAGE ONLY, MOBILE ONLY) — BULLETPROOF
+   Scope: ONLY inside #btn-logo-rest-body
+   - Injects button INSIDE the SAME DIV as #myBtn (within container)
+   - Bottom-right tiny chip (smaller than iframe)
+   - Focus order: first empty Name -> Email -> Phone
+   - If none empty: focus MOST RECENTLY TOUCHED field (flow)
+   - Waits for intl-tel-input flag ONLY if phone is actually iti-wrapped
+   - Absolutely NO value changes
+   - Never touches any other form on the page
+   ========================================================= */
+(function () {
+  "use strict";
+
+  /* =========================
+     MOBILE ONLY
+     ========================= */
+  function isMobileLike() {
+    try {
+      if (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) return true;
+    } catch (e) {}
+    var ua = "";
+    try { ua = String(navigator.userAgent || ""); } catch (e) { ua = ""; }
+    return /Android|iPhone|iPad|iPod|Mobile/i.test(ua);
+  }
+  if (!isMobileLike()) return;
+
+  /* =========================
+     Safe helpers
+     ========================= */
+  function hasEl(el) { return !!(el && el.nodeType === 1); }
+
+  function usable(el) {
+    if (!hasEl(el)) return false;
+    try {
+      if (el.disabled) return false;
+      if (el.readOnly) return false;
+      if ((el.type || "").toLowerCase() === "hidden") return false;
+
+      var cs = window.getComputedStyle ? getComputedStyle(el) : null;
+      if (cs && (cs.display === "none" || cs.visibility === "hidden")) return false;
+
+      return true;
+    } catch (e) {
+      return true;
+    }
+  }
+
+  function empty(el) {
+    try { return !String(el.value || "").trim(); } catch (e) { return true; }
+  }
+
+  function now() { return Date.now ? Date.now() : +new Date(); }
+
+  function markTouched(el) {
+    if (!hasEl(el) || !usable(el)) return;
+    try { el.setAttribute("data-sf-touched", String(now())); } catch (e) {}
+  }
+
+  function lastTouched(el) {
+    try { return parseInt(el.getAttribute("data-sf-touched") || "0", 10) || 0; } catch (e) { return 0; }
+  }
+
+  function focusNudge(el) {
+    if (!hasEl(el) || !usable(el)) return false;
+
+    try { el.scrollIntoView({ block: "center", inline: "nearest" }); } catch (e) {}
+    try { el.focus(); } catch (e) {}
+
+    // nice caret placement (no value changes)
+    try {
+      var v = String(el.value || "");
+      if (typeof el.setSelectionRange === "function") el.setSelectionRange(v.length, v.length);
+    } catch (e) {}
+
+    // safe "tap" simulation
+    try { el.click(); } catch (e) {}
+    return true;
+  }
+
+  /* =========================
+     intl-tel-input readiness
+     (ONLY if actually wrapped)
+     ========================= */
+  function itiWrapOf(phone) {
+    try {
+      if (!hasEl(phone) || typeof phone.closest !== "function") return null;
+      return phone.closest(".intl-tel-input, .iti");
+    } catch (e) { return null; }
+  }
+
+  function itiReady(phone) {
+    try {
+      var wrap = itiWrapOf(phone);
+      if (!wrap) return true; // no iti => nothing to wait for
+      return !!wrap.querySelector(".selected-flag, .iti__selected-flag");
+    } catch (e) { return true; }
+  }
+
+  function waitUntilReady(fn) {
+    var tries = 0;
+    var maxTries = 60; // 6s max
+    var delay = 100;
+
+    var t = setInterval(function () {
+      tries++;
+      try {
+        if (fn()) { clearInterval(t); }
+        else if (tries >= maxTries) { clearInterval(t); }
+      } catch (e) {
+        if (tries >= maxTries) clearInterval(t);
+      }
+    }, delay);
+  }
+
+  /* =========================
+     Main
+     ========================= */
+  function initQuickFillOnPage() {
+    // ✅ HARD SCOPE: ONLY this container
+    var container = document.getElementById("btn-logo-rest-body");
+    if (!hasEl(container)) return;
+
+    // ✅ ONLY query inside container (cannot touch other forms)
+    var nameEl  = container.querySelector("#userName");
+    var emailEl = container.querySelector("#userEmail");
+    var phoneEl = container.querySelector("#phonenumb");
+    var submitBtn = container.querySelector("#myBtn");
+
+    if (!hasEl(submitBtn)) return;
+    if (!hasEl(nameEl) && !hasEl(emailEl) && !hasEl(phoneEl)) return;
+
+    // ✅ Prevent duplicates (ONLY inside container)
+    try {
+      if (container.querySelector('[data-sf-assist="1"]')) return;
+    } catch (e) {}
+
+    // ✅ Track last touched (ONLY if element exists & usable)
+    var trackEvents = ["input", "change", "keyup", "paste", "blur"];
+    function bindTrack(el) {
+      if (!hasEl(el) || !usable(el)) return;
+      for (var i = 0; i < trackEvents.length; i++) {
+        try {
+          el.addEventListener(trackEvents[i], function () { markTouched(this); }, true);
+        } catch (e) {}
+      }
+      if (!empty(el)) markTouched(el);
+    }
+    bindTrack(nameEl);
+    bindTrack(emailEl);
+    bindTrack(phoneEl);
+
+    // ✅ Same logic as iframe:
+    // 1) first empty Name -> Email -> Phone
+    // 2) else most recently touched (flow)
+    // 3) else fallback Name -> Email -> Phone
+    function chooseTarget() {
+      if (hasEl(nameEl)  && usable(nameEl)  && empty(nameEl))  return nameEl;
+      if (hasEl(emailEl) && usable(emailEl) && empty(emailEl)) return emailEl;
+      if (hasEl(phoneEl) && usable(phoneEl) && empty(phoneEl)) return phoneEl;
+
+      var best = null, bestTs = -1;
+      var cands = [nameEl, emailEl, phoneEl];
+      for (var i = 0; i < cands.length; i++) {
+        var el = cands[i];
+        if (!hasEl(el) || !usable(el)) continue;
+        var ts = lastTouched(el);
+        if (ts > bestTs) { bestTs = ts; best = el; }
+      }
+
+      if (best) return best;
+      if (hasEl(nameEl) && usable(nameEl)) return nameEl;
+      if (hasEl(emailEl) && usable(emailEl)) return emailEl;
+      return (hasEl(phoneEl) && usable(phoneEl)) ? phoneEl : null;
+    }
+
+    function injectButton() {
+      // ✅ still scoped: host is the parent of submitBtn inside container
+      var host = null;
+      try { host = submitBtn.parentNode; } catch (e) { host = null; }
+      if (!hasEl(host)) return;
+
+      // positioning context
+      try {
+        var pos = "";
+        try { pos = String(getComputedStyle(host).position || ""); } catch (e) { pos = ""; }
+        if (!pos || pos === "static") host.style.position = "relative";
+      } catch (e) {}
+
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = "Quick fill";
+      btn.setAttribute("data-sf-assist", "1");
+      btn.setAttribute("aria-label", "Quick fill");
+
+      // ✅ same placement as iframe, but SMALLER
+      btn.style.position = "absolute";
+      btn.style.right = "20px";
+      btn.style.bottom = "-3px";
+      btn.style.transform = "translate(20%, 35%)";
+      btn.style.zIndex = "9999";
+
+      btn.style.border = "1px solid rgba(0,0,0,.10)";
+      btn.style.background = "rgba(255,255,255,.98)";
+      btn.style.color = "#111";
+      btn.style.borderRadius = "999px";
+      btn.style.padding = "4px 6px";
+      btn.style.fontSize = "12px";
+      btn.style.lineHeight = "1";
+      btn.style.fontWeight = "600";
+      btn.style.boxShadow = "0 4px 12px rgba(0,0,0,.12)";
+      btn.style.webkitTapHighlightColor = "transparent";
+
+      btn.addEventListener("click", function (ev) {
+        try { ev.preventDefault(); ev.stopPropagation(); } catch (e) {}
+        var target = chooseTarget();
+        if (!target) return;
+        focusNudge(target);
+      }, true);
+
+      try { host.appendChild(btn); } catch (e) {}
+    }
+
+    // ✅ Wait for iti flag ONLY if phone is actually iti-wrapped.
+    // If not iti-wrapped or no phone, inject immediately.
+    if (hasEl(phoneEl) && itiWrapOf(phoneEl)) {
+      waitUntilReady(function () {
+        if (!itiReady(phoneEl)) return false;
+        injectButton();
+        return true;
+      });
+    } else {
+      injectButton();
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initQuickFillOnPage, { once: true });
+  } else {
+    initQuickFillOnPage();
+  }
+})();
+
+
+
+
+/* =========================================================
+   LS Spam Shield (ON-PAGE + IFRAME OTP forms) — SAFE + bulletproof
+   - Runs ONLY inside: #form-outer and/or #form-outer-contact (if present)
+   - Hooks ONLY OTP submit (#myBtn) when otp markers OR onclick has sendOTP
+   - Blocks ONLY exact matches:
+       • email (case-insensitive exact)
+       • phone (last 10 digits exact)
+   - On block: stops OTP, shows alert, clears entered values (only if fields exist)
+   ========================================================= */
+(function () {
+  "use strict";
+
+  /* CONFIG */
+  var BLOCK_EMAILS = [
+    "pandupatil123@gmail.com",
+    "asmitakalal123@gmail.com",
+    "sunilparishwadkar@gmail.com",
+    "meghakalal123@gmail.com"
+  ];
+  var BLOCK_PHONE_LAST10 = [
+    "9945009592",
+    "7338688377",
+    "9731974661",
+    "7019951271"
+  ];
+  var THANKS_MSG = "Thank you for filling the details. We will get in touch shortly.";
+
+  function normEmail(v) {
+    return String(v || "")
+      .toLowerCase()
+      .replace(/[\u00A0\u200B-\u200D\uFEFF]/g, "") // NBSP + zero-width
+      .replace(/\s+/g, "")
+      .trim();
+  }
+  function last10(v) {
+    var d = String(v || "").replace(/\D+/g, "");
+    return d.length > 10 ? d.slice(-10) : d;
+  }
+  function toSet(arr, norm) {
+    var s = Object.create(null);
+    for (var i = 0; i < arr.length; i++) {
+      var v = norm(arr[i]);
+      if (v) s[v] = 1;
+    }
+    return s;
+  }
+
+  var EMAIL_SET = toSet(BLOCK_EMAILS, normEmail);
+  var PHONE_SET = toSet(BLOCK_PHONE_LAST10, last10);
+
+  function q(root, sel) { return root ? root.querySelector(sel) : null; }
+
+  function getContainers() {
+    var out = [];
+    var a = document.getElementById("form-outer");
+    var b = document.getElementById("form-outer-contact");
+    if (a) out.push(a);
+    if (b) out.push(b);
+    return out;
+  }
+
+  function isOtpForm(container, btn) {
+    if (!container || !btn) return false;
+    if (!q(container, "#phonenumb")) return false;
+    var hasOtp = !!q(container, "#otpdone") || !!q(container, "#otpdiv");
+    var oc = (btn.getAttribute("onclick") || "").toLowerCase();
+    var hasSendOtp = oc.indexOf("sendotp") !== -1;
+    return hasOtp || hasSendOtp;
+  }
+
+  function isBlocked(container) {
+    var phoneEl = q(container, "#phonenumb");
+    var p = last10(phoneEl && phoneEl.value);
+    if (p && PHONE_SET[p]) return true;
+
+    var emailEl = q(container, "#userEmail"); // optional
+    if (emailEl) {
+      var e = normEmail(emailEl.value);
+      if (e && EMAIL_SET[e]) return true;
+    }
+    return false;
+  }
+
+  function clearIfExists(container, sel, value) {
+    var el = q(container, sel);
+    if (!el) return;
+    el.value = (value !== undefined ? value : "");
+  }
+
+  function clearSpamInputs(container) {
+    clearIfExists(container, "#userName", "");
+    clearIfExists(container, "#userEmail", "");
+    clearIfExists(container, "#phonenumb", "");
+    clearIfExists(container, "#otpfield", "");
+    clearIfExists(container, "#otpdone", "false");
+
+    var otpdiv = q(container, "#otpdiv");
+    if (otpdiv) otpdiv.style.display = "none";
+
+    var msg = q(container, "#otp-messages");
+    if (msg) msg.textContent = "";
+
+    var v = q(container, "#valid-msg");
+    if (v && v.classList) v.classList.add("hide");
+
+    var er = q(container, "#error-msg");
+    if (er) {
+      er.textContent = "";
+      if (er.classList) er.classList.add("hide");
+    }
+  }
+
+  var lastShownAt = 0;
+  function thankAndClear(container) {
+    var now = Date.now();
+    if (now - lastShownAt < 600) return;
+    lastShownAt = now;
+    alert(THANKS_MSG);
+    clearSpamInputs(container);
+  }
+
+  function findActiveContainer(containers) {
+    var el = document.activeElement;
+    while (el && el !== document.documentElement) {
+      for (var i = 0; i < containers.length; i++) {
+        if (containers[i] === el) return containers[i];
+        if (containers[i].contains && containers[i].contains(el)) return containers[i];
+      }
+      el = el.parentNode;
+    }
+    return containers.length === 1 ? containers[0] : null;
+  }
+
+  function wireClickBlock(container) {
+    if (!container || container.__lsSpamShieldWired) return;
+
+    var btn = q(container, "#myBtn");
+    if (!btn || btn.__lsSpamBtnWired) return;
+    if (!isOtpForm(container, btn)) return;
+
+    btn.__lsSpamBtnWired = true;
+    container.__lsSpamShieldWired = true;
+
+    btn.addEventListener("click", function (ev) {
+      if (!isBlocked(container)) return;
+
+      ev.preventDefault();
+      ev.stopPropagation();
+      if (ev.stopImmediatePropagation) ev.stopImmediatePropagation();
+
+      thankAndClear(container);
+      return false;
+    }, true); // capture => before inline onclick="sendOTP()"
+  }
+
+  function wrapSendOTP(containers) {
+    if (typeof window.sendOTP !== "function") return;
+    if (window.sendOTP.__lsWrapped) return;
+
+    var orig = window.sendOTP;
+    function wrappedSendOTP() {
+      var c = findActiveContainer(containers);
+      if (c) {
+        var btn = q(c, "#myBtn");
+        if (isOtpForm(c, btn) && isBlocked(c)) {
+          thankAndClear(c);
+          return false;
+        }
+      }
+      return orig.apply(this, arguments);
+    }
+    wrappedSendOTP.__lsWrapped = true;
+    window.sendOTP = wrappedSendOTP;
+  }
+
+  function init() {
+    var containers = getContainers();
+    if (!containers.length) return;
+
+    for (var i = 0; i < containers.length; i++) wireClickBlock(containers[i]);
+    wrapSendOTP(containers);
+  }
+
+  // init now + handle delayed DOM injection
+  init();
+  if (window.MutationObserver) {
+    var mo = new MutationObserver(function () { init(); });
+    mo.observe(document.documentElement, { childList: true, subtree: true });
+  }
+})();
