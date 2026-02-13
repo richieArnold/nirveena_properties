@@ -1,8 +1,10 @@
+//propertyControllers.js
+
 const fs = require("fs");
 const path = require("path");
 const pool = require("../rds_setup/db/index"); // assuming you export pool from db/index.js
 
-// 🔹 Slug generator
+//  Slug generator
 function generateSlug(name) {
   return name
     .toLowerCase()
@@ -12,7 +14,7 @@ function generateSlug(name) {
     .replace(/-+/g, "-");
 }
 
-// 🔹 Safe number conversion
+//  Safe number conversion
 function toNumber(value) {
   if (!value) return null;
   const cleaned = value.toString().replace(/[^\d.]/g, "");
@@ -66,7 +68,7 @@ exports.importProjects = async (req, res) => {
           project.sba?.trim() || null,
           project.price?.trim() || null,
           project.rera_completion?.trim() || null,
-        ]
+        ],
       );
     }
 
@@ -74,7 +76,6 @@ exports.importProjects = async (req, res) => {
       success: true,
       message: "Projects imported successfully",
     });
-
   } catch (error) {
     console.error("Import error:", error);
     res.status(500).json({
@@ -85,5 +86,39 @@ exports.importProjects = async (req, res) => {
   }
 };
 
-//write a controller to fetch property data from the database 
-//write a function in the frontend to fetch the property data and display 
+exports.getAllProjects = async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT 
+        project_id,
+        project_name,
+        slug,
+        project_type,
+        project_status,
+        project_location,
+        total_acres,
+        no_of_units,
+        club_house_size,
+        structure,
+        typology,
+        sba,
+        price,
+        rera_completion
+      FROM projects
+      ORDER BY project_id DESC
+    `);
+
+    res.status(200).json({
+      success: true,
+      count: result.rows.length,
+      data: result.rows,
+    });
+  } catch (error) {
+    console.error("Fetch projects error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch projects",
+      error: error.message,
+    });
+  }
+};

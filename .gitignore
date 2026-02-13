@@ -38,3 +38,5 @@ coverage/
 
 # Vite cache (optional)
 .vite/
+
+frontend

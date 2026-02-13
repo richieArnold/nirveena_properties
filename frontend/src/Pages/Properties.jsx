@@ -44,6 +44,8 @@ import { getProperties } from "@/services/api";
 /**
  * NEW PROPERTY DETAIL MODAL (Split View with Map and Info)
  */
+
+
 const PropertyDetailModal = ({ isOpen, onClose, property, onEnquire }) => {
   if (!property) return null;
 
@@ -480,6 +482,43 @@ const PropertyCard = forwardRef(({ property, onClick }, ref) => {
             </span>
           </div>
         </div>
+                          {/* EXTRA PROJECT DETAILS */}
+<div className="grid grid-cols-2 gap-x-4 gap-y-2 mb-6 text-[11px]">
+  <div>
+    <p className="text-gray-400 font-black uppercase tracking-widest">Project ID</p>
+    <p className="text-gray-900 font-bold">{property.id}</p>
+  </div>
+
+  <div>
+    <p className="text-gray-400 font-black uppercase tracking-widest">Typology</p>
+    <p className="text-gray-900 font-bold">{property.area}</p>
+  </div>
+
+  <div>
+    <p className="text-gray-400 font-black uppercase tracking-widest">Total Acres</p>
+    <p className="text-gray-900 font-bold">{property.totalAcres}</p>
+  </div>
+
+  <div>
+    <p className="text-gray-400 font-black uppercase tracking-widest">Units</p>
+    <p className="text-gray-900 font-bold">{property.units}</p>
+  </div>
+
+  <div>
+    <p className="text-gray-400 font-black uppercase tracking-widest">Structure</p>
+    <p className="text-gray-900 font-bold">{property.structure}</p>
+  </div>
+
+  <div>
+    <p className="text-gray-400 font-black uppercase tracking-widest">SBA</p>
+    <p className="text-gray-900 font-bold">{property.sba}</p>
+  </div>
+
+  <div className="col-span-2">
+    <p className="text-gray-400 font-black uppercase tracking-widest">Club House Size</p>
+    <p className="text-gray-900 font-bold">{property.clubHouseSize}</p>
+  </div>
+</div>
 
         <div className="mt-auto pt-5 border-t border-gray-100 flex items-center justify-between">
           <div className="flex flex-col">
@@ -490,11 +529,14 @@ const PropertyCard = forwardRef(({ property, onClick }, ref) => {
               {property.priceRange}
             </p>
           </div>
+
           {/* Added color to detail button */}
           <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-5 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest shadow-md transform group-hover:scale-105 transition-all">
             View Details
           </div>
         </div>
+
+
       </div>
     </motion.div>
   );
@@ -513,24 +555,46 @@ const PropertiesPage = () => {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
 
+const API_URL = "http://localhost:5000";
+
 useEffect(() => {
-  getProperties()
-    .then((data) => {
-      const normalized = data.map((p) => ({
-        ...p,
-        image: p.images?.[0],
-        location: `${p.location.area}, ${p.location.city}`,
-        priceRange: p.price.display,
+  const fetchProjects = async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/projects`);
+      const result = await res.json();
+
+      if (!result.success) {
+        throw new Error("Failed to fetch projects");
+      }
+
+      const normalized = result.data.map((p) => ({
+        id: p.project_id,
+        title: p.project_name,
+        location: p.project_location,
+        status: p.project_status,
+        category: p.project_type?.toLowerCase(),
+        area: p.typology,
+        possession: p.rera_completion,
+        priceRange: p.price,
+        totalAcres: p.total_acres,
+        units: p.no_of_units,
+        structure: p.structure,
+        sba: p.sba,
+        clubHouseSize: p.club_house_size,
+        image: null, // no images yet
       }));
 
       setProperties(normalized);
       setLoading(false);
-    })
-    .catch((err) => {
-      console.error("Failed to load properties:", err);
+    } catch (err) {
+      console.error("Error fetching projects:", err);
       setLoading(false);
-    });
+    }
+  };
+
+  fetchProjects();
 }, []);
+
 
   const categories = [
     { id: "all", name: "All Assets", icon: LayoutGrid },
