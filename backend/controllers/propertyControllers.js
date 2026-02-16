@@ -85,5 +85,3 @@ exports.importProjects = async (req, res) => {
   }
 };
 
-//write a controller to fetch property data from the database 
-//write a function in the frontend to fetch the property data and display 
