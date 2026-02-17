@@ -18,57 +18,80 @@ const PropertyTabs = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    let isMounted = true;
+  
+useEffect(() => {
+  let isMounted = true;
 
-    const fetchProperties = async () => {
+  const fetchProperties = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await axiosInstance.get("/api/projects");
+
       if (!isMounted) return;
 
-      setLoading(true);
-      setError(null);
+      const normalized = response.data.data.map((p) => ({
+        id: p.id,
+        slug: p.slug,
+        title: p.project_name,
+        developer: "Nirveena Properties",
+        location: {
+          area: p.project_location,
+          city: "Bangalore",
+        },
+        price: {
+          display: p.price,
+        },
+        configuration: p.typology ? [p.typology] : [],
+        images: p.images?.map((img) => img.image_url) || [],
+        status: p.project_status?.toLowerCase(),
+        category: p.project_type?.toLowerCase(),
+      }));
 
-      try {
-        const currentTab = tabs.find(tab => tab.id === activeTab);
-        let apiUrl = `/properties?_limit=3`;
-        
-        // For Apartments, Villas, Plots - filter by category
-        if (currentTab.category === "flat" || 
-            currentTab.category === "villa" || 
-            currentTab.category === "plot") {
-          apiUrl = `/properties?category=${encodeURIComponent(currentTab.category)}&_limit=3`;
-        }
-        // For Upcoming Projects - filter by status
-        else if (currentTab.category === "upcoming") {
-          apiUrl = `/properties?status=${encodeURIComponent("upcoming")}&_limit=3`;
-        }
-        // For Resale Projects - filter by status
-        else if (currentTab.category === "resale") {
-          apiUrl = `/properties?status=${encodeURIComponent("resale")}&_limit=3`;
-        }
+      const currentTab = tabs.find((tab) => tab.id === activeTab);
 
-        const response = await axiosInstance.get(apiUrl);
+      let filtered = normalized;
 
-        if (isMounted) {
-          setProperties(response.data);
-          setLoading(false);
-        }
-      } catch (err) {
-        if (isMounted) {
-          console.error("Failed to fetch properties:", err);
-          setError("Failed to load properties");
-          setProperties([]);
-          setLoading(false);
-        }
+      if (currentTab.category === "flat") {
+        filtered = normalized.filter((p) => p.category === "apartment");
       }
-    };
 
-    const timer = setTimeout(fetchProperties, 200);
+      if (currentTab.category === "villa") {
+        filtered = normalized.filter((p) => p.category === "villas");
+      }
 
-    return () => {
-      isMounted = false;
-      clearTimeout(timer);
-    };
-  }, [activeTab]);
+      if (currentTab.category === "plot") {
+        filtered = normalized.filter((p) =>
+          p.category?.includes("plot")
+        );
+      }
+
+      if (currentTab.category === "upcoming") {
+        filtered = normalized.filter((p) => p.status === "uc");
+      }
+
+      if (currentTab.category === "resale") {
+        filtered = normalized.filter((p) => p.status === "rtm");
+      }
+
+      setProperties(filtered.slice(0, 3));
+      setLoading(false);
+    } catch (err) {
+      console.error("Failed to fetch properties:", err);
+      setError("Failed to load properties");
+      setProperties([]);
+      setLoading(false);
+    }
+  };
+
+  fetchProperties();
+
+  return () => {
+    isMounted = false;
+  };
+}, [activeTab]);
+
 
   // Animation variants
   const headerVariants = {
@@ -83,7 +106,11 @@ const PropertyTabs = () => {
 
   const tabVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6, ease: "easeOut" },
+    },
     hover: { scale: 1.05, transition: { duration: 0.2 } },
     tap: { scale: 0.95, transition: { duration: 0.1 } },
   };
@@ -95,7 +122,11 @@ const PropertyTabs = () => {
 
   const itemVariants = {
     hidden: { opacity: 0, y: 30 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.8, ease: "easeOut" },
+    },
   };
 
   return (

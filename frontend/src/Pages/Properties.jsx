@@ -40,6 +40,8 @@ import {
 } from "framer-motion";
 import ImageWithFallback from "@/components/common/ImageWithFallback";
 import { getProperties } from "@/services/api";
+import axiosInstance from "@/utils/Instance";
+
 
 /**
  * NEW PROPERTY DETAIL MODAL (Split View with Map and Info)
@@ -47,7 +49,9 @@ import { getProperties } from "@/services/api";
 const PropertyDetailModal = ({ isOpen, onClose, property, onEnquire }) => {
   if (!property) return null;
 
-  const query = encodeURIComponent(`${property.title}, ${property.location}`);
+  const query = encodeURIComponent(`${property.project_name
+}, ${property.project_location
+}`);
   const mapUrl = `https://maps.google.com/maps?q=${query}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
 
   const connectivity = Object.entries(property.connectivity || {}).map(
@@ -89,11 +93,11 @@ const PropertyDetailModal = ({ isOpen, onClose, property, onEnquire }) => {
                     Premium Asset
                   </div>
                   <h2 className="text-3xl md:text-4xl font-black text-gray-900 uppercase tracking-tight leading-none mb-3">
-                    {property.title}
+                    {property.project_name}
                   </h2>
                   <div className="flex items-center gap-2 text-gray-500 font-bold text-sm uppercase tracking-wider">
                     <MapPin size={16} className="text-blue-500" />
-                    {property.location}
+                    {property.project_location}
                   </div>
                 </div>
                 <button
@@ -106,8 +110,10 @@ const PropertyDetailModal = ({ isOpen, onClose, property, onEnquire }) => {
 
               <div className="rounded-2xl overflow-hidden mb-8 shadow-lg aspect-video">
                 <img
-                  src={property.image}
-                  alt={property.title}
+                  src={property.images?.[0]?.image_url}
+
+                  alt={property.project_name}
+
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -118,7 +124,7 @@ const PropertyDetailModal = ({ isOpen, onClose, property, onEnquire }) => {
                     Configuration
                   </p>
                   <p className="text-base font-black text-gray-900">
-                    {property.area}
+                    {property.typology}
                   </p>
                 </div>
                 <div className="space-y-1">
@@ -126,7 +132,7 @@ const PropertyDetailModal = ({ isOpen, onClose, property, onEnquire }) => {
                     Possession
                   </p>
                   <p className="text-base font-black text-gray-900">
-                    {property.possession}
+                    {property.rera_completion}
                   </p>
                 </div>
                 <div className="space-y-1">
@@ -134,7 +140,7 @@ const PropertyDetailModal = ({ isOpen, onClose, property, onEnquire }) => {
                     Status
                   </p>
                   <p className="text-base font-black text-blue-600 uppercase italic">
-                    {property.status}
+                    {property.project_status}
                   </p>
                 </div>
               </div>
@@ -169,7 +175,7 @@ const PropertyDetailModal = ({ isOpen, onClose, property, onEnquire }) => {
                     Starting Price
                   </p>
                   <p className="text-3xl font-black text-gray-900">
-                    {property.priceRange}
+                    {property.price}
                   </p>
                 </div>
                 <button
@@ -189,7 +195,8 @@ const PropertyDetailModal = ({ isOpen, onClose, property, onEnquire }) => {
                 <X size={24} />
               </button>
               <iframe
-                title={`Map for ${property.title}`}
+                title={`Map for ${property.project_name}`}
+
                 className="w-full h-full border-0 grayscale-[0.2]"
                 src={mapUrl}
                 allowFullScreen
@@ -205,7 +212,7 @@ const PropertyDetailModal = ({ isOpen, onClose, property, onEnquire }) => {
                       Interactive Location
                     </p>
                     <p className="text-xs font-bold truncate max-w-[200px]">
-                      {property.title}
+                      {property.project_name}
                     </p>
                   </div>
                 </div>
@@ -214,7 +221,7 @@ const PropertyDetailModal = ({ isOpen, onClose, property, onEnquire }) => {
                     Region
                   </p>
                   <p className="text-xs font-bold">
-                    {property.location.split(",")[0]}
+                    {property.project_location}
                   </p>
                 </div>
               </div>
@@ -434,14 +441,16 @@ const PropertyCard = forwardRef(({ property, onClick }, ref) => {
       <div className="relative h-[260px] overflow-hidden">
         <ImageWithFallback
           src={property.image}
-          alt={property.title}
+
+          alt={property.project_name}
+
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
         />
 
         <div
           className={`absolute top-5 left-5 ${getStatusColor(property.status)} text-white text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-xl shadow-lg`}
         >
-          {property.status}
+          {property.status}     
         </div>
         <div className="absolute bottom-5 right-5 bg-white/95 backdrop-blur-sm px-4 py-2 rounded-xl border border-white/20 shadow-md">
           <p className="text-blue-600 font-black text-[10px] uppercase tracking-wider">
@@ -517,10 +526,17 @@ useEffect(() => {
   getProperties()
     .then((data) => {
       const normalized = data.map((p) => ({
-        ...p,
-        image: p.images?.[0],
-        location: `${p.location.area}, ${p.location.city}`,
-        priceRange: p.price.display,
+        id: p.id,
+        slug: p.slug, // 🔥 IMPORTANT
+        title: p.project_name,
+        status: p.project_status?.toLowerCase(),
+        category: p.project_type?.toLowerCase(),
+
+        image: p.images?.[0]?.image_url,
+        location: p.project_location,
+        priceRange: p.price,
+        area: p.typology,
+        possession: p.rera_completion,
       }));
 
       setProperties(normalized);
@@ -531,6 +547,7 @@ useEffect(() => {
       setLoading(false);
     });
 }, []);
+
 
   const categories = [
     { id: "all", name: "All Assets", icon: LayoutGrid },
@@ -567,10 +584,21 @@ useEffect(() => {
     return list;
   }, [properties, activeTab, searchQuery]);
 
-  const handlePropertyClick = (prop) => {
-    setSelectedProp(prop);
+const handlePropertyClick = async (prop) => {
+  try {
+    setLoading(true);
+
+    const res = await axiosInstance.get(`/api/projects/${prop.slug}`);
+
+    setSelectedProp(res.data.data); // full project
     setIsDetailModalOpen(true);
-  };
+  } catch (err) {
+    console.error("Failed to fetch project details:", err);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handleEnquireFromDetail = (prop) => {
     setIsDetailModalOpen(false);
@@ -592,7 +620,8 @@ useEffect(() => {
       <ConsultationModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        propertyTitle={selectedProp?.title || "Property"}
+        propertyTitle={selectedProp?.project_name || "Property"}
+
       />
 
       <PropertyDetailModal

@@ -1,7 +1,9 @@
 // server.js
 const express = require("express");
+const cors = require("cors");   // ✅ ADD THIS
 const app = express();
 
+app.use(cors());                // ✅ ADD THIS (before routes)
 app.use(express.json());
 
 const projectRoutes = require("./routes/propertyRoutes");

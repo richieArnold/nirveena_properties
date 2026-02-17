@@ -85,3 +85,129 @@ exports.importProjects = async (req, res) => {
   }
 };
 
+// exports.getAllProjects = async (req, res) => {
+//   try {
+//     const limit = req.query.limit ? Number(req.query.limit) : 12;
+
+//     const result = await pool.query(`
+//       SELECT 
+//         p.id,
+//         p.slug,
+//         p.project_name,
+//         p.project_location,
+//         p.price,
+//         p.project_type,
+//         p.project_status,
+//         (
+//           SELECT image_url
+//           FROM project_images pi
+//           WHERE pi.project_id = p.project_id
+//           ORDER BY sort_order ASC
+//           LIMIT 1
+//         ) AS image_url
+//       FROM projects p
+//       ORDER BY p.project_id DESC
+//       LIMIT $1
+//     `, [limit]);
+
+//     res.json({
+//       success: true,
+//       count: result.rows.length,
+//       data: result.rows
+//     });
+
+//   } catch (error) {
+//     res.status(500).json({
+//       success: false,
+//       message: "Failed to fetch projects",
+//       error: error.message
+//     });
+//   }
+// };
+
+exports.getAllProjects = async (req, res) => {
+  try {
+    // const limit = req.query.limit ? Number(req.query.limit) : 12;
+
+    const result = await pool.query(
+      `
+      SELECT 
+        p.id,
+        p.slug,
+        p.project_name,
+        p.project_location,
+        p.price,
+        p.project_type,
+        p.project_status,
+        img.image_url
+      FROM projects p
+      LEFT JOIN LATERAL (
+        SELECT image_url
+        FROM project_images pi
+        WHERE pi.project_id = p.id
+        ORDER BY pi.sort_order ASC
+        LIMIT 1
+      ) img ON true
+      ORDER BY p.id DESC
+      `,
+      // [limit]
+    );
+console.log(result);
+    res.json({
+      success: true,
+      count: result.rows.length,
+      data: result.rows,
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch projects",
+      error: error.message,
+    });
+  }
+};
+
+exports.getProjectBySlug = async (req, res) => {
+  try {
+    const { slug } = req.params;
+
+    const projectResult = await pool.query(
+      `SELECT * FROM projects WHERE slug = $1`,
+      [slug]
+    );
+
+    if (projectResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Project not found",
+      });
+    }
+
+    const project = projectResult.rows[0];
+
+    const imagesResult = await pool.query(
+      `
+      SELECT image_url, sort_order
+      FROM project_images
+      WHERE project_id = $1
+      ORDER BY sort_order ASC
+      `,
+      [project.project_id]
+    );
+
+    project.images = imagesResult.rows;
+
+    res.json({
+      success: true,
+      data: project,
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch project",
+      error: error.message,
+    });
+  }
+};

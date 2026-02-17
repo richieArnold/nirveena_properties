@@ -7,6 +7,8 @@ import About from "@/pages/About";
 import Property from "@/pages/Properties";
 import Events from "@/pages/Events";
 import Contact from "@/pages/Contact";
+import PropertyDetails from "../pages/PropertyDetails";
+
 
 const PageRoutes = () => {
   return (
@@ -16,6 +18,7 @@ const PageRoutes = () => {
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/property" element={<Property />} />
+        <Route path="/property/:slug" element={<PropertyDetails />} />
         <Route path="/contact" element={<Contact />} />
       </Route>
     </Routes>
