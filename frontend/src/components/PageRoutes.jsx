@@ -21,7 +21,8 @@ const PageRoutes = () => {
         <Route path="/about" element={<About />} />
         <Route path="/property" element={<PropertiesPage />} />
         <Route path="/property/:slug" element={<PropertyDetails />} />
-        <Route path="/contact" element={<Contact />} />
+        <Route path="/contact" element={<Property />} />
+
       </Route>
     </Routes>
   );

@@ -14,7 +14,8 @@ router.post("/importProjects", importProjects);
 router.post("/import-images", importProjectImages);
 
 // Fetch routes
-router.get("/", getAllProjects);
-router.get("/:slug", getProjectBySlug);
+router.get("/getAllProjects", getAllProjects);
+//single project 
+router.get("/getSingleProject/:slug", getProjectBySlug);
 
 module.exports = router;
