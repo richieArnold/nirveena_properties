@@ -1,4 +1,7 @@
 // server.js
+
+
+// server.js
 const express = require("express");
 const cors = require("cors");   // ✅ ADD THIS
 const app = express();
