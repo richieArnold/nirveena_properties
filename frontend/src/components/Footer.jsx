@@ -58,25 +58,24 @@ const Footer = () => {
   const handleNewsletterSubmit = (e) => {
     e.preventDefault();
     console.log("Newsletter subscription");
-    // Handle newsletter signup
   };
 
   return (
-    <footer className="bg-white border-t border-gray-100">
+    <footer className="bg-gray-900 text-gray-200">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
           {/* Company Info */}
           <div className="lg:col-span-1">
             <div className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-gray-900 rounded flex items-center justify-center">
+              <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
                 <span className="text-white font-bold text-sm">NV</span>
               </div>
-              <h1 className="text-base sm:text-lg font-medium text-gray-900 tracking-tight">
+              <h1 className="text-base sm:text-lg font-medium text-white tracking-tight">
                 VEENA
               </h1>
             </div>
-            <p className="text-gray-600 text-sm mb-6">
+            <p className="text-gray-400 text-sm mb-6">
               Premium real estate solutions for modern living and smart
               investments in Dubai's most sought-after locations.
             </p>
@@ -85,10 +84,10 @@ const Footer = () => {
                 <a
                   key={index}
                   href={social.href}
-                  className="bg-gray-50 p-2 rounded-md hover:bg-gray-100 transition-colors duration-300 group"
+                  className="bg-gray-800 p-2 rounded-md hover:bg-blue-600 transition-colors duration-300 group"
                   aria-label={social.label}
                 >
-                  <div className="text-gray-600 group-hover:text-blue-600 transition-colors duration-300">
+                  <div className="text-gray-200 group-hover:text-white transition-colors duration-300">
                     {social.icon}
                   </div>
                 </a>
@@ -98,7 +97,7 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-gray-900">
+            <h3 className="text-lg font-semibold mb-4 text-white">
               Quick Links
             </h3>
             <ul className="space-y-3">
@@ -106,9 +105,9 @@ const Footer = () => {
                 <li key={link.name}>
                   <Link
                     to={link.path}
-                    className="text-gray-600 hover:text-blue-600 transition-colors duration-300 text-sm flex items-center gap-2 group"
+                    className="text-gray-400 hover:text-blue-500 transition-colors duration-300 text-sm flex items-center gap-2 group"
                   >
-                    <span className="w-1 h-1 bg-gray-300 rounded-full group-hover:bg-blue-600 transition-colors duration-300"></span>
+                    <span className="w-1 h-1 bg-gray-500 rounded-full group-hover:bg-blue-500 transition-colors duration-300"></span>
                     {link.name}
                   </Link>
                 </li>
@@ -118,7 +117,7 @@ const Footer = () => {
 
           {/* Properties */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-gray-900">
+            <h3 className="text-lg font-semibold mb-4 text-white">
               Properties
             </h3>
             <ul className="space-y-3">
@@ -126,9 +125,9 @@ const Footer = () => {
                 <li key={property.name}>
                   <Link
                     to={property.path}
-                    className="text-gray-600 hover:text-blue-600 transition-colors duration-300 text-sm flex items-center gap-2 group"
+                    className="text-gray-400 hover:text-blue-500 transition-colors duration-300 text-sm flex items-center gap-2 group"
                   >
-                    <span className="w-1 h-1 bg-gray-300 rounded-full group-hover:bg-blue-600 transition-colors duration-300"></span>
+                    <span className="w-1 h-1 bg-gray-500 rounded-full group-hover:bg-blue-500 transition-colors duration-300"></span>
                     {property.name}
                   </Link>
                 </li>
@@ -138,7 +137,7 @@ const Footer = () => {
 
           {/* Newsletter & Contact */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-gray-900">
+            <h3 className="text-lg font-semibold mb-4 text-white">
               Stay Updated
             </h3>
             <form onSubmit={handleNewsletterSubmit} className="mb-6">
@@ -146,12 +145,12 @@ const Footer = () => {
                 <input
                   type="email"
                   placeholder="Your email address"
-                  className="flex-1 px-4 py-2.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="flex-1 px-4 py-2.5 border border-gray-700 rounded-md text-sm bg-gray-800 text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                 />
                 <button
                   type="submit"
-                  className="bg-linear-to-r from-blue-600 to-purple-600 text-white px-4 py-2.5 rounded-md font-medium hover:shadow-md transition-all duration-300 hover:from-blue-700 hover:to-purple-700 flex items-center justify-center gap-2 text-sm"
+                  className="bg-linear-to-r from-blue-600 to-purple-600 text-white px-4 py-2.5 rounded-md font-medium hover:shadow-md transition-all duration-300 flex items-center justify-center gap-2 text-sm"
                 >
                   <Send size={16} />
                   <span className="hidden sm:inline">Subscribe</span>
@@ -162,7 +161,7 @@ const Footer = () => {
               </p>
             </form>
 
-            <h4 className="text-md font-semibold mb-3 text-gray-900">
+            <h4 className="text-md font-semibold mb-3 text-white">
               Contact Info
             </h4>
             <div className="space-y-3">
@@ -170,10 +169,10 @@ const Footer = () => {
                 <a
                   key={index}
                   href={info.href}
-                  className="flex items-center gap-3 text-gray-600 hover:text-blue-600 transition-colors duration-300 group"
+                  className="flex items-center gap-3 text-gray-400 hover:text-blue-500 transition-colors duration-300 group"
                 >
-                  <div className="bg-gray-50 p-1.5 rounded-md group-hover:bg-blue-50 transition-colors duration-300">
-                    <div className="text-gray-500 group-hover:text-blue-600 transition-colors duration-300">
+                  <div className="bg-gray-800 p-1.5 rounded-md group-hover:bg-blue-600 transition-colors duration-300">
+                    <div className="text-gray-400 group-hover:text-white transition-colors duration-300">
                       {info.icon}
                     </div>
                   </div>
@@ -185,14 +184,13 @@ const Footer = () => {
         </div>
 
         {/* Divider */}
-        <div className="my-8 h-px bg-linear-to-r from-transparent via-gray-200 to-transparent"></div>
+        <div className="my-8 h-px bg-gray-700"></div>
 
         {/* Bottom Bar */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="text-center md:text-left">
-            <p className="text-gray-600 text-sm">
-              © {new Date().getFullYear()} VEENA Real Estate. All rights
-              reserved.
+            <p className="text-gray-500 text-sm">
+              © {new Date().getFullYear()} VEENA Real Estate. All rights reserved.
             </p>
           </div>
 
@@ -201,7 +199,7 @@ const Footer = () => {
               <Link
                 key={link.name}
                 to={link.path}
-                className="text-gray-600 hover:text-gray-900 transition-colors duration-300 text-sm"
+                className="text-gray-400 hover:text-gray-200 transition-colors duration-300 text-sm"
               >
                 {link.name}
               </Link>

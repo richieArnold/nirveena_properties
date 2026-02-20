@@ -1,0 +1,403 @@
+document.addEventListener("DOMContentLoaded", function () {
+  // Mobile menu functionality
+  const mobileMenuBtn = document.getElementById("mobileMenuBtn");
+  const mobileMenu = document.getElementById("mobileMenu");
+  const mobileMenuIcon = document.getElementById("mobileMenuIcon");
+  const mobileMenuClose = document.getElementById("mobileMenuClose");
+  const navbar = document.querySelector(".navbar");
+
+  // Toggle mobile menu
+  mobileMenuBtn.addEventListener("click", function () {
+    mobileMenu.classList.toggle("active");
+    mobileMenuIcon.classList.toggle("active");
+    document.body.style.overflow = mobileMenu.classList.contains("active")
+      ? "hidden"
+      : "";
+  });
+
+  // Close mobile menu with close button
+  mobileMenuClose.addEventListener("click", function () {
+    mobileMenu.classList.remove("active");
+    mobileMenuIcon.classList.remove("active");
+    document.body.style.overflow = "";
+  });
+
+  // Close mobile menu when clicking on links
+  const mobileNavLinks = document.querySelectorAll(
+    ".mobile-nav-link, .mobile-cta a"
+  );
+  mobileNavLinks.forEach((link) => {
+    link.addEventListener("click", function () {
+      mobileMenu.classList.remove("active");
+      mobileMenuIcon.classList.remove("active");
+      document.body.style.overflow = "";
+    });
+  });
+
+  // Close mobile menu on window resize
+  window.addEventListener("resize", function () {
+    if (window.innerWidth >= 992) {
+      mobileMenu.classList.remove("active");
+      mobileMenuIcon.classList.remove("active");
+      document.body.style.overflow = "";
+    }
+  });
+
+  // Scroll effect for sticky header
+  let lastScrollTop = 0;
+  window.addEventListener("scroll", function () {
+    const currentScroll =
+      window.pageYOffset || document.documentElement.scrollTop;
+
+    if (currentScroll > 50) {
+      navbar.classList.add("scrolled");
+    } else {
+      navbar.classList.remove("scrolled");
+    }
+
+    lastScrollTop = currentScroll;
+  });
+
+  // Smooth scrolling for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+    anchor.addEventListener("click", function (e) {
+      // Don't prevent default for modal triggers
+      if (this.getAttribute("data-bs-toggle") === "modal") {
+        return;
+      }
+
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute("href"));
+      if (target) {
+        const headerHeight =
+          document.querySelector(".main-header").offsetHeight;
+        const targetPosition = target.offsetTop - headerHeight - 20;
+
+        window.scrollTo({
+          top: targetPosition,
+          behavior: "smooth",
+        });
+      }
+    });
+  });
+
+  // Modal sound effect
+  var modal = document.getElementById("formModal");
+  if (modal) {
+    modal.addEventListener("shown.bs.modal", function () {
+      var modalSound = document.getElementById("modalSound");
+      if (modalSound) {
+        modalSound.play().catch(function (error) {
+          console.log("Audio play failed:", error);
+        });
+      }
+    });
+  }
+
+  // Active nav link highlighting
+  const sections = document.querySelectorAll("div[id]");
+  const navLinks = document.querySelectorAll(".nav-link");
+
+  window.addEventListener("scroll", function () {
+    let current = "";
+    const scrollPos = window.pageYOffset + 200;
+
+    sections.forEach((section) => {
+      const sectionTop = section.offsetTop;
+      const sectionHeight = section.offsetHeight;
+      if (scrollPos >= sectionTop && scrollPos < sectionTop + sectionHeight) {
+        current = section.getAttribute("id");
+      }
+    });
+
+    navLinks.forEach((link) => {
+      link.classList.remove("active");
+      if (link.getAttribute("href") === "#" + current) {
+        link.classList.add("active");
+      }
+    });
+
+    // Default to home if no section is active
+    if (!current) {
+      document
+        .querySelector('.nav-link[href="#home"]')
+        ?.classList.add("active");
+    }
+  });
+  const hourSwiper = new Swiper(".hour-swiper", {
+    slidesPerView: "auto",
+    spaceBetween: 20,
+    loop: false,
+    autoHeight: false,
+    centeredSlides: false,
+    scrollbar: {
+      el: ".swiper-scrollbar",
+      hide: false,
+      draggable: true,
+      dragSize: "auto", // This ensures the drag size is calculated automatically
+    },
+    breakpoints: {
+      // when window width is >= 576px
+      576: {
+        slidesPerView: 1,
+        spaceBetween: 15,
+      },
+      // when window width is >= 768px
+      768: {
+        slidesPerView: 1,
+        spaceBetween: 20,
+      },
+      // when window width is >= 992px
+      992: {
+        slidesPerView: 3,
+        spaceBetween: 25,
+      },
+    },
+  });
+
+  // Video play step by step on scroll using GSAP ScrollTrigger
+  // Check if video element exists
+
+  // Initialize Trinity Slider
+  const trinitySwiper = new Swiper(".trinity-swiper", {
+    loop: true,
+    slidesPerView: 1,
+    spaceBetween: 0,
+    effect: "fade",
+    fadeEffect: {
+      crossFade: true,
+    },
+    autoplay: {
+      delay: 8000,
+      disableOnInteraction: false,
+    },
+    pagination: {
+      el: ".swiper-pagination",
+      clickable: true,
+    },
+  });
+
+  // Initialize Video Slider
+  const videoSwiper = new Swiper(".video-swiper", {
+    loop: true,
+    slidesPerView: 1,
+    spaceBetween: 0,
+    effect: "fade",
+    fadeEffect: {
+      crossFade: true,
+    },
+    autoplay: {
+      delay: 2500,
+      disableOnInteraction: false,
+    },
+    pagination: {
+      el: ".swiper-pagination",
+      clickable: true,
+    },
+  });
+
+  // YouTube Player API Integration
+  // Load YouTube IFrame API
+  let tag = document.createElement("script");
+  tag.src = "https://www.youtube.com/iframe_api";
+  let firstScriptTag = document.getElementsByTagName("script")[0];
+  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+  // Initialize YouTube Players
+  let players = [];
+  let isAnyVideoPlaying = false;
+
+  window.onYouTubeIframeAPIReady = function () {
+    // Create players for each iframe
+    for (let i = 1; i <= 3; i++) {
+      players[i] = new YT.Player("youtube-player-" + i, {
+        events: {
+          onStateChange: onPlayerStateChange,
+        },
+      });
+    }
+  };
+
+  // Handle player state changes
+  function onPlayerStateChange(event) {
+    // YT.PlayerState.PLAYING = 1
+    // YT.PlayerState.PAUSED = 2
+    // YT.PlayerState.ENDED = 0
+
+    if (event.data === YT.PlayerState.PLAYING) {
+      // A video started playing
+      isAnyVideoPlaying = true;
+      videoSwiper.autoplay.stop();
+
+      // Pause other videos
+      players.forEach(function (player, index) {
+        if (player && player.getPlayerState && event.target !== player) {
+          try {
+            if (player.getPlayerState() === YT.PlayerState.PLAYING) {
+              player.pauseVideo();
+            }
+          } catch (e) {
+            console.log("Error pausing video:", e);
+          }
+        }
+      });
+    } else if (
+      event.data === YT.PlayerState.PAUSED ||
+      event.data === YT.PlayerState.ENDED
+    ) {
+      // Check if any video is still playing
+      setTimeout(function () {
+        let anyPlaying = false;
+        players.forEach(function (player) {
+          if (player && player.getPlayerState) {
+            try {
+              if (player.getPlayerState() === YT.PlayerState.PLAYING) {
+                anyPlaying = true;
+              }
+            } catch (e) {
+              console.log("Error checking video state:", e);
+            }
+          }
+        });
+
+        // If no video is playing, resume slider
+        if (!anyPlaying && isAnyVideoPlaying) {
+          isAnyVideoPlaying = false;
+          videoSwiper.autoplay.start();
+        }
+      }, 100);
+    }
+  }
+});
+
+// Function to animate slide text with GSAP
+function animateSlideText(swiper) {
+  const activeSlide = swiper.slides[swiper.activeIndex];
+  const slideText = activeSlide.querySelector(".slide-text");
+  const title = slideText.querySelector(".slide-title");
+  const description = slideText.querySelector(".slide-description");
+  const descriptionTwo = slideText.querySelector(".slide-description-two");
+  const slideImg = activeSlide.querySelector(".slide-img");
+
+  // Reset animations to initial state
+  gsap.set([title, description, descriptionTwo], {
+    opacity: 0,
+    y: 30,
+  });
+
+  // Reset image animation
+  if (slideImg) {
+    gsap.set(slideImg, {
+      rotation: -90, // Start from negative rotation
+      opacity: 0,
+    });
+
+    // Animate image: rotate to default position and fade in
+    gsap.to(slideImg, {
+      rotation: 0,
+      opacity: 1,
+      duration: 1.2,
+      ease: "linear",
+    });
+  }
+
+  // Animate title
+  gsap.to(title, {
+    opacity: 1,
+    y: 0,
+    duration: 0.8,
+    ease: "power2.out",
+  });
+
+  // Animate description with delay
+  gsap.to(description, {
+    opacity: 1,
+    y: 0,
+    duration: 0.8,
+    delay: 0.3,
+    ease: "power2.out",
+  });
+
+  // Animate descriptionTwo with delay
+  gsap.to(descriptionTwo, {
+    opacity: 1,
+    y: 0,
+    duration: 0.8,
+    delay: 0.6,
+    ease: "power2.out",
+  });
+}
+
+// Initialize Trinity Slider
+
+// Initialize Hour Slider
+
+function changeImage(fileName) {
+  let img = document.querySelector("#trinity_card");
+  img.setAttribute("src", fileName);
+}
+
+const mainSwiper = new Swiper(".main-swiper", {
+  grabCursor: true,
+  effect: "creative",
+
+  creativeEffect: {
+    prev: {
+      shadow: true,
+      translate: ["-20%", 0, -1],
+    },
+    next: {
+      translate: ["100%", 0, 0],
+    },
+  },
+  fadeEffect: {
+    crossFade: true,
+  },
+  speed: 1000,
+  loop: true,
+  autoplay: {
+    delay: 4000,
+    disableOnInteraction: false,
+  },
+  navigation: {
+    nextEl: false,
+    prevEl: false,
+  },
+  pagination: {
+    el: ".swiper-pagination",
+    clickable: true,
+  },
+  on: {
+    init: function () {
+      // Small delay to ensure DOM is ready
+      setTimeout(() => {
+        animateSlideText(this);
+      }, 100);
+    },
+    slideChangeTransitionStart: function () {
+      // Reset animations for all text elements
+      const activeSlide = this.slides[this.activeIndex];
+      const slideText = activeSlide.querySelector(".slide-text");
+      const title = slideText.querySelector(".slide-title");
+      const description = slideText.querySelector(".slide-description");
+      const descriptionTwo = slideText.querySelector(".slide-description-two");
+      const slideImg = activeSlide.querySelector(".slide-img");
+
+      gsap.set([title, description, descriptionTwo], {
+        opacity: 0,
+        y: 30,
+      });
+
+      // Reset image to negative rotation
+      if (slideImg) {
+        gsap.set(slideImg, {
+          rotation: -90,
+          opacity: 0,
+        });
+      }
+    },
+    slideChangeTransitionEnd: function () {
+      animateSlideText(this);
+    },
+  },
+});
