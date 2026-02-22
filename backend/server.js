@@ -1,15 +1,13 @@
-// server.js
-
-
-// server.js
 const express = require("express");
-const cors = require("cors");   // ✅ ADD THIS
+const cors = require("cors");   
 const app = express();
 
-app.use(cors());                // ✅ ADD THIS (before routes)
+app.use(cors());               
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // Add this for form data
 
 const projectRoutes = require("./routes/propertyRoutes");
+const authRoutes = require("./routes/authRoutes");
 
 app.use("/api/projects", projectRoutes);
 
@@ -31,6 +29,8 @@ app.get("/test-s3", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+app.use("/api/auth", authRoutes);
 
 app.listen(5000, () => {
   console.log("Server running on port 5000");
