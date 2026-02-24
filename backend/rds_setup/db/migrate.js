@@ -1,10 +1,14 @@
 const dotenv = require("dotenv");
 const path = require("path");
 
+<<<<<<< HEAD
+dotenv.config({ path: path.join(__dirname, '../../.env') });
+=======
 // Load .env from backend folder
 dotenv.config({
   path: path.resolve(__dirname, "../../.env"),
 });
+>>>>>>> dev
 
 const fs = require("fs");
 const pool = require("./index");
@@ -14,17 +18,13 @@ const pool = require("./index");
     const schemaPath = path.join(__dirname, "../schema.sql");
     const schema = fs.readFileSync(schemaPath, "utf8");
 
-    console.log("⏳ Connecting to database...");
+    console.log(" Connecting to database...");
     await pool.query(schema);
 
-    console.log("✅ Tables created successfully");
+    console.log(" Tables created successfully");
     process.exit(0);
   } catch (err) {
-    console.error("❌ Migration failed:", err);
+    console.error(" Migration failed:", err);
     process.exit(1);
   }
 })();
-
-
-
-

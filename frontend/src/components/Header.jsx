@@ -2,14 +2,17 @@ import { useState, useEffect } from "react";
 import { Menu, X, Phone } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import NirveenaLogo from "../assets/NirveenaLogo.jpeg";// CTA Button
+import logo from "../assets/logo/logo.png";
+
+// CTA Button - Smaller for mobile
 const CTAButton = ({ onClick }) => (
   <button
     onClick={onClick}
-    className="bg-linear-to-r from-blue-600 to-purple-600 text-white font-semibold px-4 py-2 md:px-5 md:py-2.5 rounded-md hover:shadow-md transition-all duration-300 flex items-center gap-1.5 text-xs md:text-sm"
+    className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold px-3 py-1.5 sm:px-4 sm:py-2 rounded-md hover:shadow-md transition-all duration-300 flex items-center gap-1 text-xs sm:text-sm"
   >
-    <Phone size={14} className="md:w-4 md:h-4" />
-    <span>GET IN TOUCH</span>
+    <Phone size={12} className="sm:w-3.5 sm:h-3.5" />
+    <span className="hidden xs:inline">GET IN TOUCH</span>
+    <span className="xs:hidden">GET IN TOUCH</span>
   </button>
 );
 
@@ -26,16 +29,16 @@ const Header = () => {
     { name: "Contact Us", path: "/contact" },
   ];
 
-  // Scroll listener to change header background on lg+
+  // Scroll listener
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 30); // trigger after 30px scroll
+      setIsScrolled(window.scrollY > 10);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Prevent body scroll when menu is open
+  // Prevent body scroll when mobile menu open
   useEffect(() => {
     document.body.style.overflow = isMenuOpen ? "hidden" : "unset";
     return () => {
@@ -43,7 +46,6 @@ const Header = () => {
     };
   }, [isMenuOpen]);
 
-  // Mobile Drawer animation variants
   const drawerVariants = {
     hidden: { x: "100%" },
     visible: { x: 0 },
@@ -52,62 +54,71 @@ const Header = () => {
 
   return (
     <header
-      // className={`w-full sticky top-0 z-50 transition-colors duration-300 bg-linear-to-b from-purple-600 to-purple-500`}
-      className={`w-full sticky top-0 z-50 transition-colors duration-300 bg-white`}
-    >
-    {/* <header
-      className={`w-full sticky top-0 z-50 transition-colors duration-300 ${
-        isScrolled ? "bg-blue-500 shadow-md" : "bg-transparent"
+      className={`w-full sticky top-0 z-50 transition-all duration-300 ${
+        isScrolled ? "bg-white/95 backdrop-blur-sm shadow-sm" : "bg-white"
       }`}
-    > */}
-      <div className="container mx-auto px-6 flex items-center justify-between">
-        {/* Logo */}
-<Link to="/" className="flex items-center">
-  <img
-    src={NirveenaLogo}
-    alt="Nirveena Logo"
-    className="h-16 sm:h-18 lg:h-20 w-auto object-contain"
-  />
-</Link>
+    >
+      <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-1.5 sm:py-2 flex items-center justify-between">
+        {/* Logo Section - Smaller on mobile */}
+        <Link to="/" className="flex items-center gap-1 sm:gap-2">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 overflow-hidden rounded-full flex-shrink-0">
+            <img
+              src={logo}
+              alt="Nirveena Logo"
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <h1 className="text-sm sm:text-base md:text-lg lg:text-xl font-serif tracking-tight text-gray-900">
+            NIRVEENA
+          </h1>
+        </Link>
 
-        {/* Desktop Nav - lg+ */}
-        <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8 text-white">
+        {/* Desktop Nav - Hidden on mobile */}
+        <nav className="hidden lg:flex items-center space-x-5 xl:space-x-12">
           {navItems.map((item) => {
             const isActive = activeTab === item.path;
             return (
               <Link
                 key={item.name}
                 to={item.path}
-                className={`font-medium relative group no-underline text-sm xl:text-base transition-colors duration-200 ${
+                className={`font-semibold text-xs xl:text-sm tracking-wide relative py-1 transition-colors duration-200 ${
                   isActive
-                    ? "text-gray-900 font-semibold"
+                    ? "text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600"
                     : "text-gray-600 hover:text-gray-900"
                 }`}
               >
                 {item.name}
-                <span
-                  className={`absolute -bottom-1 left-0 h-0.5 transition-all duration-300 ${
-                    isActive
-                      ? "w-full bg-black"
-                      : "w-0 bg-black group-hover:w-full"
-                  }`}
-                />
+                {isActive && (
+                  <motion.span
+                    layoutId="activeNav"
+                    className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-blue-600 to-purple-600"
+                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                  />
+                )}
               </Link>
             );
           })}
         </nav>
 
-        {/* Right side: CTA + Hamburger */}
-        <div className="flex items-center gap-3 md:gap-4">
+        {/* Right Side */}
+        <div className="flex items-center gap-1 sm:gap-2 md:gap-3">
           <CTAButton onClick={() => console.log("CTA Click")} />
 
-          {/* Hamburger Menu */}
+          {/* Admin Link - Hidden on very small screens */}
+          <Link
+            to="/admin"
+            className="hidden sm:inline-block px-3 py-1.5 sm:px-4 sm:py-2 bg-blue-600 text-white text-xs sm:text-sm rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Admin
+          </Link>
+
+          {/* Mobile Menu Button */}
           <button
-            className="lg:hidden text-gray-700 p-1.5"
+            className="lg:hidden text-gray-600 hover:text-gray-900 p-1 transition-colors"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label={isMenuOpen ? "Close menu" : "Open menu"}
           >
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
       </div>
@@ -120,10 +131,10 @@ const Header = () => {
             <motion.div
               key="backdrop"
               initial={{ opacity: 0 }}
-              animate={{ opacity: 0.5 }}
+              animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsMenuOpen(false)}
-              className="fixed inset-0 bg-black z-40 backdrop-blur-sm"
+              className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
             />
 
             {/* Drawer Panel */}
@@ -134,38 +145,42 @@ const Header = () => {
               animate="visible"
               exit="exit"
               transition={{ type: "tween", duration: 0.3 }}
-              className="fixed top-0 right-0 h-full w-80 max-w-[85%] bg-white shadow-xl z-50 flex flex-col"
+              className="fixed top-0 right-0 h-full w-72 max-w-[80%] bg-white shadow-xl z-50 flex flex-col"
             >
-              {/* Header */}
-              <div className="flex items-center justify-between p-6 border-b border-gray-100">
-<div className="flex items-center">
-  <img
-    src={NirveenaLogo}
-    alt="Nirveena Logo"
-    className="h-10 w-auto object-contain"
-  />
-</div>
+              <div className="flex items-center justify-between p-4 border-b border-gray-100">
+                <div className="flex items-center gap-2">
+                  <div className="w-10 h-10 overflow-hidden rounded-full">
+                    <img
+                      src={logo}
+                      alt="Nirveena Logo"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <h2 className="text-sm font-semibold text-gray-900">
+                    NIRVEENA
+                  </h2>
+                </div>
+
                 <button
                   onClick={() => setIsMenuOpen(false)}
-                  className="text-gray-500 hover:text-gray-700 p-1"
+                  className="text-gray-400 hover:text-gray-600 p-1"
                   aria-label="Close menu"
                 >
-                  <X size={24} />
+                  <X size={18} />
                 </button>
               </div>
 
-              {/* Menu Items */}
-              <div className="flex-1 p-4 flex flex-col space-y-2 overflow-y-auto">
+              <div className="flex-1 py-3 px-3 flex flex-col space-y-0.5 overflow-y-auto">
                 {navItems.map((item) => {
                   const isActive = activeTab === item.path;
                   return (
                     <Link
                       key={item.name}
                       to={item.path}
-                      className={`font-medium py-3 px-4 rounded-lg transition-all duration-200 no-underline text-base ${
+                      className={`font-medium py-2.5 px-3 rounded-md text-sm transition-all duration-200 ${
                         isActive
-                          ? "text-white bg-black shadow-md"
-                          : "text-gray-700 hover:text-blue-600 hover:bg-gray-50"
+                          ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+                          : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
                       }`}
                       onClick={() => setIsMenuOpen(false)}
                     >
@@ -173,13 +188,25 @@ const Header = () => {
                     </Link>
                   );
                 })}
+
+                {/* Mobile Admin Link */}
+                <Link
+                  to="/admin"
+                  className="sm:hidden font-medium py-2.5 px-3 rounded-md text-sm bg-blue-50 text-blue-600 hover:bg-blue-100 transition-all duration-200 mt-2"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Admin Dashboard
+                </Link>
               </div>
 
-              {/* Footer Info */}
-              <div className="p-6 border-t border-gray-100 text-sm text-gray-600 space-y-2">
-                <p>Email: info@veena.com</p>
-                <p>Phone: +1 234 567 8900</p>
-                <p>Hours: Mon-Fri 9am-6pm, Sat 10am-4pm</p>
+              <div className="p-4 border-t border-gray-100">
+                <div className="space-y-1 text-xs text-gray-600">
+                  <p className="font-medium">hello@nirveena.com</p>
+                  <p className="font-medium">+1 (234) 567-8900</p>
+                  <p className="text-[10px] text-gray-500 mt-1">
+                    Mon-Fri: 9am - 6pm
+                  </p>
+                </div>
               </div>
             </motion.div>
           </>
