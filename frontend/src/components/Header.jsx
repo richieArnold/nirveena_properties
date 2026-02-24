@@ -4,14 +4,15 @@ import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import logo from "../assets/logo/logo.png";
 
-// CTA Button - Gradient colors maintained
+// CTA Button - Smaller for mobile
 const CTAButton = ({ onClick }) => (
   <button
     onClick={onClick}
-    className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold px-4 py-2 sm:px-5 sm:py-2.5 rounded-md hover:shadow-md transition-all duration-300 flex items-center gap-1.5 text-xs sm:text-sm"
+    className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold px-3 py-1.5 sm:px-4 sm:py-2 rounded-md hover:shadow-md transition-all duration-300 flex items-center gap-1 text-xs sm:text-sm"
   >
-    <Phone size={14} className="sm:w-4 sm:h-4" />
-    <span>GET IN TOUCH</span>
+    <Phone size={12} className="sm:w-3.5 sm:h-3.5" />
+    <span className="hidden xs:inline">GET IN TOUCH</span>
+    <span className="xs:hidden">GET IN TOUCH</span>
   </button>
 );
 
@@ -31,7 +32,7 @@ const Header = () => {
   // Scroll listener
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      setIsScrolled(window.scrollY > 10);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -57,32 +58,32 @@ const Header = () => {
         isScrolled ? "bg-white/95 backdrop-blur-sm shadow-sm" : "bg-white"
       }`}
     >
-      <div className="container mx-auto px-4 sm:px-6 py-1 flex items-center justify-between">
-        {/* Logo Section - Bigger logo */}
-        <Link to="/" className="flex items-center space-x-1 sm:space-x-1">
-          <div className="w-12 h-12 sm:w-16 sm:h-16 md:w-18 md:h-18 overflow-hidden rounded-full p-1 flex-shrink-0">
+      <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-1.5 sm:py-2 flex items-center justify-between">
+        {/* Logo Section - Smaller on mobile */}
+        <Link to="/" className="flex items-center gap-1 sm:gap-2">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 overflow-hidden rounded-full flex-shrink-0">
             <img
               src={logo}
               alt="Nirveena Logo"
               className="w-full h-full object-cover"
             />
           </div>
-          <h1 className="text-lg sm:text-xl md:text-2xl font-serif tracking-tight text-gray-900">
+          <h1 className="text-sm sm:text-base md:text-lg lg:text-xl font-serif tracking-tight text-gray-900">
             NIRVEENA
           </h1>
         </Link>
 
         {/* Desktop Nav - Hidden on mobile */}
-        <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8">
+        <nav className="hidden lg:flex items-center space-x-5 xl:space-x-12">
           {navItems.map((item) => {
             const isActive = activeTab === item.path;
             return (
               <Link
                 key={item.name}
                 to={item.path}
-                className={`font-semibold text-sm xl:text-base tracking-wide relative py-1 transition-colors duration-200 ${
+                className={`font-semibold text-xs xl:text-sm tracking-wide relative py-1 transition-colors duration-200 ${
                   isActive
-                    ? "text-gray-900"
+                    ? "text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600"
                     : "text-gray-600 hover:text-gray-900"
                 }`}
               >
@@ -90,7 +91,7 @@ const Header = () => {
                 {isActive && (
                   <motion.span
                     layoutId="activeNav"
-                    className="absolute bottom-0 left-0 w-full h-0.5 bg-gray-900"
+                    className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-blue-600 to-purple-600"
                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
                 )}
@@ -100,25 +101,26 @@ const Header = () => {
         </nav>
 
         {/* Right Side */}
-        <div className="flex items-center gap-2 sm:gap-4">
+        <div className="flex items-center gap-1 sm:gap-2 md:gap-3">
           <CTAButton onClick={() => console.log("CTA Click")} />
+
+          {/* Admin Link - Hidden on very small screens */}
+          <Link
+            to="/admin"
+            className="hidden sm:inline-block px-3 py-1.5 sm:px-4 sm:py-2 bg-blue-600 text-white text-xs sm:text-sm rounded-md hover:bg-blue-700 transition-colors"
+          >
+            Admin
+          </Link>
 
           {/* Mobile Menu Button */}
           <button
-            className="lg:hidden text-gray-600 hover:text-gray-900 p-1.5 transition-colors"
+            className="lg:hidden text-gray-600 hover:text-gray-900 p-1 transition-colors"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label={isMenuOpen ? "Close menu" : "Open menu"}
           >
-            {isMenuOpen ? <X size={22} /> : <Menu size={22} />}
+            {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
-
-        <Link
-          to="/admin"
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-        >
-          Admin Dashboard
-        </Link>
       </div>
 
       {/* Mobile Drawer */}
@@ -143,39 +145,39 @@ const Header = () => {
               animate="visible"
               exit="exit"
               transition={{ type: "tween", duration: 0.3 }}
-              className="fixed top-0 right-0 h-full w-80 max-w-[85%] bg-white shadow-xl z-50 flex flex-col"
+              className="fixed top-0 right-0 h-full w-72 max-w-[80%] bg-white shadow-xl z-50 flex flex-col"
             >
-              <div className="flex items-center justify-between p-5 sm:p-6 border-b border-gray-100">
-                <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 overflow-hidden rounded-full">
+              <div className="flex items-center justify-between p-4 border-b border-gray-100">
+                <div className="flex items-center gap-2">
+                  <div className="w-10 h-10 overflow-hidden rounded-full">
                     <img
                       src={logo}
                       alt="Nirveena Logo"
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <h2 className="text-base sm:text-lg font-semibold text-gray-900">
+                  <h2 className="text-sm font-semibold text-gray-900">
                     NIRVEENA
                   </h2>
                 </div>
 
                 <button
                   onClick={() => setIsMenuOpen(false)}
-                  className="text-gray-400 hover:text-gray-600 p-1.5"
+                  className="text-gray-400 hover:text-gray-600 p-1"
                   aria-label="Close menu"
                 >
-                  <X size={20} />
+                  <X size={18} />
                 </button>
               </div>
 
-              <div className="flex-1 py-4 px-4 sm:px-5 flex flex-col space-y-1 overflow-y-auto">
+              <div className="flex-1 py-3 px-3 flex flex-col space-y-0.5 overflow-y-auto">
                 {navItems.map((item) => {
                   const isActive = activeTab === item.path;
                   return (
                     <Link
                       key={item.name}
                       to={item.path}
-                      className={`font-semibold py-3 px-4 rounded-md transition-all duration-200 ${
+                      className={`font-medium py-2.5 px-3 rounded-md text-sm transition-all duration-200 ${
                         isActive
                           ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
                           : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
@@ -186,13 +188,22 @@ const Header = () => {
                     </Link>
                   );
                 })}
+
+                {/* Mobile Admin Link */}
+                <Link
+                  to="/admin"
+                  className="sm:hidden font-medium py-2.5 px-3 rounded-md text-sm bg-blue-50 text-blue-600 hover:bg-blue-100 transition-all duration-200 mt-2"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Admin Dashboard
+                </Link>
               </div>
 
-              <div className="p-5 sm:p-6 border-t border-gray-100">
-                <div className="space-y-1.5 text-sm text-gray-600">
+              <div className="p-4 border-t border-gray-100">
+                <div className="space-y-1 text-xs text-gray-600">
                   <p className="font-medium">hello@nirveena.com</p>
                   <p className="font-medium">+1 (234) 567-8900</p>
-                  <p className="text-xs text-gray-500 mt-2">
+                  <p className="text-[10px] text-gray-500 mt-1">
                     Mon-Fri: 9am - 6pm
                   </p>
                 </div>

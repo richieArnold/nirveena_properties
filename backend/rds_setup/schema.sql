@@ -29,3 +29,19 @@ CREATE TABLE IF NOT EXISTS project_images (
   sort_order INTEGER DEFAULT 0,
   created_at TIMESTAMP DEFAULT NOW()
 );
+
+
+CREATE TABLE IF NOT EXISTS admins (
+  id SERIAL PRIMARY KEY,
+  username VARCHAR(50) UNIQUE NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+
+-- INSERT INTO admins (username, password_hash) 
+-- VALUES (
+--   'admin@nirveena', 
+--   '$2b$10$/sLv8DenRm7d6jleukdxmubKZUtlnDjpf06h/1BRLnIWwQxtcJtm2'
+-- ) ON CONFLICT (username) DO NOTHING;

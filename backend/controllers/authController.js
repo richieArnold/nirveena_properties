@@ -1,13 +1,6 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-
-// Simple admin credentials (in production, store in database)
-const ADMIN_USER = {
-  username: 'admin',
-  // This is 'admin123' hashed - generate your own with bcrypt
-  passwordHash: '$2a$10$YourHashedPasswordHere',
-  id: 1
-};
+const pool = require('../rds_setup/db/index');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this';
 
@@ -23,17 +16,26 @@ exports.login = async (req, res) => {
       });
     }
 
-    // Check username (in production, query database)
-    if (username !== 'admin') {
+    // Get admin from database
+    const result = await pool.query(
+      'SELECT * FROM admins WHERE username = $1',
+      [username]
+    );
+
+    // Check if admin exists
+    if (result.rows.length === 0) {
       return res.status(401).json({
         success: false,
         message: 'Invalid username or password'
       });
     }
 
-    // Check password (in production, compare with bcrypt)
-    // For now, simple check - in production use bcrypt.compare()
-    if (password !== 'admin123') {
+    const admin = result.rows[0];
+
+    // Compare password with hash using bcrypt
+    const isValidPassword = await bcrypt.compare(password, admin.password_hash);
+
+    if (!isValidPassword) {
       return res.status(401).json({
         success: false,
         message: 'Invalid username or password'
@@ -42,7 +44,10 @@ exports.login = async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign(
-      { id: 1, username: 'admin' },
+      { 
+        id: admin.id, 
+        username: admin.username 
+      },
       JWT_SECRET,
       { expiresIn: '24h' }
     );
@@ -52,8 +57,8 @@ exports.login = async (req, res) => {
       message: 'Login successful',
       token,
       user: {
-        id: 1,
-        username: 'admin'
+        id: admin.id,
+        username: admin.username
       }
     });
 

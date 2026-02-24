@@ -4,7 +4,9 @@ const {
   importProjects,
   getAllProjects,
   getProjectBySlug,
-  deleteProject  // ADD THIS IMPORT
+  getProjectById,      // ADD THIS
+  updateProject,       // ADD THIS
+  deleteProject
 } = require("../controllers/propertyControllers");
 const { importProjectImages } = require("../controllers/imageControllers");
 const uploadController = require("../controllers/uploadController");
@@ -16,6 +18,7 @@ router.post("/import-images", importProjectImages);
 // Fetch routes
 router.get("/getAllProjects", getAllProjects);
 router.get("/getSingleProject/:slug", getProjectBySlug);
+router.get("/getProject/:id", getProjectById);           // ADD THIS - Get project by ID for editing
 
 // Admin routes
 router.post(
@@ -24,7 +27,12 @@ router.post(
   uploadController.addProjectWithImages
 );
 
-// ADD THIS DELETE ROUTE
+router.put(
+  "/updateProject/:id", 
+  uploadController.uploadImages,
+  uploadController.updateProjectWithImages  // We'll create this next
+);
+
 router.delete("/deleteProject/:id", deleteProject);
 
 module.exports = router;
