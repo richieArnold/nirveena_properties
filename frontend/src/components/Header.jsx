@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Menu, X, Phone } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import logo from "../assets/logo/logo.png";
+import logo from "../assets/NirveenaLogo.jpeg";
 
 // CTA Button - Smaller for mobile
 const CTAButton = ({ onClick }) => (
@@ -104,13 +104,6 @@ const Header = () => {
         <div className="flex items-center gap-1 sm:gap-2 md:gap-3">
           <CTAButton onClick={() => console.log("CTA Click")} />
 
-          {/* Admin Link - Hidden on very small screens */}
-          <Link
-            to="/admin"
-            className="hidden sm:inline-block px-3 py-1.5 sm:px-4 sm:py-2 bg-blue-600 text-white text-xs sm:text-sm rounded-md hover:bg-blue-700 transition-colors"
-          >
-            Admin
-          </Link>
 
           {/* Mobile Menu Button */}
           <button

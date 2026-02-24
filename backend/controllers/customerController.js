@@ -4,7 +4,7 @@ exports.createCustomerEnquiry = async (req, res) => {
   const { first_name, last_name, contact, email, project_id } = req.body;
 
   try {
-    // 1️⃣ Check existing customer
+    // Check existing customer
     const existingCustomer = await pool.query(
       "SELECT id FROM customers WHERE email = $1",
       [email]
@@ -25,7 +25,7 @@ exports.createCustomerEnquiry = async (req, res) => {
       customerId = newCustomer.rows[0].id;
     }
 
-    // 2️⃣ Insert enquiry
+    //  Insert enquiry
     await pool.query(
       `INSERT INTO enquiries (customer_id, project_id)
        VALUES ($1, $2)`,

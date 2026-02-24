@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-=======
-
-// server.js
->>>>>>> dev
 const express = require("express");
 const cors = require("cors");   
 const app = express();

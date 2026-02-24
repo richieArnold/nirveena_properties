@@ -28,6 +28,7 @@ function EnquiryForm({ projectId, onSuccess }) {
         ...formData,
         project_id: projectId,
       });
+      console.log(res)
 
       if (res.data.success) {
         onSuccess(); // tell parent submission success
