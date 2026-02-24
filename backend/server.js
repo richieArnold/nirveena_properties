@@ -1,13 +1,14 @@
-// server.js
-
 
 // server.js
 const express = require("express");
 const cors = require("cors");   // ✅ ADD THIS
 const app = express();
+const customerRoutes = require("./routes/customerRoutes");
 
 app.use(cors());                // ✅ ADD THIS (before routes)
 app.use(express.json());
+
+app.use("/api/customers", customerRoutes);
 
 const projectRoutes = require("./routes/propertyRoutes");
 
@@ -21,6 +22,15 @@ const s3 = new S3Client({
     accessKeyId: process.env.AWS_ACCESS_KEY,
     secretAccessKey: process.env.AWS_SECRET_KEY,
   },
+});
+
+app.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "API is running successfully 🚀",
+    environment: process.env.NODE_ENV || "development",
+    timestamp: new Date().toISOString()
+  });
 });
 
 app.get("/test-s3", async (req, res) => {

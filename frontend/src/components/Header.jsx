@@ -2,8 +2,7 @@ import { useState, useEffect } from "react";
 import { Menu, X, Phone } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-
-// CTA Button
+import NirveenaLogo from "../assets/NirveenaLogo.jpeg";// CTA Button
 const CTAButton = ({ onClick }) => (
   <button
     onClick={onClick}
@@ -61,16 +60,15 @@ const Header = () => {
         isScrolled ? "bg-blue-500 shadow-md" : "bg-transparent"
       }`}
     > */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3 md:py-3 flex items-center justify-between">
+      <div className="container mx-auto px-6 flex items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="flex items-center space-x-2 sm:space-x-2.5">
-          <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gray-900 rounded flex items-center justify-center">
-            <span className="text-white font-bold text-xs sm:text-sm">NV</span>
-          </div>
-          <h1 className="text-base sm:text-lg font-medium text-gray-900 tracking-tight">
-            VEENA
-          </h1>
-        </Link>
+<Link to="/" className="flex items-center">
+  <img
+    src={NirveenaLogo}
+    alt="Nirveena Logo"
+    className="h-16 sm:h-18 lg:h-20 w-auto object-contain"
+  />
+</Link>
 
         {/* Desktop Nav - lg+ */}
         <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8 text-white">
@@ -140,12 +138,13 @@ const Header = () => {
             >
               {/* Header */}
               <div className="flex items-center justify-between p-6 border-b border-gray-100">
-                <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-gray-900 rounded flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">NV</span>
-                  </div>
-                  <h2 className="text-lg font-medium text-gray-900">VEENA</h2>
-                </div>
+<div className="flex items-center">
+  <img
+    src={NirveenaLogo}
+    alt="Nirveena Logo"
+    className="h-10 w-auto object-contain"
+  />
+</div>
                 <button
                   onClick={() => setIsMenuOpen(false)}
                   className="text-gray-500 hover:text-gray-700 p-1"

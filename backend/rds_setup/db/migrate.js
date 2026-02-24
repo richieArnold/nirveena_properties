@@ -1,7 +1,10 @@
 const dotenv = require("dotenv");
 const path = require("path");
 
-dotenv.config({});
+// Load .env from backend folder
+dotenv.config({
+  path: path.resolve(__dirname, "../../.env"),
+});
 
 const fs = require("fs");
 const pool = require("./index");

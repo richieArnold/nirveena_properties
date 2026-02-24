@@ -1,14 +1,6 @@
 //propertyRoutes.js
-
-
 const express = require("express");
 const router = express.Router();
-const {
-  importProjects,
-  getAllProjects,
-} = require("../controllers/propertyControllers");
-
-
 
 const {
   importProjects,
