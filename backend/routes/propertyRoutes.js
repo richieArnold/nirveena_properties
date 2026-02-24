@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 const express = require("express");
 const router = express.Router();
 const {
@@ -8,6 +9,18 @@ const {
   updateProject,       // ADD THIS
   deleteProject
 } = require("../controllers/propertyControllers");
+=======
+//propertyRoutes.js
+const express = require("express");
+const router = express.Router();
+
+const {
+  importProjects,
+  getAllProjects,
+  getProjectBySlug
+} = require("../controllers/propertyControllers");
+
+>>>>>>> dev
 const { importProjectImages } = require("../controllers/imageControllers");
 const uploadController = require("../controllers/uploadController");
 

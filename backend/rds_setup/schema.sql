@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS project_images (
   created_at TIMESTAMP DEFAULT NOW()
 );
 
+<<<<<<< HEAD
 
 CREATE TABLE IF NOT EXISTS admins (
   id SERIAL PRIMARY KEY,
@@ -45,3 +46,24 @@ CREATE TABLE IF NOT EXISTS admins (
 --   'admin@nirveena', 
 --   '$2b$10$/sLv8DenRm7d6jleukdxmubKZUtlnDjpf06h/1BRLnIWwQxtcJtm2'
 -- ) ON CONFLICT (username) DO NOTHING;
+=======
+CREATE TABLE IF NOT EXISTS customers (
+    id SERIAL PRIMARY KEY,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    contact VARCHAR(20),
+    email VARCHAR(150) UNIQUE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ===============================
+-- ENQUIRIES TABLE
+-- ===============================
+
+CREATE TABLE IF NOT EXISTS enquiries (
+    id SERIAL PRIMARY KEY,
+    customer_id INTEGER REFERENCES customers(id) ON DELETE CASCADE,
+    project_id INTEGER REFERENCES projects(id) ON DELETE CASCADE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+>>>>>>> dev
