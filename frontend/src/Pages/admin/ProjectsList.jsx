@@ -5,6 +5,8 @@ import { Eye, Edit2, Trash2, RefreshCw } from 'lucide-react';
 import AdminLayout from "../../components/admin/AdminLayout";
 import Pagination from "../../components/admin/Pagination";
 import AlertMessage from "../../components/admin/AlertMessage";
+import axiosInstance from "../../utils/Instance";
+
 
 const ProjectsList = () => {
   const navigate = useNavigate();
@@ -35,8 +37,8 @@ const ProjectsList = () => {
   const fetchProjects = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(
-        `http://localhost:5000/api/projects/getAllProjects?page=${currentPage}&limit=10`
+      const response = await axiosInstance.get(
+        `/api/projects/getAllProjects?page=${currentPage}&limit=10`
       );
       setProjects(response.data.data);
       setTotalPages(response.data.pagination.totalPages);
@@ -53,7 +55,7 @@ const ProjectsList = () => {
 
     setDeleteLoading(id);
     try {
-      await axios.delete(`http://localhost:5000/api/projects/deleteProject/${id}`);
+      await axiosInstance.delete(`/api/projects/deleteProject/${id}`);
       setMessage({ type: "success", text: "Project deleted successfully!" });
       fetchProjects(); // Refresh after delete
     } catch (error) {

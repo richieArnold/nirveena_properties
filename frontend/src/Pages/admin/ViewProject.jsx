@@ -4,6 +4,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, MapPin, Calendar, Home, Building2, Ruler, DollarSign } from 'lucide-react';
 import AdminLayout from "../../components/admin/AdminLayout";
 import AlertMessage from "../../components/admin/AlertMessage";
+import axiosInstance from "../../utils/Instance";
+
 
 const ViewProject = () => {
   const navigate = useNavigate();
@@ -29,7 +31,7 @@ const ViewProject = () => {
 
   const fetchProject = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/projects/getProject/${id}`);
+      const response = await axiosInstance.get(`/api/projects/getProject/${id}`);
       setProject(response.data.data);
     } catch (error) {
       setMessage({ type: "error", text: "Failed to fetch project details" });

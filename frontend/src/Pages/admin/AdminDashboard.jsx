@@ -1,37 +1,58 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { PlusCircle, Edit3, Eye } from 'lucide-react';
-import AdminLayout from "../../components/admin/AdminLayout";  // Correct path
-import DashboardCard from "../../components/admin/DashboardCard";  // Correct path
-import AlertMessage from "../../components/admin/AlertMessage";  // Correct path
+import { PlusCircle, Edit3, Eye, Users, Mail, TrendingUp } from "lucide-react";
+import AdminLayout from "../../components/admin/AdminLayout";
+import DashboardCard from "../../components/admin/DashboardCard";
+import LeadsCard from "../../components/admin/LeadsCard";
+import AlertMessage from "../../components/admin/AlertMessage";
+
+import ApiFallback from "../../components/common/ApiFallback";
+
+import axiosInstance from "../../utils/Instance";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
+  const [leadsStats, setLeadsStats] = useState({
+    total: 0,
+    new: 0,
+    contacted: 0,
+    unopened: 0,
+    today: 0,
+  });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(true);
   const [user, setUser] = useState(null);
   const [message, setMessage] = useState({ type: "", text: "" });
 
   useEffect(() => {
-    const token = localStorage.getItem('adminToken');
-    const userData = localStorage.getItem('adminUser');
-    
+    const token = localStorage.getItem("adminToken");
+    const userData = localStorage.getItem("adminUser");
+
     if (!token) {
-      navigate('/admin/login');
+      navigate("/admin/login");
     } else {
       setUser(JSON.parse(userData));
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      fetchProjects();
+      axiosInstance.defaults.headers.common["Authorization"] =
+        `Bearer ${token}`;
+      fetchDashboardData();
     }
   }, [navigate]);
 
-  const fetchProjects = async () => {
+  const fetchDashboardData = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/projects/getAllProjects");
-      setProjects(response.data.data);
+      setError(false);
+
+      const [projectsRes, leadsStatsRes] = await Promise.all([
+        axiosInstance.get("/api/projects/getAllProjects"),
+        axiosInstance.get("/api/leads/stats"),
+      ]);
+
+      setProjects(projectsRes.data.data);
+      setLeadsStats(leadsStatsRes.data.data);
     } catch (error) {
-      setMessage({ type: "error", text: "Failed to load projects" });
+      console.log(error);
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -39,74 +60,164 @@ const AdminDashboard = () => {
 
   const stats = {
     total: projects.length,
-    rtm: projects.filter(p => p.project_status === 'RTM').length,
-    uc: projects.filter(p => p.project_status === 'UC').length
+    rtm: projects.filter((p) => p.project_status === "RTM").length,
+    uc: projects.filter((p) => p.project_status === "UC").length,
   };
+
+  if (loading) {
+    return (
+      <AdminLayout user={user}>
+        <ApiFallback
+          title="Loading dashboard..."
+          message="Please wait while we fetch your data."
+          loading={true}
+        />
+      </AdminLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <AdminLayout user={user}>
+        <ApiFallback
+          title="Failed to load dashboard"
+          message="There was a problem connecting to the server."
+          onRetry={fetchDashboardData}
+          fullScreen
+        />
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout user={user}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Welcome back, {user?.username}!</h1>
-          <p className="text-gray-500 mt-2">Manage your properties from here</p>
+          <h1 className="text-3xl font-bold text-gray-900">
+            Welcome back, {user?.username}!
+          </h1>
+          <p className="text-gray-500 mt-2">
+            Manage your properties and leads from here
+          </p>
         </div>
 
-        <AlertMessage 
-          message={message.text} 
-          type={message.type} 
-          onClose={() => setMessage({ type: "", text: "" })} 
+        <AlertMessage
+          message={message.text}
+          type={message.type}
+          onClose={() => setMessage({ type: "", text: "" })}
         />
 
-        {/* 3 Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <DashboardCard
-            title="Add Project"
-            // count={stats.total}
-            icon={<PlusCircle className="w-8 h-8" />}
-            color="blue"
-            link="/admin/add"
-          />
-          <DashboardCard
-            title="Update Projects"
-            // count={stats.uc}
-            icon={<Edit3 className="w-8 h-8" />}
-            color="green"
-            link="/admin/list"
-          />
-          <DashboardCard
-            title="View Projects"
-            // count={stats.rtm}
-            icon={<Eye className="w-8 h-8" />}
-            color="purple"
-            link="/admin/list"
-          />
+        {/* Projects Section */}
+        <div className="mb-12">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            <TrendingUp className="w-5 h-5 text-blue-600" />
+            Property Management
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <DashboardCard
+              title="Add Project"
+              icon={<PlusCircle className="w-8 h-8" />}
+              color="blue"
+              link="/admin/add"
+            />
+            <DashboardCard
+              title="Update Projects"
+              icon={<Edit3 className="w-8 h-8" />}
+              color="green"
+              link="/admin/list"
+            />
+            <DashboardCard
+              title="View Projects"
+              icon={<Eye className="w-8 h-8" />}
+              color="purple"
+              link="/admin/list"
+            />
+          </div>
         </div>
 
-        {/* Recent Projects */}
-        {/* <div className="bg-white rounded-xl shadow-lg p-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">Recent Projects</h2>
-          {loading ? (
-            <div className="flex justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        {/* Leads Section */}
+        <div>
+          <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            <Mail className="w-5 h-5 text-green-600" />
+            Lead Management
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <LeadsCard
+              title="Total Leads"
+              count={leadsStats.total}
+              icon={<Users className="w-8 h-8" />}
+              color="blue"
+              link="/admin/leads"
+              subtitle="All time leads"
+            />
+            <LeadsCard
+              title="New Leads"
+              count={leadsStats.new}
+              icon={<Mail className="w-8 h-8" />}
+              color="green"
+              link="/admin/leads?status=new"
+              subtitle="Awaiting contact"
+            />
+            <LeadsCard
+              title="Unopened"
+              count={leadsStats.unopened}
+              icon={<Eye className="w-8 h-8" />}
+              color="orange"
+              link="/admin/leads?status=new&unopened=true"
+              subtitle="Not viewed yet"
+            />
+            <LeadsCard
+              title="Today's Leads"
+              count={leadsStats.today}
+              icon={<TrendingUp className="w-8 h-8" />}
+              color="purple"
+              link="/admin/leads?today=true"
+              subtitle="Received today"
+            />
+          </div>
+
+          {/* Quick Status Summary */}
+          <div className="mt-6 grid grid-cols-2 md:grid-cols-5 gap-3">
+            <div className="bg-blue-50 rounded-lg p-3 text-center">
+              <p className="text-xs text-blue-600 font-medium">Contacted</p>
+              <p className="text-xl font-bold text-blue-700">
+                {leadsStats.contacted || 0}
+              </p>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {projects.slice(0, 3).map(project => (
-                <div key={project.id} className="border rounded-lg p-4 hover:shadow-md transition">
-                  {project.image_url && (
-                    <img 
-                      src={project.image_url} 
-                      alt={project.project_name}
-                      className="w-full h-32 object-cover rounded-lg mb-3"
-                    />
-                  )}
-                  <h3 className="font-semibold text-gray-900">{project.project_name}</h3>
-                  <p className="text-sm text-gray-500">{project.project_location}</p>
-                </div>
-              ))}
+            <div className="bg-purple-50 rounded-lg p-3 text-center">
+              <p className="text-xs text-purple-600 font-medium">Qualified</p>
+              <p className="text-xl font-bold text-purple-700">
+                {leadsStats.qualified || 0}
+              </p>
             </div>
-          )}
-        </div> */}
+            <div className="bg-green-50 rounded-lg p-3 text-center">
+              <p className="text-xs text-green-600 font-medium">Converted</p>
+              <p className="text-xl font-bold text-green-700">
+                {leadsStats.converted || 0}
+              </p>
+            </div>
+            <div className="bg-yellow-50 rounded-lg p-3 text-center">
+              <p className="text-xs text-yellow-600 font-medium">Lost</p>
+              <p className="text-xl font-bold text-yellow-700">
+                {leadsStats.lost || 0}
+              </p>
+            </div>
+            <div className="bg-gray-50 rounded-lg p-3 text-center">
+              <p className="text-xs text-gray-600 font-medium">Total</p>
+              <p className="text-xl font-bold text-gray-700">
+                {leadsStats.total || 0}
+              </p>
+            </div>
+          </div>
+          <DashboardCard
+            title="Customers"
+            count={stats.totalCustomers || 0}
+            icon={<Users className="w-8 h-8" />}
+            color="orange"
+            link="/admin/customers"
+            subtitle="Manage customers & enquiries"
+          />
+        </div>
       </div>
     </AdminLayout>
   );

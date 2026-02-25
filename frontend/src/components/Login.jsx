@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import axiosInstance from "../utils/Instance";
 
 const Login = ({ onLogin }) => {
   const navigate = useNavigate();
@@ -24,7 +25,7 @@ const Login = ({ onLogin }) => {
     setError('');
 
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', credentials);
+      const response = await axiosInstance.post('/api/auth/login', credentials);
       
       if (response.data.success) {
         localStorage.setItem('adminToken', response.data.token);

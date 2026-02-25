@@ -12,13 +12,20 @@ import Contact from "@/pages/Contact";
 import PropertyDetails from "../pages/PropertyDetails";
 import PropertiesPage from "../Pages/PropertiesPage";
 import PropertyDetailsPage from "../Pages/PropertyDetailsPage";
+import LeadsList from "../Pages/admin/LeadsList";
+import LeadDetails from "../Pages/admin/LeadDetails";
 
-// Admin Pages - Update these paths to match your folder structure
+// Admin Pages
 import AdminDashboard from "../Pages/admin/AdminDashboard";
 import AddProject from "../Pages/admin/AddProject";
 import EditProject from "../Pages/admin/EditProject";
 import ViewProject from "../Pages/admin/ViewProject";
 import ProjectsList from "../Pages/admin/ProjectsList";
+
+import CustomersList from "../Pages/admin/CustomersList";
+import CustomerDetails from "../Pages/admin/CustomerDetails";
+
+import ChangePassword from "../components/admin/ChangePassword";
 
 const PageRoutes = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -43,7 +50,16 @@ const PageRoutes = () => {
 
       {/* Admin Routes - NO Layout */}
       <Route path="/admin/login" element={<Login onLogin={handleLogin} />} />
-      
+
+      <Route
+        path="/admin/change-password"
+        element={
+          <ProtectedRoute>
+            <ChangePassword />
+          </ProtectedRoute>
+        }
+      />
+
       <Route
         path="/admin"
         element={
@@ -52,7 +68,7 @@ const PageRoutes = () => {
           </ProtectedRoute>
         }
       />
-      
+
       <Route
         path="/admin/add"
         element={
@@ -61,7 +77,7 @@ const PageRoutes = () => {
           </ProtectedRoute>
         }
       />
-      
+
       <Route
         path="/admin/list"
         element={
@@ -70,7 +86,7 @@ const PageRoutes = () => {
           </ProtectedRoute>
         }
       />
-      
+
       <Route
         path="/admin/edit/:id"
         element={
@@ -79,7 +95,7 @@ const PageRoutes = () => {
           </ProtectedRoute>
         }
       />
-      
+
       <Route
         path="/admin/view/:id"
         element={
@@ -88,13 +104,47 @@ const PageRoutes = () => {
           </ProtectedRoute>
         }
       />
-      
-      {/* Catch-all for any other admin routes - redirect to dashboard */}
+
+      {/* LEADS ROUTES - Place these BEFORE the catch-all route */}
+      <Route
+        path="/admin/leads"
+        element={
+          <ProtectedRoute>
+            <LeadsList />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/leads/:id"
+        element={
+          <ProtectedRoute>
+            <LeadDetails />
+          </ProtectedRoute>
+        }
+      />
+
       <Route
         path="/admin/*"
         element={
           <ProtectedRoute>
             <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/customers"
+        element={
+          <ProtectedRoute>
+            <CustomersList />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/customers/:id"
+        element={
+          <ProtectedRoute>
+            <CustomerDetails />
           </ProtectedRoute>
         }
       />

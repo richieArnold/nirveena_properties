@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { Save, Upload, ArrowLeft, CheckCircle, XCircle, X } from 'lucide-react';
 import AdminLayout from "../../components/admin/AdminLayout";
 import AlertMessage from "../../components/admin/AlertMessage";
+import axiosInstance from "../../utils/Instance";
+
 
 const AddProject = () => {
   const navigate = useNavigate();
@@ -91,8 +93,8 @@ const AddProject = () => {
     });
 
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/projects/addProject",
+      const response = await axiosInstance.post(
+        "/api/projects/addProject",
         data,
         { headers: { "Content-Type": "multipart/form-data" } }
       );

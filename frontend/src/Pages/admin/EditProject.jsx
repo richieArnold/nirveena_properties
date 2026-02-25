@@ -4,6 +4,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Save, Upload, ArrowLeft, Trash2, X, CheckCircle, XCircle } from 'lucide-react';
 import AdminLayout from "../../components/admin/AdminLayout";
 import AlertMessage from "../../components/admin/AlertMessage";
+import axiosInstance from "../../utils/Instance";
+
 
 const EditProject = () => {
   const navigate = useNavigate();
@@ -48,7 +50,7 @@ const EditProject = () => {
 
   const fetchProject = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/projects/getProject/${id}`);
+      const response = await axiosInstance.get(`/api/projects/getProject/${id}`);
       const project = response.data.data;
       
       setFormData({
@@ -71,6 +73,7 @@ const EditProject = () => {
       setExistingImages(images);
       setImagesToKeep(images.map(img => img.image_url));
     } catch (error) {
+      console.log(error)
       setMessage({ type: "error", text: "Failed to fetch project details" });
     } finally {
       setFetchLoading(false);
@@ -149,8 +152,8 @@ const EditProject = () => {
     });
 
     try {
-      const response = await axios.put(
-        `http://localhost:5000/api/projects/updateProject/${id}`,
+      const response = await axiosInstance.put(
+        `/api/projects/updateProject/${id}`,
         data,
         { headers: { "Content-Type": "multipart/form-data" } }
       );
@@ -175,7 +178,7 @@ const EditProject = () => {
     if (!window.confirm('Are you sure you want to delete this project? This action cannot be undone.')) return;
 
     try {
-      const response = await axios.delete(`http://localhost:5000/api/projects/deleteProject/${id}`);
+      const response = await axiosInstance.delete(`/api/projects/deleteProject/${id}`);
       if (response.data.success) {
         setMessage({ type: "success", text: "Project deleted successfully!" });
         
