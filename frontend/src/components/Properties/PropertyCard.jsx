@@ -1,12 +1,14 @@
-import React from "react";
-import { motion } from "framer-motion";
-import { MapPin } from "lucide-react";
+import React from 'react';
+import { motion } from 'framer-motion';
+import { MapPin } from 'lucide-react';
 
 function PropertyCard({ property, getIcon, handleViewDetails }) {
+  // Debug log
+  console.log('Rendering property:', property);
+
   return (
     <motion.div
       layout
-      key={property.slug}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
@@ -17,18 +19,19 @@ function PropertyCard({ property, getIcon, handleViewDetails }) {
         transition-all duration-300 group relative
         flex flex-col h-[440px]"
       >
-        <div className="relative h-56 overflow-hidden">
+        <div className="relative h-56 overflow-hidden rounded-t-2xl">
           <img
-            src={
-              property.image_url ||
-              "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1600&auto=format&fit=crop"
-            }
+            src={property.image_url || "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1600&auto=format&fit=crop"}
             alt={property.project_name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+            onError={(e) => {
+              console.log('Image failed to load:', property.image_url);
+              e.target.src = "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1600&auto=format&fit=crop";
+            }}
           />
 
           <div className="absolute top-4 left-4 bg-white/90 text-gray-900 text-[10px] font-bold uppercase px-3 py-1 rounded-full">
-            {property.project_status}
+            {property.project_status || 'Coming Soon'}
           </div>
         </div>
 
@@ -40,12 +43,12 @@ function PropertyCard({ property, getIcon, handleViewDetails }) {
 
             <p className="text-sm text-gray-500 flex items-center gap-2">
               <MapPin size={15} className="text-gray-400" />
-              {property.project_location}
+              {property.project_location || 'Location coming soon'}
             </p>
 
             <p className="text-xs text-gray-500 uppercase tracking-wide flex items-center gap-2">
-              {getIcon(property.project_type?.toLowerCase())}
-              {property.project_type}
+              <span className="text-lg">{getIcon(property.project_type?.toLowerCase())}</span>
+              {property.project_type || 'Property'}
             </p>
           </div>
 
@@ -56,7 +59,7 @@ function PropertyCard({ property, getIcon, handleViewDetails }) {
               </p>
 
               <p className="text-blue-600 font-bold text-lg whitespace-nowrap tabular-nums">
-                {property.price}
+                {property.price || 'On Request'}
               </p>
             </div>
 

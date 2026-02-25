@@ -1,8 +1,10 @@
+//propertyControllers.js
+
 const fs = require("fs");
 const path = require("path");
 const pool = require("../rds_setup/db/index"); // assuming you export pool from db/index.js
 
-// 🔹 Slug generator
+//  Slug generator
 function generateSlug(name) {
   return name
     .toLowerCase()
@@ -12,7 +14,7 @@ function generateSlug(name) {
     .replace(/-+/g, "-");
 }
 
-// 🔹 Safe number conversion
+//  Safe number conversion
 function toNumber(value) {
   if (!value) return null;
   const cleaned = value.toString().replace(/[^\d.]/g, "");
@@ -66,7 +68,7 @@ exports.importProjects = async (req, res) => {
           project.sba?.trim() || null,
           project.price?.trim() || null,
           project.rera_completion?.trim() || null,
-        ]
+        ],
       );
     }
 
@@ -74,7 +76,6 @@ exports.importProjects = async (req, res) => {
       success: true,
       message: "Projects imported successfully",
     });
-
   } catch (error) {
     console.error("Import error:", error);
     res.status(500).json({
@@ -87,9 +88,8 @@ exports.importProjects = async (req, res) => {
 
 // exports.getAllProjects = async (req, res) => {
 //   try {
-//     const limit = req.query.limit ? Number(req.query.limit) : 12;
-
-//     const result = await pool.query(`
+//     const result = await pool.query(
+//       `
 //       SELECT 
 //         p.id,
 //         p.slug,
@@ -98,68 +98,100 @@ exports.importProjects = async (req, res) => {
 //         p.price,
 //         p.project_type,
 //         p.project_status,
-//         (
-//           SELECT image_url
-//           FROM project_images pi
-//           WHERE pi.project_id = p.project_id
-//           ORDER BY sort_order ASC
-//           LIMIT 1
-//         ) AS image_url
+//         img.image_url
 //       FROM projects p
-//       ORDER BY p.project_id DESC
-//       LIMIT $1
-//     `, [limit]);
+//       LEFT JOIN LATERAL (
+//         SELECT image_url
+//         FROM project_images pi
+//         WHERE pi.project_id = p.project_id
+//         ORDER BY pi.sort_order ASC
+//         LIMIT 1
+//       ) img ON true
+//       ORDER BY p.id DESC
+//       `,
+//     );
+
+//     console.log("Query successful, rows:", result.rows.length);
 
 //     res.json({
 //       success: true,
 //       count: result.rows.length,
-//       data: result.rows
+//       data: result.rows,
 //     });
-
 //   } catch (error) {
+//     console.error("ERROR in getAllProjects:", error); // This will show in your terminal
 //     res.status(500).json({
 //       success: false,
 //       message: "Failed to fetch projects",
-//       error: error.message
+//       error: error.message,
 //     });
 //   }
 // };
 
+
+
+// controllers/propertyControllers.js
+
 exports.getAllProjects = async (req, res) => {
   try {
-    // const limit = req.query.limit ? Number(req.query.limit) : 12;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
 
+    // Get total count for pagination
+    const countResult = await pool.query('SELECT COUNT(*) FROM projects');
+    const totalCount = parseInt(countResult.rows[0].count);
+
+    // Get paginated projects with images
     const result = await pool.query(
       `
       SELECT 
         p.id,
+        p.project_id,
         p.slug,
         p.project_name,
         p.project_location,
         p.price,
         p.project_type,
         p.project_status,
+        p.total_acres,
+        p.no_of_units,
+        p.club_house_size,
+        p.structure,
+        p.typology,
+        p.sba,
+        p.rera_completion,
+        p.created_at,
+        p.updated_at,
         img.image_url
       FROM projects p
       LEFT JOIN LATERAL (
         SELECT image_url
         FROM project_images pi
-        WHERE pi.project_id = p.id
+        WHERE pi.project_id = p.project_id
         ORDER BY pi.sort_order ASC
         LIMIT 1
       ) img ON true
       ORDER BY p.id DESC
+      LIMIT $1 OFFSET $2
       `,
-      // [limit]
+      [limit, offset]
     );
-console.log(result);
+
+    console.log("Query successful, rows:", result.rows.length);
+
     res.json({
       success: true,
-      count: result.rows.length,
       data: result.rows,
+      pagination: {
+        currentPage: page,
+        totalPages: Math.ceil(totalCount / limit),
+        totalCount: totalCount,
+        limit: limit
+      }
     });
-
   } catch (error) {
+    console.error("ERROR in getAllProjects:", error);
     res.status(500).json({
       success: false,
       message: "Failed to fetch projects",
@@ -168,13 +200,16 @@ console.log(result);
   }
 };
 
+
+
+
 exports.getProjectBySlug = async (req, res) => {
   try {
     const { slug } = req.params;
 
     const projectResult = await pool.query(
       `SELECT * FROM projects WHERE slug = $1`,
-      [slug]
+      [slug],
     );
 
     if (projectResult.rows.length === 0) {
@@ -193,7 +228,7 @@ exports.getProjectBySlug = async (req, res) => {
       WHERE project_id = $1
       ORDER BY sort_order ASC
       `,
-      [project.project_id]
+      [project.project_id],
     );
 
     project.images = imagesResult.rows;
@@ -202,7 +237,6 @@ exports.getProjectBySlug = async (req, res) => {
       success: true,
       data: project,
     });
-
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -211,3 +245,392 @@ exports.getProjectBySlug = async (req, res) => {
     });
   }
 };
+
+//  Add Create Project
+exports.addProject = async (req, res) => {
+  const client = await pool.connect();
+
+  try {
+    const {
+      project_id,
+      project_name,
+      project_type,
+      project_status,
+      project_location,
+      total_acres,
+      no_of_units,
+      club_house_size,
+      structure,
+      typology,
+      sba,
+      price,
+      rera_completion,
+      images = [],
+    } = req.body;
+
+    // Basic validation
+    if (!project_id || !project_name) {
+      return res.status(400).json({
+        success: false,
+        message: "project_id and project_name are required",
+      });
+    }
+
+    const slug = generateSlug(project_name);
+
+    await client.query("BEGIN");
+
+    // Insert project
+    await client.query(
+      `
+      INSERT INTO projects (
+        project_id,
+        project_name,
+        slug,
+        project_type,
+        project_status,
+        project_location,
+        total_acres,
+        no_of_units,
+        club_house_size,
+        structure,
+        typology,
+        sba,
+        price,
+        rera_completion
+      )
+      VALUES (
+        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14
+      )
+      `,
+      [
+        Number(project_id),
+        project_name.trim(),
+        slug,
+        project_type || null,
+        project_status || null,
+        project_location || null,
+        total_acres || null,
+        no_of_units || null,
+        club_house_size || null,
+        structure || null,
+        typology || null,
+        sba || null,
+        price || null,
+        rera_completion || null,
+      ],
+    );
+
+    // Insert images if provided
+    for (let i = 0; i < images.length; i++) {
+      await client.query(
+        `
+        INSERT INTO project_images (project_id, image_url, sort_order)
+        VALUES ($1, $2, $3)
+        `,
+        [Number(project_id), images[i], i],
+      );
+    }
+
+    await client.query("COMMIT");
+
+    res.status(201).json({
+      success: true,
+      message: "Project created successfully",
+    });
+  } catch (error) {
+    await client.query("ROLLBACK");
+
+    console.error("Create project error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Project creation failed",
+      error: error.message,
+    });
+  } finally {
+    client.release();
+  }
+};
+
+
+const { S3Client, DeleteObjectCommand } = require("@aws-sdk/client-s3");
+
+// Configure S3 (add this at the top of your file with other imports)
+const s3 = new S3Client({
+  region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY,
+    secretAccessKey: process.env.AWS_SECRET_KEY,
+  },
+});
+
+// Delete project (with S3 cleanup)
+exports.deleteProject = async (req, res) => {
+  const client = await pool.connect();
+  
+  try {
+    const { id } = req.params;
+    
+    await client.query("BEGIN");
+    
+    // First, get the project details to know the slug and project_id
+    const projectResult = await client.query(
+      "SELECT project_id, slug FROM projects WHERE id = $1",
+      [id]
+    );
+    
+    if (projectResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Project not found"
+      });
+    }
+    
+    const { project_id, slug } = projectResult.rows[0];
+    
+    // Get all image URLs for this project
+    const imagesResult = await client.query(
+      `SELECT image_url FROM project_images WHERE project_id = $1`,
+      [project_id]
+    );
+    
+    console.log(`Deleting ${imagesResult.rows.length} images from S3 for project: ${slug}`);
+    
+    // Delete images from S3
+    for (const row of imagesResult.rows) {
+      try {
+        // Extract the key from the URL
+        // URL format: https://bucket-name.s3.region.amazonaws.com/images/slug/filename.jpg
+        const url = new URL(row.image_url);
+        const key = url.pathname.substring(1); // Remove leading slash
+        
+        console.log("Deleting from S3:", key);
+        
+        const deleteCommand = new DeleteObjectCommand({
+          Bucket: process.env.AWS_BUCKET_NAME,
+          Key: key
+        });
+        
+        await s3.send(deleteCommand);
+      } catch (s3Error) {
+        console.error("Error deleting from S3:", s3Error);
+        // Continue with database deletion even if S3 delete fails
+      }
+    }
+    
+    // Delete from project_images
+    await client.query(
+      "DELETE FROM project_images WHERE project_id = $1",
+      [project_id]
+    );
+    
+    // Delete from projects
+    const result = await client.query(
+      "DELETE FROM projects WHERE id = $1 RETURNING *",
+      [id]
+    );
+    
+    await client.query("COMMIT");
+    
+    res.json({
+      success: true,
+      message: `Project deleted successfully. Removed ${imagesResult.rows.length} images from S3.`,
+      data: {
+        project: result.rows[0],
+        images_deleted: imagesResult.rows.length
+      }
+    });
+    
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error("Delete project error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete project",
+      error: error.message
+    });
+  } finally {
+    client.release();
+  }
+};
+
+/////////////////////////////   BELOW IS THE UPDATE PROPERTIES CONTROLLER ////////////////////////////////////////////////
+
+// Get single project by ID for editing
+exports.getProjectById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const projectResult = await pool.query(
+      `SELECT * FROM projects WHERE id = $1`,
+      [id]
+    );
+
+    if (projectResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Project not found"
+      });
+    }
+
+    const project = projectResult.rows[0];
+
+    // Get project images
+    const imagesResult = await pool.query(
+      `SELECT id, image_url, sort_order 
+       FROM project_images 
+       WHERE project_id = $1 
+       ORDER BY sort_order ASC`,
+      [project.project_id]
+    );
+
+    project.images = imagesResult.rows;
+
+    res.json({
+      success: true,
+      data: project
+    });
+
+  } catch (error) {
+    console.error("Get project by ID error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch project",
+      error: error.message
+    });
+  }
+};
+
+// Update project
+exports.updateProject = async (req, res) => {
+  const client = await pool.connect();
+
+  try {
+    const { id } = req.params;
+    const {
+      project_id,
+      project_name,
+      project_type,
+      project_status,
+      project_location,
+      total_acres,
+      no_of_units,
+      club_house_size,
+      structure,
+      typology,
+      sba,
+      price,
+      rera_completion,
+      existing_images = [], // Array of image URLs that should be kept
+      new_images = []       // New images to upload
+    } = req.body;
+
+    // Basic validation
+    if (!project_id || !project_name) {
+      return res.status(400).json({
+        success: false,
+        message: "project_id and project_name are required"
+      });
+    }
+
+    // Check if project exists
+    const projectCheck = await client.query(
+      "SELECT * FROM projects WHERE id = $1",
+      [id]
+    );
+
+    if (projectCheck.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Project not found"
+      });
+    }
+
+    const slug = generateSlug(project_name);
+
+    await client.query("BEGIN");
+
+    // Update project
+    await client.query(
+      `
+      UPDATE projects SET
+        project_id = $1,
+        project_name = $2,
+        slug = $3,
+        project_type = $4,
+        project_status = $5,
+        project_location = $6,
+        total_acres = $7,
+        no_of_units = $8,
+        club_house_size = $9,
+        structure = $10,
+        typology = $11,
+        sba = $12,
+        price = $13,
+        rera_completion = $14,
+        updated_at = NOW()
+      WHERE id = $15
+      `,
+      [
+        Number(project_id),
+        project_name.trim(),
+        slug,
+        project_type || null,
+        project_status || null,
+        project_location || null,
+        total_acres || null,
+        no_of_units || null,
+        club_house_size || null,
+        structure || null,
+        typology || null,
+        sba || null,
+        price || null,
+        rera_completion || null,
+        id
+      ]
+    );
+
+    // Handle images if provided
+    if (existing_images.length > 0 || new_images.length > 0) {
+      // Delete images that are no longer needed
+      await client.query(
+        "DELETE FROM project_images WHERE project_id = $1 AND image_url NOT IN (SELECT unnest($2::text[]))",
+        [Number(project_id), existing_images]
+      );
+
+      // Add new images
+      let nextSortOrder = existing_images.length;
+      for (let i = 0; i < new_images.length; i++) {
+        await client.query(
+          `
+          INSERT INTO project_images (project_id, image_url, sort_order)
+          VALUES ($1, $2, $3)
+          ON CONFLICT DO NOTHING
+          `,
+          [Number(project_id), new_images[i], nextSortOrder + i]
+        );
+      }
+    }
+
+    await client.query("COMMIT");
+
+    res.json({
+      success: true,
+      message: "Project updated successfully"
+    });
+
+  } catch (error) {
+    await client.query("ROLLBACK");
+    console.error("Update project error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update project",
+      error: error.message
+    });
+  } finally {
+    client.release();
+  }
+};
+
+

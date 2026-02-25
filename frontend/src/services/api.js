@@ -6,6 +6,9 @@ const api = axios.create({
 
 export const getProperties = async () => {
   const response = await api.get("/api/projects");
-  return response.data.data; // ✅ return only the array
+  return response.data.data; 
 };
+export const addProject = async (formData) => await api.post('/projects/addProject', formData, {
+  headers: { 'Content-Type': 'multipart/form-data' }
+});
 

@@ -6,7 +6,6 @@ import {
   TreePine,
   Briefcase,
 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 
 import PropertiesHero from "../components/Properties/PropertiesHero";
 import PropertiesFilterBar from "../components/Properties/PropertiesFilterBar";
@@ -22,7 +21,6 @@ function PropertiesPage() {
   const [selectedProject, setSelectedProject] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const navigate = useNavigate();
 
 
   async function fetchProperties() {
@@ -73,8 +71,17 @@ function PropertiesPage() {
     return <Building2 size={14} />;
   };
 
-  const handleViewDetails = (slug) => {
-  navigate(`/properties/${slug}`);
+const handleViewDetails = async (slug) => {
+  try {
+    const res = await axiosInstance.get(
+      `/api/projects/getSingleProject/${slug}`
+    );
+
+    setSelectedProject(res.data.data);
+    setIsModalOpen(true);
+  } catch (err) {
+    console.error("Failed to fetch project:", err);
+  }
 };
 
   return (

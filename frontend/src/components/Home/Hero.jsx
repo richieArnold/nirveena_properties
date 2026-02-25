@@ -1,7 +1,7 @@
 import { Users, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
-import bgImage from "../../assets/bg-cover-home-6.jpg";
+import bgImage from "../../assets/bg-cover-home-5.jpg";
 
 /* Parent container animation */
 const containerVariants = {

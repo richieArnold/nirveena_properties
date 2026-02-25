@@ -1,31 +1,153 @@
 // src/components/PageRoutes.jsx
 import { Routes, Route } from "react-router-dom";
 import Layout from "./Layout";
+import Login from "./Login";
+import ProtectedRoute from "./ProtectedRoute";
+import { useState } from "react";
 
+// Public Pages
 import Home from "@/pages/Home";
 import About from "@/pages/About";
-import Property from "@/pages/Properties";
 import Contact from "@/pages/Contact";
 import PropertyDetails from "../pages/PropertyDetails";
 import PropertiesPage from "../Pages/PropertiesPage";
 import PropertyDetailsPage from "../Pages/PropertyDetailsPage";
+import LeadsList from "../Pages/admin/LeadsList";
+import LeadDetails from "../Pages/admin/LeadDetails";
 
+// Admin Pages
+import AdminDashboard from "../Pages/admin/AdminDashboard";
+import AddProject from "../Pages/admin/AddProject";
+import EditProject from "../Pages/admin/EditProject";
+import ViewProject from "../Pages/admin/ViewProject";
+import ProjectsList from "../Pages/admin/ProjectsList";
 
+import CustomersList from "../Pages/admin/CustomersList";
+import CustomerDetails from "../Pages/admin/CustomerDetails";
+
+import ChangePassword from "../components/admin/ChangePassword";
 
 const PageRoutes = () => {
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    !!localStorage.getItem("adminToken"),
+  );
+
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+  };
+
   return (
     <Routes>
-      {/* Layout Route */}
+      {/* Public Routes - with Layout */}
       <Route element={<Layout />}>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/property" element={<PropertiesPage />} />
         <Route path="/property/:slug" element={<PropertyDetails />} />
         <Route path="/contact" element={<Contact />} />
-              <Route path="/properties/:slug" element={<PropertyDetailsPage />} />
-
-
+        <Route path="/properties/:slug" element={<PropertyDetailsPage />} />
       </Route>
+
+      {/* Admin Routes - NO Layout */}
+      <Route path="/admin/login" element={<Login onLogin={handleLogin} />} />
+
+      <Route
+        path="/admin/change-password"
+        element={
+          <ProtectedRoute>
+            <ChangePassword />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute>
+            <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/add"
+        element={
+          <ProtectedRoute>
+            <AddProject />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/list"
+        element={
+          <ProtectedRoute>
+            <ProjectsList />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/edit/:id"
+        element={
+          <ProtectedRoute>
+            <EditProject />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/view/:id"
+        element={
+          <ProtectedRoute>
+            <ViewProject />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* LEADS ROUTES - Place these BEFORE the catch-all route */}
+      <Route
+        path="/admin/leads"
+        element={
+          <ProtectedRoute>
+            <LeadsList />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/leads/:id"
+        element={
+          <ProtectedRoute>
+            <LeadDetails />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/*"
+        element={
+          <ProtectedRoute>
+            <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin/customers"
+        element={
+          <ProtectedRoute>
+            <CustomersList />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/customers/:id"
+        element={
+          <ProtectedRoute>
+            <CustomerDetails />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 };

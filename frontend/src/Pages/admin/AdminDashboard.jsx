@@ -1,0 +1,226 @@
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { PlusCircle, Edit3, Eye, Users, Mail, TrendingUp } from "lucide-react";
+import AdminLayout from "../../components/admin/AdminLayout";
+import DashboardCard from "../../components/admin/DashboardCard";
+import LeadsCard from "../../components/admin/LeadsCard";
+import AlertMessage from "../../components/admin/AlertMessage";
+
+import ApiFallback from "../../components/common/ApiFallback";
+
+import axiosInstance from "../../utils/Instance";
+
+const AdminDashboard = () => {
+  const navigate = useNavigate();
+  const [projects, setProjects] = useState([]);
+  const [leadsStats, setLeadsStats] = useState({
+    total: 0,
+    new: 0,
+    contacted: 0,
+    unopened: 0,
+    today: 0,
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(true);
+  const [user, setUser] = useState(null);
+  const [message, setMessage] = useState({ type: "", text: "" });
+
+  useEffect(() => {
+    const token = localStorage.getItem("adminToken");
+    const userData = localStorage.getItem("adminUser");
+
+    if (!token) {
+      navigate("/admin/login");
+    } else {
+      setUser(JSON.parse(userData));
+      axiosInstance.defaults.headers.common["Authorization"] =
+        `Bearer ${token}`;
+      fetchDashboardData();
+    }
+  }, [navigate]);
+
+  const fetchDashboardData = async () => {
+    try {
+      setError(false);
+
+      const [projectsRes, leadsStatsRes] = await Promise.all([
+        axiosInstance.get("/api/projects/getAllProjects"),
+        axiosInstance.get("/api/leads/stats"),
+      ]);
+
+      setProjects(projectsRes.data.data);
+      setLeadsStats(leadsStatsRes.data.data);
+    } catch (error) {
+      console.log(error);
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const stats = {
+    total: projects.length,
+    rtm: projects.filter((p) => p.project_status === "RTM").length,
+    uc: projects.filter((p) => p.project_status === "UC").length,
+  };
+
+  if (loading) {
+    return (
+      <AdminLayout user={user}>
+        <ApiFallback
+          title="Loading dashboard..."
+          message="Please wait while we fetch your data."
+          loading={true}
+        />
+      </AdminLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <AdminLayout user={user}>
+        <ApiFallback
+          title="Failed to load dashboard"
+          message="There was a problem connecting to the server."
+          onRetry={fetchDashboardData}
+          fullScreen
+        />
+      </AdminLayout>
+    );
+  }
+
+  return (
+    <AdminLayout user={user}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">
+            Welcome back, {user?.username}!
+          </h1>
+          <p className="text-gray-500 mt-2">
+            Manage your properties and leads from here
+          </p>
+        </div>
+
+        <AlertMessage
+          message={message.text}
+          type={message.type}
+          onClose={() => setMessage({ type: "", text: "" })}
+        />
+
+        {/* Projects Section */}
+        <div className="mb-12">
+          <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            <TrendingUp className="w-5 h-5 text-blue-600" />
+            Property Management
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <DashboardCard
+              title="Add Project"
+              icon={<PlusCircle className="w-8 h-8" />}
+              color="blue"
+              link="/admin/add"
+            />
+            <DashboardCard
+              title="Update Projects"
+              icon={<Edit3 className="w-8 h-8" />}
+              color="green"
+              link="/admin/list"
+            />
+            <DashboardCard
+              title="View Projects"
+              icon={<Eye className="w-8 h-8" />}
+              color="purple"
+              link="/admin/list"
+            />
+          </div>
+        </div>
+
+        {/* Leads Section */}
+        <div>
+          <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            <Mail className="w-5 h-5 text-green-600" />
+            Lead Management
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <LeadsCard
+              title="Total Leads"
+              count={leadsStats.total}
+              icon={<Users className="w-8 h-8" />}
+              color="blue"
+              link="/admin/leads"
+              subtitle="All time leads"
+            />
+            <LeadsCard
+              title="New Leads"
+              count={leadsStats.new}
+              icon={<Mail className="w-8 h-8" />}
+              color="green"
+              link="/admin/leads?status=new"
+              subtitle="Awaiting contact"
+            />
+            <LeadsCard
+              title="Unopened"
+              count={leadsStats.unopened}
+              icon={<Eye className="w-8 h-8" />}
+              color="orange"
+              link="/admin/leads?status=new&unopened=true"
+              subtitle="Not viewed yet"
+            />
+            <LeadsCard
+              title="Today's Leads"
+              count={leadsStats.today}
+              icon={<TrendingUp className="w-8 h-8" />}
+              color="purple"
+              link="/admin/leads?today=true"
+              subtitle="Received today"
+            />
+          </div>
+
+          {/* Quick Status Summary */}
+          <div className="mt-6 grid grid-cols-2 md:grid-cols-5 gap-3">
+            <div className="bg-blue-50 rounded-lg p-3 text-center">
+              <p className="text-xs text-blue-600 font-medium">Contacted</p>
+              <p className="text-xl font-bold text-blue-700">
+                {leadsStats.contacted || 0}
+              </p>
+            </div>
+            <div className="bg-purple-50 rounded-lg p-3 text-center">
+              <p className="text-xs text-purple-600 font-medium">Qualified</p>
+              <p className="text-xl font-bold text-purple-700">
+                {leadsStats.qualified || 0}
+              </p>
+            </div>
+            <div className="bg-green-50 rounded-lg p-3 text-center">
+              <p className="text-xs text-green-600 font-medium">Converted</p>
+              <p className="text-xl font-bold text-green-700">
+                {leadsStats.converted || 0}
+              </p>
+            </div>
+            <div className="bg-yellow-50 rounded-lg p-3 text-center">
+              <p className="text-xs text-yellow-600 font-medium">Lost</p>
+              <p className="text-xl font-bold text-yellow-700">
+                {leadsStats.lost || 0}
+              </p>
+            </div>
+            <div className="bg-gray-50 rounded-lg p-3 text-center">
+              <p className="text-xs text-gray-600 font-medium">Total</p>
+              <p className="text-xl font-bold text-gray-700">
+                {leadsStats.total || 0}
+              </p>
+            </div>
+          </div>
+          <DashboardCard
+            title="Customers"
+            count={stats.totalCustomers || 0}
+            icon={<Users className="w-8 h-8" />}
+            color="orange"
+            link="/admin/customers"
+            subtitle="Manage customers & enquiries"
+          />
+        </div>
+      </div>
+    </AdminLayout>
+  );
+};
+
+export default AdminDashboard;
