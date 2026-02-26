@@ -12,13 +12,6 @@ import {
 import { Link } from "react-router-dom";
 
 const Footer = () => {
-  const quickLinks = [
-    { name: "Home", path: "/" },
-    { name: "About Us", path: "/about" },
-    { name: "Properties", path: "/properties" },
-    { name: "Services", path: "/services" },
-    { name: "Contact", path: "/contact" },
-  ];
 
   const propertyTypes = [
     { name: "Apartments", path: "/properties?type=apartments" },
@@ -29,24 +22,22 @@ const Footer = () => {
   ];
 
   const socialLinks = [
-    { icon: <Facebook size={18} />, href: "#", label: "Facebook" },
-    { icon: <Twitter size={18} />, href: "#", label: "Twitter" },
+    { icon: <Twitter size={18} />, href: " Nirveenarealty", label: "Twitter" },
     { icon: <Instagram size={18} />, href: "#", label: "Instagram" },
-    { icon: <Linkedin size={18} />, href: "#", label: "LinkedIn" },
   ];
 
   const contactInfo = [
     {
       icon: <Phone size={18} />,
-      text: "+971 4 123 4567",
-      href: "tel:+97141234567",
+      text: "+91 9731658272",
+      href: "tel:+91 9731658272",
     },
     {
       icon: <Mail size={18} />,
-      text: "info@veena.com",
-      href: "mailto:info@veena.com",
+      text: "info@nirveena.com",
+      href: "mailto:info@nirveena.com",
     },
-    { icon: <MapPin size={18} />, text: "Dubai, UAE", href: "#" },
+    { icon: <MapPin size={18} />, text: "Bengaluru", href: "#" },
   ];
 
   const legalLinks = [
@@ -64,12 +55,12 @@ const Footer = () => {
     <footer className="bg-gray-900 text-gray-200">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
           {/* Company Info */}
           <div className="lg:col-span-1">
             <div className="flex items-center space-x-2 mb-4">
               <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
-                <span className="text-white font-bold text-sm">NV</span>
+                <span className="text-white font-bold text-sm"></span>
               </div>
               <h1 className="text-base sm:text-lg font-medium text-white tracking-tight">
                 VEENA
@@ -77,7 +68,7 @@ const Footer = () => {
             </div>
             <p className="text-gray-400 text-sm mb-6">
               Premium real estate solutions for modern living and smart
-              investments in Dubai's most sought-after locations.
+              investments in Bangalore's most sought-after locations.
             </p>
             <div className="flex space-x-3">
               {socialLinks.map((social, index) => (
@@ -95,28 +86,8 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Quick Links */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4 text-white">
-              Quick Links
-            </h3>
-            <ul className="space-y-3">
-              {quickLinks.map((link) => (
-                <li key={link.name}>
-                  <Link
-                    to={link.path}
-                    className="text-gray-400 hover:text-blue-500 transition-colors duration-300 text-sm flex items-center gap-2 group"
-                  >
-                    <span className="w-1 h-1 bg-gray-500 rounded-full group-hover:bg-blue-500 transition-colors duration-300"></span>
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
           {/* Properties */}
-          <div>
+          <div className="flex flex-col items-center text-center">
             <h3 className="text-lg font-semibold mb-4 text-white">
               Properties
             </h3>
@@ -187,7 +158,7 @@ const Footer = () => {
         <div className="my-8 h-px bg-gray-700"></div>
 
         {/* Bottom Bar */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="flex flex-col md:flex-row justify-center items-center gap-4">
           <div className="text-center md:text-left">
             <p className="text-gray-500 text-sm">
               © {new Date().getFullYear()} VEENA Real Estate. All rights reserved.
@@ -212,3 +183,4 @@ const Footer = () => {
 };
 
 export default Footer;
+

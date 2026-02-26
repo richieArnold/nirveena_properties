@@ -25,7 +25,7 @@ function PropertiesPage() {
 
   async function fetchProperties() {
     try {
-      const res = await axiosInstance.get("/api/projects/getAllProjects");
+      const res = await axiosInstance.get("/api/projects/getAllPropertiesUnfiltered");
       setProperties(res.data.data);
     } catch (err) {
       console.log(err);

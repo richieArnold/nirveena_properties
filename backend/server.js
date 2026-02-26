@@ -6,6 +6,10 @@ const { S3Client, ListBucketsCommand } = require("@aws-sdk/client-s3");
 const projectRoutes = require("./routes/propertyRoutes");
 const authRoutes = require("./routes/authRoutes");
 const leadRoutes = require("./routes/leadRoutes");
+const path = require("path")
+
+app.use(express.static(path.join(__dirname, "../frontend/dist")));
+
 
 app.use(cors());
 app.use(express.json());
@@ -20,13 +24,17 @@ const s3 = new S3Client({
 });
 
 app.get("/", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "API is running successfully ",
-    environment: process.env.NODE_ENV || "development",
-    timestamp: new Date().toISOString(),
-  });
+  res.sendFile(path.join(__dirname, "../frontend/dist", "index.html"));
 });
+
+// app.get("/", (req, res) => {
+//   res.status(200).json({
+//     success: true,
+//     message: "API is running successfully ",
+//     environment: process.env.NODE_ENV || "development",
+//     timestamp: new Date().toISOString(),
+//   });
+// });
 
 app.get("/test-s3", async (req, res) => {
   try {
@@ -36,6 +44,7 @@ app.get("/test-s3", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
 
 app.use("/api/customers", customerRoutes);
 app.use("/api/projects", projectRoutes);

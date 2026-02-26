@@ -4,7 +4,8 @@ const {
   importProjects,
   getAllProjects,
   getProjectBySlug,
-  getProjectById,      // ADD THIS
+  getProjectById,
+  getAllPropertiesUnfiltered,      // ADD THIS
   updateProject,       // ADD THIS
   deleteProject
 } = require("../controllers/propertyControllers");
@@ -17,6 +18,7 @@ router.post("/import-images", importProjectImages);
 
 // Fetch routes
 router.get("/getAllProjects", getAllProjects);
+router.get("/getAllPropertiesUnfiltered", getAllPropertiesUnfiltered);
 router.get("/getSingleProject/:slug", getProjectBySlug);
 router.get("/getProject/:id", getProjectById);           // ADD THIS - Get project by ID for editing
 

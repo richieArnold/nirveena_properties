@@ -1,6 +1,7 @@
+import React from "react";
 import { motion } from "framer-motion";
 import { useInView } from "framer-motion";
-import { useRef, useState, useEffect } from "react";
+import { useRef } from "react";
 
 // SVG Icons
 const SvgIcons = {
@@ -31,7 +32,7 @@ const SvgIcons = {
   ),
   SwimmingPool: () => (
     <svg className="w-12 h-12" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M22 10V6c0-1.1-.9-2-2-2h-2V2h-2v2h-2.03c.04.1.03.32.03.5 0 1.93-1.57 3.5-3.5 3.5S7.5 4.93 7.5 3c0-.18 0-.4.03-.5H6V2H4v2H2c-1.1 0-2 .9-2 2v4h2v-4h2v4h2V6h2v4h2V6h2v4h2V6h2v4h2z"/>
+      <path d="M22 10V6c0-1.1-.9-2-2-2h-2V2h-2v2h-2.03c.04.1.03.32.03.5 0 1.93-1.57 3.5-3.5 3.5S7.5 4.93 7.5 3c0-.18 0-.4.03-.5H6V2H4v2H2c-1.1 0-2 .9-2 2v4h2v-4h2v4h2V6h2v4h2V6h2v4h2V6h2v4h2V6h2v4h2z"/>
     </svg>
   ),
   MultipurposeHall: () => (
@@ -85,108 +86,40 @@ const amenities = [
   { id: 11, title: "Badminton Court", icon: SvgIcons.BadmintonCourt },
   { id: 12, title: "Basketball Court", icon: SvgIcons.BasketballCourt },
 ];
-// Enhanced animation variants
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.2,
-    }
-  }
-};
 
-const cardVariants = {
-  hidden: { 
-    opacity: 0, 
-    y: 30,
-    scale: 0.8,
-    rotateX: -10
-  },
-  visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    rotateX: 0,
-    transition: {
-      type: "spring",
-      stiffness: 100,
-      damping: 12,
-      duration: 0.6
-    }
-  }
-};
-
-const AmenitiesCard = ({ amenity, isActive }) => {
-  const cardRef = useRef(null);
-
+const AmenitiesCard = ({ amenity }) => {
   return (
     <motion.div
-      ref={cardRef}
-      className={`relative shrink-0 ${isActive ? 'mx-4' : 'mx-2'}`}
-      animate={{
-        scale: isActive ? 1.1 : 0.9,
-        y: isActive ? -10 : 0,
+      className="relative shrink-0 w-48 md:w-56 mx-3 group"
+      whileHover={{ 
+        y: -12,
+        scale: 1.05,
+        transition: { type: "spring", stiffness: 400, damping: 10 }
       }}
-      whileHover={{
-        scale: isActive ? 1.15 : 1,
-        transition: { duration: 0.2 }
-      }}
-      transition={{ duration: 0.3, type: "spring" }}
     >
-      <div className={`
-        relative p-6 text-center bg-white rounded-xl shadow-sm transition-all duration-300 border
-        ${isActive 
-          ? 'border-blue-300 shadow-xl scale-110' 
-          : 'border-gray-100 hover:border-blue-200 hover:shadow-md'
-        }
-      `}>
-        {/* Top gradient line - Always visible */}
-        <div className={`absolute top-0 left-0 right-0 h-1 rounded-t-xl ${
-          isActive 
-            ? 'bg-linear-to-r from-blue-500 to-purple-500' 
-            : 'bg-linear-to-r from-blue-400 to-purple-400'
-        }`} />
+      <div className="relative p-6 text-center bg-white rounded-2xl shadow-sm border border-gray-100 group-hover:border-blue-300 group-hover:shadow-2xl transition-all duration-300">
+        <div className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl bg-gradient-to-r from-blue-400 to-purple-400 opacity-50 group-hover:opacity-100 transition-opacity" />
         
-        {/* Icon */}
-        <div className="mb-4">
+        <div className="mb-4 flex justify-center">
           <motion.div 
-            className={`transition-colors duration-300 ${
-              isActive ? 'text-blue-600 scale-110' : 'text-blue-500'
-            }`}
-            whileHover={{ rotate: 5 }}
-            transition={{ type: "spring", stiffness: 200 }}
+            className="text-blue-500 group-hover:text-blue-600 transition-colors"
+            whileHover={{ rotate: 10 }}
           >
             <amenity.icon />
           </motion.div>
         </div>
         
-        {/* Main Title */}
-        <h3 className={`font-semibold mb-1 ${
-          isActive ? 'text-lg text-gray-900' : 'text-base text-gray-800'
-        }`}>
+        <h3 className="font-bold text-gray-800 text-sm md:text-base mb-1 whitespace-nowrap">
           {amenity.title}
         </h3>
         
-        {/* Subtitle "amenities" */}
         <div>
-          <span className={`text-xs font-medium uppercase tracking-wide ${
-            isActive ? 'text-blue-600' : 'text-gray-500'
-          }`}>
+          <span className="text-[10px] font-bold uppercase tracking-widest text-gray-400 group-hover:text-blue-500 transition-colors">
             amenities
           </span>
         </div>
 
-        {/* Active indicator */}
-        {isActive && (
-          <motion.div 
-            className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-linear-to-r from-blue-500 to-purple-500 rounded-full"
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ duration: 0.3 }}
-          />
-        )}
+        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full group-hover:w-1/2 transition-all duration-300" />
       </div>
     </motion.div>
   );
@@ -194,211 +127,70 @@ const AmenitiesCard = ({ amenity, isActive }) => {
 
 const Amenities = () => {
   const sectionRef = useRef(null);
-  const scrollContainerRef = useRef(null);
-  const isInView = useInView(sectionRef, { 
-    once: true, 
-    amount: 0.3, // Triggers when 30% of section is visible
-    margin: "-100px" // Starts animation a bit before section is fully in view
-  });
-  
-  const [activeIndex, setActiveIndex] = useState(5); // Start with center item active
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [scrollLeft, setScrollLeft] = useState(0);
+  const isInView = useInView(sectionRef, { once: true, amount: 0.2 });
 
-  // Handle scroll to center active item
-  useEffect(() => {
-    if (scrollContainerRef.current) {
-      const container = scrollContainerRef.current;
-      const cardWidth = 200; // Approximate card width with margins
-      const containerCenter = container.clientWidth / 2;
-      const scrollPosition = activeIndex * cardWidth - containerCenter + cardWidth / 2;
-      
-      container.scrollTo({
-        left: scrollPosition,
-        behavior: 'smooth'
-      });
-    }
-  }, [activeIndex]);
-
-  // Handle drag scrolling
-  const handleMouseDown = (e) => {
-    setIsDragging(true);
-    setStartX(e.pageX - scrollContainerRef.current.offsetLeft);
-    setScrollLeft(scrollContainerRef.current.scrollLeft);
-  };
-
-  const handleMouseMove = (e) => {
-    if (!isDragging || !scrollContainerRef.current) return;
-    e.preventDefault();
-    const x = e.pageX - scrollContainerRef.current.offsetLeft;
-    const walk = (x - startX) * 2;
-    scrollContainerRef.current.scrollLeft = scrollLeft - walk;
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  const handleCardClick = (index) => {
-    setActiveIndex(index);
-  };
+  const marqueeItems = [...amenities, ...amenities, ...amenities];
 
   return (
-    <section ref={sectionRef} className="py-16 bg-linear-to-b from-gray-50 to-white overflow-hidden">
+    <section ref={sectionRef} className="py-20 bg-gradient-to-b from-gray-50 to-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header with enhanced animations */}
+        
         <motion.div
-          className="text-center mb-12"
-          initial={{ opacity: 0, y: 50 }}
+          className="text-center mb-16"
+          initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ 
-            duration: 0.8,
-            ease: "easeOut",
-            delay: 0.1
-          }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
         >
-          <motion.h2
-            initial={{ opacity: 0, y: 30 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ 
-              duration: 0.7,
-              ease: [0.22, 1, 0.36, 1], // Custom bezier curve for smooth animation
-              delay: 0.2
-            }}
-            className="text-3xl md:text-4xl font-bold text-gray-900 mb-3"
-          >
-            <span className="bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h2 className="text-3xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">
+            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               AMENITIES FOR EVERY ASPECT OF LIFE
             </span>
-          </motion.h2>
+          </h2>
           
           <motion.div
-            initial={{ opacity: 0, scaleX: 0 }}
-            animate={isInView ? { opacity: 1, scaleX: 1 } : {}}
-            transition={{ 
-              duration: 0.8,
-              ease: "easeOut",
-              delay: 0.3
-            }}
-            className="w-32 h-1 bg-linear-to-r from-blue-500 to-purple-500 mx-auto mb-6"
+            initial={{ scaleX: 0 }}
+            animate={isInView ? { scaleX: 1 } : {}}
+            transition={{ duration: 1, delay: 0.5 }}
+            className="w-24 h-1.5 bg-gradient-to-r from-blue-500 to-purple-500 mx-auto mb-6 rounded-full"
           />
           
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={isInView ? { opacity: 1 } : {}}
-            transition={{ 
-              duration: 0.6,
-              delay: 0.4
-            }}
-            className="text-gray-600 max-w-2xl mx-auto text-sm uppercase tracking-wider"
-          >
-            World-Class Facilities | Premium Experience
-          </motion.p>
+          <p className="text-gray-500 font-medium text-xs md:text-sm uppercase tracking-[0.3em]">
+            World-Class Facilities &bull; Premium Experience &bull; Active Lifestyle
+          </p>
         </motion.div>
 
-        {/* Horizontal Scrolling Container with staggered animation */}
-        <motion.div
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-          variants={containerVariants}
-          className="relative"
-        >
-          {/* Left Gradient Fade with animation */}
-          <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ delay: 0.5 }}
-            className="absolute left-0 top-0 bottom-0 w-24 bg-linear-to-r from-gray-50 to-transparent z-10 pointer-events-none"
-          />
-          
-          {/* Right Gradient Fade with animation */}
-          <motion.div 
-            initial={{ opacity: 0, x: 20 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ delay: 0.5 }}
-            className="absolute right-0 top-0 bottom-0 w-24 bg-linear-to-l from-gray-50 to-transparent z-10 pointer-events-none"
-          />
-          
-          {/* Horizontal Scroll Container */}
-          <motion.div 
-            ref={scrollContainerRef}
-            className="flex overflow-x-auto py-8 px-4 cursor-grab active:cursor-grabbing"
-            style={{ 
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none',
-              scrollBehavior: 'smooth'
-            }}
-            initial={{ opacity: 0, y: 20 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.6 }}
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseUp}
-          >
-            {/* Hide scrollbar for Chrome, Safari and Opera */}
-            <style jsx>{`
-              div::-webkit-scrollbar {
-                display: none;
-              }
-            `}</style>
-            
-            {/* Spacer for centering */}
-            <div className="shrink-0 w-1/4 md:w-1/3" />
-            
-            {/* Amenities Cards with staggered animation */}
-            {amenities.map((amenity, index) => (
-              <motion.div
-                key={amenity.id}
-                onClick={() => handleCardClick(index)}
-                className="cursor-pointer"
-                variants={cardVariants}
-                whileHover={{ 
-                  y: -5,
-                  transition: { duration: 0.2 }
-                }}
-              >
-                <AmenitiesCard 
-                  amenity={amenity} 
-                  isActive={index === activeIndex}
-                />
-              </motion.div>
-            ))}
-            
-            {/* Spacer for centering */}
-            <div className="shrink-0 w-1/4 md:w-1/3" />
-          </motion.div>
-        </motion.div>
+        <div className="relative">
+          <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-gray-50 to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
 
-        {/* Navigation Dots with animation */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.8 }}
-          className="flex justify-center gap-2 mt-8"
-        >
-          {amenities.map((_, index) => (
-            <motion.button
-              key={index}
-              onClick={() => setActiveIndex(index)}
-              className="focus:outline-none"
-              whileHover={{ scale: 1.2 }}
-              whileTap={{ scale: 0.9 }}
+          <div className="flex overflow-hidden py-10">
+            <motion.div 
+              className="flex"
+              animate={{
+                x: [0, "-33.33%"],
+              }}
+              transition={{
+                duration: 40,
+                ease: "linear",
+                repeat: Infinity,
+              }}
+              whileHover={{ animationPlayState: "paused" }}
+              style={{ width: "max-content" }}
             >
-              <motion.div 
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                  index === activeIndex 
-                    ? 'w-8 bg-linear-to-r from-blue-500 to-purple-500' 
-                    : 'bg-gray-300 hover:bg-gray-400'
-                }`}
-                animate={isInView ? {
-                  opacity: 1,
-                  transition: { delay: 0.9 + index * 0.05 }
-                } : {}}
-              />
-            </motion.button>
-          ))}
+              {marqueeItems.map((amenity, index) => (
+                <AmenitiesCard key={`${amenity.id}-${index}`} amenity={amenity} />
+              ))}
+            </motion.div>
+          </div>
+        </div>
+
+        <motion.div 
+          className="mt-12 text-center text-gray-400 text-xs italic md:hidden"
+          initial={{ opacity: 0 }}
+          animate={isInView ? { opacity: 1 } : {}}
+          transition={{ delay: 1.5 }}
+        >
+          Hover or tap on a card to learn more
         </motion.div>
       </div>
     </section>
