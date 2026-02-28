@@ -51,6 +51,6 @@ app.use("/api/projects", projectRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/leads", leadRoutes);
 
-app.listen(5000, () => {
-  console.log("Server running on port 5000");
+app.listen(80, () => {
+  console.log("Server running on port 80");
 });
