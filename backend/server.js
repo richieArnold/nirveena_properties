@@ -8,6 +8,8 @@ const authRoutes = require("./routes/authRoutes");
 const leadRoutes = require("./routes/leadRoutes");
 const path = require("path")
 
+app.set("trust proxy", true);
+
 app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
 
@@ -41,6 +43,8 @@ app.get("/test-s3", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+
 
 
 app.use("/api/customers", customerRoutes);
