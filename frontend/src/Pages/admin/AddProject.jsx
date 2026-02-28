@@ -110,6 +110,7 @@ const AddProject = () => {
         setTimeout(() => navigate('/admin/list'), 2000);
       }
     } catch (error) {
+      console.log(error)
       const errorMsg = error.response?.data?.message || "Failed to add project";
       setMessage({ type: "error", text: errorMsg });
       showErrorNotification(errorMsg);
