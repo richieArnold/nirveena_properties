@@ -4,12 +4,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import axiosInstance from "../../utils/Instance";
 
+import { useNavigate } from "react-router-dom";
+
 const tabs = [
-  { id: "Apartments", label: "Apartments", category: "flat" },
+  { id: "Apartments", label: "Apartments", category: "apartment" },
   { id: "Villas", label: "Villas", category: "villa" },
-  { id: "Plots", label: "Plots", category: "plot" },
-  { id: "Upcoming Projects", label: "Upcoming Projects", category: "upcoming" },
-  { id: "Resale Projects", label: "Resale Projects", category: "resale" },
+  { id: "Commercials", label: "Commercials", category: "commercial" },
+  { id: "Villa Plots", label: "Villa Plots", category: "villa plots" },
 ];
 
 const PropertyTabs = () => {
@@ -18,80 +19,69 @@ const PropertyTabs = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  
-useEffect(() => {
-  let isMounted = true;
+  const navigate = useNavigate();
 
-  const fetchProperties = async () => {
-    setLoading(true);
-    setError(null);
+  useEffect(() => {
+    let isMounted = true;
 
-    try {
-      const response = await axiosInstance.get("/api/projects");
+    const fetchProperties = async () => {
+      setLoading(true);
+      setError(null);
 
-      if (!isMounted) return;
-
-      const normalized = response.data.data.map((p) => ({
-        id: p.id,
-        slug: p.slug,
-        title: p.project_name,
-        developer: "Nirveena Properties",
-        location: {
-          area: p.project_location,
-          city: "Bangalore",
-        },
-        price: {
-          display: p.price,
-        },
-        configuration: p.typology ? [p.typology] : [],
-        images: p.images?.map((img) => img.image_url) || [],
-        status: p.project_status?.toLowerCase(),
-        category: p.project_type?.toLowerCase(),
-      }));
-
-      const currentTab = tabs.find((tab) => tab.id === activeTab);
-
-      let filtered = normalized;
-
-      if (currentTab.category === "flat") {
-        filtered = normalized.filter((p) => p.category === "apartment");
-      }
-
-      if (currentTab.category === "villa") {
-        filtered = normalized.filter((p) => p.category === "villas");
-      }
-
-      if (currentTab.category === "plot") {
-        filtered = normalized.filter((p) =>
-          p.category?.includes("plot")
+      try {
+        const response = await axiosInstance.get(
+          "/api/projects/getAllPropertiesUnfiltered",
         );
+        if (!isMounted) return;
+
+        const normalized = response.data.data.map((p) => ({
+          id: p.id,
+          slug: p.slug,
+          title: p.project_name,
+          developer: "Nirveena Properties",
+          location: {
+            area: p.project_location,
+            city: "Bangalore",
+          },
+          price: {
+            display: p.price,
+          },
+          configuration: p.typology ? [p.typology] : [],
+          images: p.image_url ? [p.image_url] : [],
+          status: p.project_status?.toLowerCase(),
+          category: p.project_type?.toLowerCase(),
+        }));
+
+        const currentTab = tabs.find((tab) => tab.id === activeTab);
+
+        let filtered = normalized;
+
+        if (currentTab.category === "villa") {
+          filtered = normalized.filter(
+            (p) => p.category === "villa" || p.category === "villas",
+          );
+        } else {
+          filtered = normalized.filter(
+            (p) => p.category === currentTab.category,
+          );
+        }
+
+        setProperties(filtered.slice(0, 6));
+        setLoading(false);
+      } catch (err) {
+        console.error("Failed to fetch properties:", err);
+        setError("Failed to load properties");
+        setProperties([]);
+        setLoading(false);
       }
+    };
 
-      if (currentTab.category === "upcoming") {
-        filtered = normalized.filter((p) => p.status === "uc");
-      }
+    fetchProperties();
 
-      if (currentTab.category === "resale") {
-        filtered = normalized.filter((p) => p.status === "rtm");
-      }
-
-      setProperties(filtered.slice(0, 3));
-      setLoading(false);
-    } catch (err) {
-      console.error("Failed to fetch properties:", err);
-      setError("Failed to load properties");
-      setProperties([]);
-      setLoading(false);
-    }
-  };
-
-  fetchProperties();
-
-  return () => {
-    isMounted = false;
-  };
-}, [activeTab]);
-
+    return () => {
+      isMounted = false;
+    };
+  }, [activeTab]);
 
   // Animation variants
   const headerVariants = {
@@ -261,14 +251,14 @@ useEffect(() => {
             whileInView="visible"
             viewport={{ once: true, amount: 0.2 }}
             exit={{ opacity: 0 }}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10"
+            className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide"
           >
             {properties.map((property) => (
               <motion.div
                 key={property.id}
                 variants={itemVariants}
                 whileHover={{ y: -5, transition: { duration: 0.3 } }}
-                className="group"
+                className="group min-w-[320px] md:min-w-[380px]"
               >
                 <PropertyCard property={property} />
               </motion.div>
@@ -288,6 +278,10 @@ useEffect(() => {
         <motion.button
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
+          onClick={() => {
+            const currentTab = tabs.find((tab) => tab.id === activeTab);
+            navigate(`/property?type=${currentTab.category}`);
+          }}
           className="bg-blue-600 text-white px-8 py-3.5 rounded-lg hover:bg-blue-700 transition duration-300 font-semibold shadow-md hover:shadow-lg inline-flex items-center gap-3"
         >
           View All {activeTab}

@@ -228,7 +228,7 @@ exports.getAllPropertiesUnfiltered = async (req, res) => {
       `,
       // [limit]
     );
-console.log(result);
+// console.log(result);
     res.json({
       success: true,
       count: result.rows.length,

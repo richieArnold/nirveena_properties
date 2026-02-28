@@ -1,7 +1,8 @@
 import { Users, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
-import bgImage from "../../assets/bg-cover-home-5.jpg";
+import bgImage from "../../assets/Hero.jpg";
+import { useNavigate } from "react-router-dom";
 
 /* Parent container animation */
 const containerVariants = {
@@ -63,6 +64,9 @@ const Hero = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+
+  const navigate = useNavigate();
+
   return (
     <div className="relative min-h-[90vh] flex items-center overflow-hidden">
       {/* Background */}
@@ -90,7 +94,7 @@ const Hero = () => {
           >
             <div className="w-1 h-5 bg-linear-to-b from-blue-500 to-purple-500 rounded-full" />
             
-            <span className="text-[11px] font-semibold text-white uppercase tracking-[0.2em]">
+            <span className="text-[15px] font-semibold text-white uppercase tracking-[0.2em]">
               Premium Real Estate
             </span>
           </motion.div>
@@ -142,10 +146,14 @@ const Hero = () => {
             variants={itemSlow}
             className="flex flex-col sm:flex-row gap-3"
           >
-            <button className="bg-linear-to-r from-blue-600 to-purple-600 text-white text-xs md:text-sm font-semibold px-5 py-2.5 rounded-md hover:shadow-lg transition-all duration-300">
+            <button 
+            onClick={()=> navigate("/property")}
+            className="bg-linear-to-r from-blue-600 to-purple-600 text-white text-xs md:text-sm font-semibold px-5 py-2.5 rounded-md hover:shadow-lg transition-all duration-300 ">
               Explore Properties
             </button>
-            <button className="bg-transparent text-white text-xs md:text-sm font-semibold px-5 py-2.5 rounded-md border border-white/40 hover:bg-white/10 transition-all duration-300">
+            <button
+            onClick={()=> navigate("/contact")}
+            className="bg-transparent text-white text-xs md:text-sm font-semibold px-5 py-2.5 rounded-md border border-white/40 hover:bg-white/10 transition-all duration-300">
               Get Free Consult
             </button>
           </motion.div>

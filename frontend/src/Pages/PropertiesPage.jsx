@@ -6,6 +6,7 @@ import {
   TreePine,
   Briefcase,
 } from "lucide-react";
+import { useLocation } from "react-router-dom";
 
 import PropertiesHero from "../components/Properties/PropertiesHero";
 import PropertiesFilterBar from "../components/Properties/PropertiesFilterBar";
@@ -20,7 +21,7 @@ function PropertiesPage() {
   const [selectedStatus, setSelectedStatus] = useState("all");
   const [selectedProject, setSelectedProject] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+const location = useLocation();
 
 
   async function fetchProperties() {
@@ -38,30 +39,62 @@ function PropertiesPage() {
     fetchProperties();
   }, []);
 
+
+  useEffect(() => {
+  const params = new URLSearchParams(location.search);
+  const typeFromURL = params.get("type");
+
+  if (typeFromURL) {
+    setSelectedType(typeFromURL.toLowerCase());
+  }
+}, [location.search]);
+
+
   const projectTypes = [
     "all",
     ...new Set(properties.map((p) => p.project_type?.toLowerCase())),
   ];
 
+  // const filteredProperties = properties.filter((property) => {
+  //   const matchesSearch =
+  //     property.project_name
+  //       ?.toLowerCase()
+  //       .includes(searchQuery.toLowerCase()) ||
+  //     property.project_location
+  //       ?.toLowerCase()
+  //       .includes(searchQuery.toLowerCase());
+
+  //   const matchesType =
+  //     selectedType === "all" ||
+  //     property.project_type?.toLowerCase() === selectedType;
+  //       (selectedType === "villa" && typeValue === "villas");
+
+  //   const matchesStatus =
+  //     selectedStatus === "all" ||
+  //     property.project_status?.toLowerCase() === selectedStatus;
+
+  //   return matchesSearch && matchesType && matchesStatus;
+  // });
+
   const filteredProperties = properties.filter((property) => {
-    const matchesSearch =
-      property.project_name
-        ?.toLowerCase()
-        .includes(searchQuery.toLowerCase()) ||
-      property.project_location
-        ?.toLowerCase()
-        .includes(searchQuery.toLowerCase());
+  const type = property.project_type?.toLowerCase();
+  const status = property.project_status?.toLowerCase();
+  const search = searchQuery.toLowerCase();
 
-    const matchesType =
-      selectedType === "all" ||
-      property.project_type?.toLowerCase() === selectedType;
+  const matchesSearch =
+    property.project_name?.toLowerCase().includes(search) ||
+    property.project_location?.toLowerCase().includes(search);
 
-    const matchesStatus =
-      selectedStatus === "all" ||
-      property.project_status?.toLowerCase() === selectedStatus;
+  const matchesType =
+    selectedType === "all" ||
+    type === selectedType ||
+    (selectedType === "villa" && type === "villas");
 
-    return matchesSearch && matchesType && matchesStatus;
-  });
+  const matchesStatus =
+    selectedStatus === "all" || status === selectedStatus;
+
+  return matchesSearch && matchesType && matchesStatus;
+});
 
   const getIcon = (type) => {
     if (type === "apartment") return <Building2 size={14} />;
