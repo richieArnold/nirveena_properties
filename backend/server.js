@@ -23,18 +23,15 @@ const s3 = new S3Client({
   },
 });
 
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/dist", "index.html"));
-});
 
-// app.get("/", (req, res) => {
-//   res.status(200).json({
-//     success: true,
-//     message: "API is running successfully ",
-//     environment: process.env.NODE_ENV || "development",
-//     timestamp: new Date().toISOString(),
-//   });
-// });
+app.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "API is running successfully ",
+    environment: process.env.NODE_ENV || "development",
+    timestamp: new Date().toISOString(),
+  });
+});
 
 app.get("/test-s3", async (req, res) => {
   try {
