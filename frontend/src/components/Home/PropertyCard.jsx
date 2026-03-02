@@ -74,7 +74,7 @@ const PropertyCard = ({ property, className = "" }) => {
           <div className="flex items-center gap-1.5 mb-3">
             <Building className="w-3.5 h-3.5" />
             <span className="text-sm font-medium opacity-90">
-              by {property.developer}
+              {property.developer}
             </span>
           </div>
 
@@ -90,7 +90,7 @@ const PropertyCard = ({ property, className = "" }) => {
           <div className="flex items-start gap-2 mb-4">
             <MapPin className="w-4 h-4 mt-0.5 shrink-0 opacity-80" />
             <div>
-              <p className="text-sm font-medium">
+              <p className="text-sm font-medium" style={{textTransform:"capitalize"}}>
                 {property.location?.area || property.location?.address}
               </p>
               <p className="text-sm opacity-90">
