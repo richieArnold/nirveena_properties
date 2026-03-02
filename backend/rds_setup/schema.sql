@@ -97,3 +97,41 @@ USING created_at AT TIME ZONE 'Asia/Kolkata';
 ALTER TABLE enquiries 
 ALTER COLUMN created_at TYPE TIMESTAMP WITH TIME ZONE 
 USING created_at AT TIME ZONE 'Asia/Kolkata';
+
+
+
+--Blog Table
+
+CREATE TABLE IF NOT EXISTS blogs (
+  id SERIAL PRIMARY KEY,
+
+  title TEXT NOT NULL,
+  slug TEXT UNIQUE NOT NULL,
+  body TEXT NOT NULL,
+  author VARCHAR(150) NOT NULL,
+
+  status VARCHAR(20) DEFAULT 'published',
+
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Indexes for performance
+CREATE INDEX IF NOT EXISTS idx_blogs_slug ON blogs(slug);
+CREATE INDEX IF NOT EXISTS idx_blogs_status ON blogs(status);
+CREATE INDEX IF NOT EXISTS idx_blogs_created_at ON blogs(created_at);
+
+-- Function to auto-update updated_at
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+-- Trigger for blogs table
+CREATE TRIGGER update_blogs_updated_at
+BEFORE UPDATE ON blogs
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
