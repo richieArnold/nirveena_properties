@@ -4,7 +4,7 @@ import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import logo from "../assets/NirveenaLogo.jpeg";
 
-// CTA Button - Smaller for mobile
+// CTA Button - Always blue gradient, never changes
 const CTAButton = ({ onClick }) => (
   <button
     onClick={onClick}
@@ -32,7 +32,9 @@ const Header = () => {
   // Scroll listener
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
+      // Check if scrolled more than half screen height
+      const halfScreen = window.innerHeight / 2;
+      setIsScrolled(window.scrollY > halfScreen);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
@@ -54,21 +56,25 @@ const Header = () => {
 
   return (
     <header
-      className={`w-full sticky top-0 z-50 transition-all duration-300 ${
-        isScrolled ? "bg-white/95 backdrop-blur-sm shadow-sm" : "bg-white"
+      className={`w-full fixed top-0 z-50 transition-all duration-500 ${
+        isScrolled 
+          ? "bg-white shadow-lg py-1.5 sm:py-2" 
+          : "bg-transparent py-2 sm:py-3"
       }`}
     >
-      <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-1.5 sm:py-2 flex items-center justify-between">
+      <div className="container mx-auto px-3 sm:px-4 lg:px-6 flex items-center justify-between">
         {/* Logo Section - Smaller on mobile */}
         <Link to="/" className="flex items-center gap-1 sm:gap-2">
-          <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 overflow-hidden rounded-full flex-shrink-0">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 overflow-hidden rounded-full flex-shrink-0 border-2 border-white/30 shadow-md">
             <img
               src={logo}
               alt="Nirveena Logo"
               className="w-full h-full object-cover"
             />
           </div>
-          <h1 className="text-sm sm:text-base md:text-lg lg:text-xl font-serif tracking-tight text-gray-900">
+          <h1 className={`text-sm sm:text-base md:text-lg lg:text-xl font-serif tracking-tight transition-colors duration-300 ${
+            isScrolled ? 'text-gray-900' : 'text-white'
+          }`}>
             NIRVEENA
           </h1>
         </Link>
@@ -81,17 +87,25 @@ const Header = () => {
               <Link
                 key={item.name}
                 to={item.path}
-                className={`font-semibold text-xs xl:text-sm tracking-wide relative py-1 transition-colors duration-200 ${
-                  isActive
-                    ? "text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600"
-                    : "text-gray-600 hover:text-gray-900"
+                className={`font-semibold text-xs xl:text-sm tracking-wide relative py-1 transition-all duration-300 ${
+                  isScrolled
+                    ? isActive
+                      ? "text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600"
+                      : "text-gray-600 hover:text-gray-900"
+                    : isActive
+                      ? "text-white font-bold"
+                      : "text-white/90 hover:text-white"
                 }`}
               >
                 {item.name}
                 {isActive && (
                   <motion.span
                     layoutId="activeNav"
-                    className="absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-blue-600 to-purple-600"
+                    className={`absolute bottom-0 left-0 w-full h-0.5 ${
+                      isScrolled
+                        ? 'bg-gradient-to-r from-blue-600 to-purple-600'
+                        : 'bg-white'
+                    }`}
                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
                 )}
@@ -102,12 +116,14 @@ const Header = () => {
 
         {/* Right Side */}
         <div className="flex items-center gap-1 sm:gap-2 md:gap-3">
+          {/* CTA Button - Always the same blue gradient */}
           <CTAButton onClick={() => console.log("CTA Click")} />
-
 
           {/* Mobile Menu Button */}
           <button
-            className="lg:hidden text-gray-600 hover:text-gray-900 p-1 transition-colors"
+            className={`lg:hidden p-1 transition-colors ${
+              isScrolled ? 'text-gray-600 hover:text-gray-900' : 'text-white hover:text-white/80'
+            }`}
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label={isMenuOpen ? "Close menu" : "Open menu"}
           >
@@ -127,7 +143,7 @@ const Header = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsMenuOpen(false)}
-              className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
             />
 
             {/* Drawer Panel */}

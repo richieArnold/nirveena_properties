@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { 
   Eye, 
@@ -14,19 +13,21 @@ import {
   Home,
   AlertCircle,
   Clock,
-  Info
+  Info,
+  Download
 } from 'lucide-react';
+import ExcelJS from 'exceljs';
+import { saveAs } from 'file-saver';
 import AdminLayout from "../../components/admin/AdminLayout";
 import Pagination from "../../components/admin/Pagination";
 import AlertMessage from "../../components/admin/AlertMessage";
-
 import axiosInstance from "../../utils/Instance";
-
 
 const LeadsList = () => {
   const navigate = useNavigate();
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [exportLoading, setExportLoading] = useState(false);
   const [user, setUser] = useState(null);
   const [message, setMessage] = useState({ type: "", text: "" });
   const [showLegend, setShowLegend] = useState(true);
@@ -84,35 +85,184 @@ const LeadsList = () => {
       navigate('/admin/login');
     } else {
       setUser(JSON.parse(userData));
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       fetchLeads();
     }
   }, [navigate, currentPage, statusFilter]);
 
- const fetchLeads = async () => {
-  setLoading(true);
+  const fetchLeads = async () => {
+    setLoading(true);
+    try {
+      const params = {
+        page: currentPage,
+        limit: 10
+      };
+      
+      if (statusFilter) {
+        params.status = statusFilter;
+      }
+      
+      const response = await axiosInstance.get('/api/leads/all', { params });
+      
+      setLeads(response.data.data);
+      setTotalPages(response.data.pagination.totalPages);
+      setTotalCount(response.data.pagination.totalCount);
+    } catch (error) {
+      console.log(error)
+      setMessage({ type: "error", text: "Failed to load leads" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Function to export all leads to Excel using ExcelJS
+ // Function to export all leads to Excel using ExcelJS
+const exportToExcel = async () => {
+  setExportLoading(true);
   try {
-    // Build the URL with query parameters
-    const params = {
-      page: currentPage,
-      limit: 10
-    };
+    // Fetch ALL leads
+    const response = await axiosInstance.get('/api/leads/export/all');
+    const allLeads = response.data.data;
     
-    // Add status filter if selected
-    if (statusFilter) {
-      params.status = statusFilter;
+    if (!allLeads || allLeads.length === 0) {
+      setMessage({ type: "error", text: "No leads to export" });
+      setExportLoading(false);
+      return;
     }
     
-    // Make the request using axiosInstance
-    const response = await axiosInstance.get('/api/leads/all', { params });
+    // Create a new workbook
+    const workbook = new ExcelJS.Workbook();
+    workbook.creator = 'Nirveena Properties Admin';
+    workbook.lastModifiedBy = user?.username || 'Admin';
+    workbook.created = new Date();
+    workbook.modified = new Date();
     
-    setLeads(response.data.data);
-    setTotalPages(response.data.pagination.totalPages);
-    setTotalCount(response.data.pagination.totalCount);
+    // Add a worksheet
+    const worksheet = workbook.addWorksheet('Leads', {
+      properties: { tabColor: { argb: 'FF4F81BD' } },
+      views: [{ state: 'frozen', xSplit: 0, ySplit: 1 }] // Freeze header row
+    });
+    
+    // Define columns
+    worksheet.columns = [
+      { header: 'ID', key: 'id', width: 8 },
+      { header: 'Name', key: 'name', width: 20 },
+      { header: 'Phone', key: 'phone', width: 15 },
+      { header: 'Email', key: 'email', width: 30 },
+      { header: 'Subject', key: 'subject', width: 25 },
+      { header: 'Message', key: 'message', width: 40 },
+      { header: 'Property Type', key: 'property_type', width: 15 },
+      { header: 'Budget', key: 'budget', width: 15 },
+      { header: 'Status', key: 'status', width: 12 },
+      { header: 'Opened', key: 'opened', width: 8 },
+      { header: 'Notes', key: 'notes', width: 30 },
+      { header: 'Created Date', key: 'created_at', width: 20 },
+      { header: 'Opened Date', key: 'opened_at', width: 20 },
+      { header: 'Last Updated', key: 'updated_at', width: 20 }
+    ];
+    
+    // Style the header row
+    const headerRow = worksheet.getRow(1);
+    headerRow.font = { bold: true, size: 12, color: { argb: 'FFFFFFFF' } };
+    headerRow.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FF4F81BD' }
+    };
+    headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
+    headerRow.height = 25;
+    
+    // Add data rows
+    allLeads.forEach(lead => {
+      // Truncate message for display
+      const messagePreview = lead.message?.length > 100 
+        ? lead.message.substring(0, 100) + '...' 
+        : lead.message || '';
+      
+      const row = worksheet.addRow({
+        id: lead.id,
+        name: lead.name,
+        phone: lead.phone,
+        email: lead.email,
+        subject: lead.subject || 'N/A',
+        message: messagePreview,
+        property_type: lead.property_type || 'Any',
+        budget: lead.budget || 'Not specified',
+        status: lead.status?.charAt(0).toUpperCase() + lead.status?.slice(1) || 'New',
+        opened: lead.opened ? 'Yes' : 'No',
+        notes: lead.notes || '',
+        created_at: lead.created_at ? new Date(lead.created_at).toLocaleString('en-IN', {
+          timeZone: 'Asia/Kolkata',
+          dateStyle: 'medium',
+          timeStyle: 'short'
+        }) : 'N/A',
+        opened_at: lead.opened_at ? new Date(lead.opened_at).toLocaleString('en-IN', {
+          timeZone: 'Asia/Kolkata',
+          dateStyle: 'medium',
+          timeStyle: 'short'
+        }) : 'N/A',
+        updated_at: lead.updated_at ? new Date(lead.updated_at).toLocaleString('en-IN', {
+          timeZone: 'Asia/Kolkata',
+          dateStyle: 'medium',
+          timeStyle: 'short'
+        }) : 'N/A'
+      });
+      
+      // Alternate row colors for better readability
+      row.eachCell((cell) => {
+        cell.alignment = { vertical: 'middle', horizontal: 'left' };
+        cell.border = {
+          top: { style: 'thin', color: { argb: 'FFD3D3D3' } },
+          left: { style: 'thin', color: { argb: 'FFD3D3D3' } },
+          bottom: { style: 'thin', color: { argb: 'FFD3D3D3' } },
+          right: { style: 'thin', color: { argb: 'FFD3D3D3' } }
+        };
+      });
+    });
+    
+    // Add empty row for spacing
+    worksheet.addRow([]);
+    
+    // Add summary section at the bottom
+    const summaryHeaderRow = worksheet.addRow(['SUMMARY']);
+    summaryHeaderRow.font = { bold: true, size: 14, color: { argb: 'FF4F81BD' } };
+    summaryHeaderRow.height = 25;
+    
+    // Add total leads row
+    const totalRow = worksheet.addRow(['Total Leads:', allLeads.length]);
+    totalRow.font = { bold: true };
+    totalRow.getCell(1).fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFF0F0F0' }
+    };
+    
+    // Add export date row
+    const dateRow = worksheet.addRow(['Export Date:', new Date().toLocaleDateString('en-IN', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })]);
+    dateRow.font = { bold: true };
+    dateRow.getCell(1).fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFF0F0F0' }
+    };
+    
+    // Generate and download the file
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const fileName = `leads_export_${new Date().toLocaleDateString('en-IN').replace(/\//g, '-')}.xlsx`;
+    saveAs(blob, fileName);
+    
+    setMessage({ type: "success", text: `Successfully exported ${allLeads.length} leads to Excel!` });
   } catch (error) {
-    setMessage({ type: "error", text: "Failed to load leads" });
+    console.error("Export error:", error);
+    setMessage({ type: "error", text: error.response?.data?.message || "Failed to export leads" });
   } finally {
-    setLoading(false);
+    setExportLoading(false);
   }
 };
 
@@ -122,6 +272,7 @@ const LeadsList = () => {
       setMessage({ type: "success", text: "Status updated successfully!" });
       fetchLeads();
     } catch (error) {
+      console.log(error)
       setMessage({ type: "error", text: "Failed to update status" });
     }
   };
@@ -184,6 +335,15 @@ const LeadsList = () => {
           </div>
           <div className="flex items-center gap-3">
             <button
+              onClick={exportToExcel}
+              disabled={exportLoading}
+              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center gap-2 disabled:bg-green-300"
+              title="Export to Excel"
+            >
+              <Download className="w-4 h-4" />
+              {exportLoading ? 'Exporting...' : 'Export Excel'}
+            </button>
+            <button
               onClick={() => setShowLegend(!showLegend)}
               className="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition flex items-center gap-2"
               title="Toggle Status Guide"
@@ -222,7 +382,7 @@ const LeadsList = () => {
           onClose={() => setMessage({ type: "", text: "" })} 
         />
 
-        {/* Status Legend Panel - Slides in from right */}
+        {/* Status Legend Panel */}
         {showLegend && (
           <div className="mb-6 bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
             <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-3 text-white flex justify-between items-center">

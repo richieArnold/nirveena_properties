@@ -402,3 +402,47 @@ exports.deleteLead = async (req, res) => {
     });
   }
 };
+
+
+
+
+
+// Export all leads to Excel (no pagination, all fields)
+exports.exportAllLeads = async (req, res) => {
+  try {
+    // Get ALL leads without pagination
+    const result = await pool.query(
+      `SELECT 
+        id, 
+        name, 
+        phone, 
+        email, 
+        subject, 
+        message, 
+        property_type,
+        budget,
+        status,
+        notes,
+        opened,
+        opened_at,
+        created_at,
+        updated_at
+      FROM inbound_leads 
+      ORDER BY created_at DESC`
+    );
+
+    res.json({
+      success: true,
+      data: result.rows
+    });
+
+  } catch (error) {
+    console.error("Error exporting leads:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to export leads",
+      error: error.message
+    });
+  }
+};
+

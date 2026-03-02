@@ -68,7 +68,7 @@ const Hero = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="relative min-h-[90vh] flex items-center overflow-hidden">
+    <div className="relative min-h-[99vh] flex items-center overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0">
         <img

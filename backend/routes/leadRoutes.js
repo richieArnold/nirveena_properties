@@ -7,7 +7,8 @@ const {
   updateLeadStatus,
   updateLeadNotes,
   getLeadsStats,
-  deleteLead
+  deleteLead,
+  exportAllLeads 
 } = require("../controllers/leadController");
 const { verifyToken } = require("../controllers/authController");
 
@@ -18,6 +19,7 @@ router.post("/submit", submitLead);
 router.get("/stats", verifyToken, getLeadsStats);
 router.get("/all", verifyToken, getAllLeads);
 router.get("/:id", verifyToken, getLeadById);
+router.get("/export/all", verifyToken, exportAllLeads);
 router.put("/:id/status", verifyToken, updateLeadStatus);
 router.put("/:id/notes", verifyToken, updateLeadNotes);
 router.delete("/:id", verifyToken, deleteLead);
