@@ -6,6 +6,7 @@ const { S3Client, ListBucketsCommand } = require("@aws-sdk/client-s3");
 const projectRoutes = require("./routes/propertyRoutes");
 const authRoutes = require("./routes/authRoutes");
 const leadRoutes = require("./routes/leadRoutes");
+const excelImportRoutes = require('./routes/excelImportRoutes');
 const path = require("path")
 
 app.set("trust proxy", true);
@@ -51,6 +52,7 @@ app.use("/api/customers", customerRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/leads", leadRoutes);
+app.use('/api/excel-import', excelImportRoutes);
 
 app.listen(5000, () => {
   console.log("Server running on port 5000");

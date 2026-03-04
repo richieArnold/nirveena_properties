@@ -72,7 +72,7 @@ const Header = () => {
               className="w-full h-full object-cover"
             />
           </div>
-          <h1 className={`text-sm sm:text-base md:text-lg lg:text-xl font-serif tracking-tight transition-colors duration-300 ${
+          <h1 className={`text-sm sm:text-base md:text-lg lg:text-xl font-serif tracking-wide transition-colors duration-300 ${
             isScrolled ? 'text-gray-900' : 'text-white'
           }`}>
             NIRVEENA
