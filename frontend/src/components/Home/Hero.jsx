@@ -174,7 +174,7 @@ const Hero = () => {
   };
 
   return (
-    <div className="relative min-h-[99vh] flex items-center overflow-hidden">
+    <div className="relative min-h-[100vh] flex items-center overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0">
         <img
