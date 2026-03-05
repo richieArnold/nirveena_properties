@@ -14,8 +14,10 @@ function generateSlug(title) {
  * CREATE BLOG
  */
 exports.createBlog = async (req, res) => {
+  const client = await pool.connect();
+
   try {
-    const { title, body, author, status } = req.body;
+    const { title, body, author, status, images = [] } = req.body;
 
     if (!title || !body || !author) {
       return res.status(400).json({
@@ -28,9 +30,8 @@ exports.createBlog = async (req, res) => {
     let slug = baseSlug;
     let counter = 1;
 
-    // Ensure slug uniqueness
     while (true) {
-      const existing = await pool.query(
+      const existing = await client.query(
         "SELECT id FROM blogs WHERE slug = $1",
         [slug]
       );
@@ -41,33 +42,50 @@ exports.createBlog = async (req, res) => {
       counter++;
     }
 
-    const result = await pool.query(
+    await client.query("BEGIN");
+
+    const blogResult = await client.query(
       `
       INSERT INTO blogs (title, slug, body, author, status)
-      VALUES ($1, $2, $3, $4, $5)
+      VALUES ($1,$2,$3,$4,$5)
       RETURNING *
       `,
-      [
-        title.trim(),
-        slug,
-        body,
-        author.trim(),
-        status || "published",
-      ]
+      [title.trim(), slug, body, author.trim(), status || "published"]
     );
+
+    const blog = blogResult.rows[0];
+
+    // Insert images
+    for (let i = 0; i < images.length; i++) {
+      await client.query(
+        `
+        INSERT INTO blog_images (blog_id, image_url, sort_order)
+        VALUES ($1,$2,$3)
+        `,
+        [blog.id, images[i], i]
+      );
+    }
+
+    await client.query("COMMIT");
 
     res.status(201).json({
       success: true,
       message: "Blog created successfully",
-      data: result.rows[0],
+      data: blog,
     });
+
   } catch (error) {
+    await client.query("ROLLBACK");
+
     console.error("Create blog error:", error);
+
     res.status(500).json({
       success: false,
       message: "Failed to create blog",
       error: error.message,
     });
+  } finally {
+    client.release();
   }
 };
 
@@ -86,16 +104,23 @@ exports.getAllBlogs = async (req, res) => {
 
     const totalCount = parseInt(countResult.rows[0].count);
 
-    const result = await pool.query(
-      `
-      SELECT id, title, slug, author, created_at
-      FROM blogs
-      WHERE status = 'published'
-      ORDER BY created_at DESC
-      LIMIT $1 OFFSET $2
-      `,
-      [limit, offset]
-    );
+ const result = await pool.query(`
+SELECT 
+  b.id,
+  b.title,
+  b.slug,
+  b.author,
+  b.created_at,
+  (
+    SELECT json_agg(bi ORDER BY bi.sort_order)
+    FROM blog_images bi
+    WHERE bi.blog_id = b.id
+  ) AS images
+FROM blogs b
+WHERE b.status = 'published'
+ORDER BY b.created_at DESC
+LIMIT $1 OFFSET $2
+`, [limit, offset]);
 
     res.json({
       success: true,
@@ -124,24 +149,40 @@ exports.getBlogBySlug = async (req, res) => {
   try {
     const { slug } = req.params;
 
-    const result = await pool.query(
+    const blogResult = await pool.query(
       "SELECT * FROM blogs WHERE slug = $1 AND status = 'published'",
       [slug]
     );
 
-    if (result.rows.length === 0) {
+    if (blogResult.rows.length === 0) {
       return res.status(404).json({
         success: false,
         message: "Blog not found",
       });
     }
 
+    const blog = blogResult.rows[0];
+
+    const imagesResult = await pool.query(
+      `
+      SELECT image_url, sort_order
+      FROM blog_images
+      WHERE blog_id = $1
+      ORDER BY sort_order ASC
+      `,
+      [blog.id]
+    );
+
+    blog.images = imagesResult.rows;
+
     res.json({
       success: true,
-      data: result.rows[0],
+      data: blog,
     });
+
   } catch (error) {
     console.error("Get blog error:", error);
+
     res.status(500).json({
       success: false,
       message: "Failed to fetch blog",
@@ -208,11 +249,65 @@ exports.updateBlog = async (req, res) => {
  * DELETE BLOG
  */
 exports.deleteBlog = async (req, res) => {
+  const client = await pool.connect();
+
+  try {
+    const { id } = req.params;
+
+    await client.query("BEGIN");
+
+    const blogResult = await client.query(
+      "SELECT * FROM blogs WHERE id = $1",
+      [id]
+    );
+
+    if (blogResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Blog not found",
+      });
+    }
+
+    await client.query(
+      "DELETE FROM blog_images WHERE blog_id = $1",
+      [id]
+    );
+
+    const result = await client.query(
+      "DELETE FROM blogs WHERE id = $1 RETURNING *",
+      [id]
+    );
+
+    await client.query("COMMIT");
+
+    res.json({
+      success: true,
+      message: "Blog deleted successfully",
+      data: result.rows[0],
+    });
+
+  } catch (error) {
+    await client.query("ROLLBACK");
+
+    console.error("Delete blog error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete blog",
+      error: error.message,
+    });
+  } finally {
+    client.release();
+  }
+};
+
+
+exports.getBlogById = async (req, res) => {
   try {
     const { id } = req.params;
 
     const result = await pool.query(
-      "DELETE FROM blogs WHERE id = $1 RETURNING *",
+      "SELECT * FROM blogs WHERE id = $1",
       [id]
     );
 
@@ -223,16 +318,31 @@ exports.deleteBlog = async (req, res) => {
       });
     }
 
+    const blog = result.rows[0];
+
+    const images = await pool.query(
+      `
+      SELECT image_url, sort_order
+      FROM blog_images
+      WHERE blog_id = $1
+      ORDER BY sort_order ASC
+      `,
+      [id]
+    );
+
+    blog.images = images.rows;
+
     res.json({
       success: true,
-      message: "Blog deleted successfully",
-      data: result.rows[0],
+      data: blog,
     });
+
   } catch (error) {
-    console.error("Delete blog error:", error);
+    console.error("Get blog by id error:", error);
+
     res.status(500).json({
       success: false,
-      message: "Failed to delete blog",
+      message: "Failed to fetch blog",
       error: error.message,
     });
   }

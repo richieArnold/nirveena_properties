@@ -22,8 +22,16 @@ import EditProject from "../Pages/admin/EditProject";
 import ViewProject from "../Pages/admin/ViewProject";
 import ProjectsList from "../Pages/admin/ProjectsList";
 
+
+import AddBlog from "../Pages/admin/AddBlog";
+import BlogsList from "../Pages/admin/BlogsList";
+import EditBlog from "../Pages/admin/EditBlog";
+
 import CustomersList from "../Pages/admin/CustomersList";
 import CustomerDetails from "../Pages/admin/CustomerDetails";
+
+import BlogsPage from "../Pages/BlogsPage";
+import BlogDetails from "../Pages/BlogDetails";
 
 import ChangePassword from "../components/admin/ChangePassword";
 
@@ -46,6 +54,8 @@ const PageRoutes = () => {
         <Route path="/property/:slug" element={<PropertyDetails />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/properties/:slug" element={<PropertyDetailsPage />} />
+        <Route path="/blogs" element={<BlogsPage />} />
+<Route path="/blogs/:slug" element={<BlogDetails />} />
       </Route>
 
       {/* Admin Routes - NO Layout */}
@@ -148,7 +158,17 @@ const PageRoutes = () => {
           </ProtectedRoute>
         }
       />
+
+      <Route path="/admin/blogs/create" element={<AddBlog />} />
+<Route path="/admin/blogs" element={<BlogsList />} />
+<Route path="/admin/blogs/edit/:id" element={<EditBlog />} />
+
+
+<Route path="/blogs" element={<BlogsPage />} />
+<Route path="/blogs/:slug" element={<BlogDetails />} />
     </Routes>
+
+    
   );
 };
 
