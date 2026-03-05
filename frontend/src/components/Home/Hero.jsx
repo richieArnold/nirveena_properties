@@ -118,7 +118,7 @@ const Hero = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowForm(true);
-    }, 5000);
+    }, 2000);
 
     return () => clearTimeout(timer);
   }, []);
@@ -132,7 +132,7 @@ const Hero = () => {
       setTimeout(() => {
         setPopButton(false);
       }, 800);
-    }, 6000);
+    }, 10000);
 
     return () => clearInterval(interval);
   }, []);
@@ -174,7 +174,7 @@ const Hero = () => {
   };
 
   return (
-    <div className="relative min-h-[99vh] flex items-center overflow-hidden">
+    <div className="relative min-h-[100vh] flex items-center overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0">
         <img
@@ -289,13 +289,13 @@ const Hero = () => {
             </button>
 
             {/* Form Card - Glassy Look */}
-            <div className="bg-white/10 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden border border-white/30">
+            <div className="bg-white/-10 backdrop-blur-xl rounded-2xl shadow-2xl overflow-hidden border border-white/30">
               {/* Header */}
               <div className="px-6 py-4 border-b border-white/30">
                 <h3 className="text-xl font-bold text-white">
                   Contact Us
                 </h3>
-                <p className="text-sm text-white/80 mt-1">Best deals are waiting for you</p>
+                <p className="text-sm text-white/80 mt-1">Best deals are waiting for you !</p>
               </div>
 
               {/* Form Content */}
