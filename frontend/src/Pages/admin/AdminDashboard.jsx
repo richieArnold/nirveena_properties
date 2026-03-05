@@ -1,6 +1,16 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { PlusCircle, Edit3, Eye, Users, Mail, TrendingUp, FileSpreadsheet, ArrowLeft } from "lucide-react";
+import {
+  PlusCircle,
+  Edit3,
+  Eye,
+  Users,
+  Mail,
+  TrendingUp,
+  FileSpreadsheet,
+  ArrowLeft,
+  FileText,
+} from "lucide-react";
 import AdminLayout from "../../components/admin/AdminLayout";
 import DashboardCard from "../../components/admin/DashboardCard";
 import LeadsCard from "../../components/admin/LeadsCard";
@@ -26,7 +36,7 @@ const AdminDashboard = () => {
   const [error, setError] = useState(false);
   const [user, setUser] = useState(null);
   const [message, setMessage] = useState({ type: "", text: "" });
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState("dashboard");
 
   useEffect(() => {
     const token = localStorage.getItem("adminToken");
@@ -36,7 +46,8 @@ const AdminDashboard = () => {
       navigate("/admin/login");
     } else {
       setUser(JSON.parse(userData));
-      axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      axiosInstance.defaults.headers.common["Authorization"] =
+        `Bearer ${token}`;
       fetchDashboardData();
     }
   }, [navigate]);
@@ -112,7 +123,7 @@ const AdminDashboard = () => {
         />
 
         {/* Show either dashboard or excel import based on activeTab */}
-        {activeTab === 'dashboard' ? (
+        {activeTab === "dashboard" ? (
           <>
             {/* Projects Section */}
             <div className="mb-12">
@@ -138,6 +149,37 @@ const AdminDashboard = () => {
                   icon={<Eye className="w-8 h-8" />}
                   color="purple"
                   link="/admin/list"
+                />
+              </div>
+            </div>
+
+            {/* Blog Management Section */}
+            <div className="mb-12">
+              <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <FileText className="w-5 h-5 text-purple-600" />
+                Blog Management
+              </h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <DashboardCard
+                  title="Add Blog"
+                  icon={<PlusCircle className="w-8 h-8" />}
+                  color="blue"
+                  link="/admin/blogs/create"
+                />
+
+                <DashboardCard
+                  title="Update Blogs"
+                  icon={<Edit3 className="w-8 h-8" />}
+                  color="green"
+                  link="/admin/blogs"
+                />
+
+                <DashboardCard
+                  title="View Blogs"
+                  icon={<Eye className="w-8 h-8" />}
+                  color="purple"
+                  link="/admin/blogs"
                 />
               </div>
             </div>
@@ -192,13 +234,17 @@ const AdminDashboard = () => {
                   </p>
                 </div>
                 <div className="bg-purple-50 rounded-lg p-3 text-center">
-                  <p className="text-xs text-purple-600 font-medium">Qualified</p>
+                  <p className="text-xs text-purple-600 font-medium">
+                    Qualified
+                  </p>
                   <p className="text-xl font-bold text-purple-700">
                     {leadsStats.qualified || 0}
                   </p>
                 </div>
                 <div className="bg-green-50 rounded-lg p-3 text-center">
-                  <p className="text-xs text-green-600 font-medium">Converted</p>
+                  <p className="text-xs text-green-600 font-medium">
+                    Converted
+                  </p>
                   <p className="text-xl font-bold text-green-700">
                     {leadsStats.converted || 0}
                   </p>
@@ -216,7 +262,7 @@ const AdminDashboard = () => {
                   </p>
                 </div>
               </div>
-              
+
               {/* Customers Card */}
               <div className="mt-6">
                 <DashboardCard
@@ -238,11 +284,15 @@ const AdminDashboard = () => {
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
                 <button
-                  onClick={() => setActiveTab('excel')}
+                  onClick={() => setActiveTab("excel")}
                   className="w-full bg-gradient-to-r from-orange-500 to-orange-600 rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group text-left"
                 >
                   <div className="absolute top-0 right-0 w-32 h-32 opacity-10 group-hover:opacity-20 transition">
-                    <svg className="w-full h-full" viewBox="0 0 100 100" fill="currentColor">
+                    <svg
+                      className="w-full h-full"
+                      viewBox="0 0 100 100"
+                      fill="currentColor"
+                    >
                       <circle cx="80" cy="20" r="40" />
                       <circle cx="20" cy="80" r="30" />
                     </svg>
@@ -253,8 +303,12 @@ const AdminDashboard = () => {
                         <FileSpreadsheet className="w-8 h-8" />
                       </div>
                     </div>
-                    <h3 className="text-xl font-semibold mb-1">Import from Excel</h3>
-                    <p className="text-sm opacity-90">Bulk import projects via Excel</p>
+                    <h3 className="text-xl font-semibold mb-1">
+                      Import from Excel
+                    </h3>
+                    <p className="text-sm opacity-90">
+                      Bulk import projects via Excel
+                    </p>
                   </div>
                 </button>
               </div>
@@ -264,7 +318,7 @@ const AdminDashboard = () => {
           /* Excel Import Tab */
           <div className="mt-6">
             <button
-              onClick={() => setActiveTab('dashboard')}
+              onClick={() => setActiveTab("dashboard")}
               className="mb-4 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition flex items-center gap-2"
             >
               <ArrowLeft className="w-4 h-4" />

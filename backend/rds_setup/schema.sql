@@ -131,7 +131,17 @@ END;
 $$ language 'plpgsql';
 
 -- Trigger for blogs table
+DROP TRIGGER IF EXISTS update_blogs_updated_at ON blogs;
+
 CREATE TRIGGER update_blogs_updated_at
 BEFORE UPDATE ON blogs
 FOR EACH ROW
 EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TABLE IF NOT EXISTS blog_images (
+  id SERIAL PRIMARY KEY,
+  blog_id INTEGER REFERENCES blogs(id) ON DELETE CASCADE,
+  image_url TEXT NOT NULL,
+  sort_order INTEGER DEFAULT 0,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);

@@ -27,6 +27,8 @@ const Header = () => {
     { name: "About Us", path: "/about" },
     { name: "Property", path: "/property" },
     { name: "Contact Us", path: "/contact" },
+      { name: "Blogs", path: "/blogs" },
+
   ];
 
   // Scroll listener
