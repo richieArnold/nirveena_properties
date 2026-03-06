@@ -8,6 +8,7 @@ const authRoutes = require("./routes/authRoutes");
 const leadRoutes = require("./routes/leadRoutes");
 const excelImportRoutes = require('./routes/excelImportRoutes');
 const path = require("path")
+const blogRoutes = require("./routes/blogRoutes");
 
 app.set("trust proxy", true);
 
@@ -53,6 +54,7 @@ app.use("/api/projects", projectRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/leads", leadRoutes);
 app.use('/api/excel-import', excelImportRoutes);
+app.use("/api/blogs", blogRoutes);
 
 app.listen(5000, () => {
   console.log("Server running on port 5000");
