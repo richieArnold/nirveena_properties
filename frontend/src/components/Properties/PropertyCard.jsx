@@ -1,10 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { MapPin } from 'lucide-react';
+import { MapPin, Home, BedDouble, Square, Maximize2, Heart } from 'lucide-react';
 
-function PropertyCard({ property, getIcon, handleViewDetails }) {
+function PropertyCard({ property, handleViewDetails }) {
+  const [isLiked, setIsLiked] = useState(false);
+  
   // Debug log
   console.log('Rendering property:', property);
+
+  // Extract BHK info from typology if available
+  const getBHKInfo = () => {
+    if (!property.typology) return null;
+    const match = property.typology.match(/(\d+)\s*BHK/i);
+    return match ? match[0] : null;
+  };
+
+  const bhkInfo = getBHKInfo();
 
   return (
     <motion.div
@@ -12,66 +23,138 @@ function PropertyCard({ property, getIcon, handleViewDetails }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
+      whileHover={{ y: -4 }}
+      className="h-full"
     >
       <div
-        className="bg-white rounded-2xl border border-gray-200
-        shadow-sm hover:shadow-xl hover:-translate-y-1
+        className="bg-white rounded-xl border border-gray-200
+        shadow-md hover:shadow-lg
         transition-all duration-300 group relative
-        flex flex-col h-[440px]"
+        flex flex-col h-full overflow-hidden"
       >
-        <div className="relative h-56 overflow-hidden rounded-t-2xl">
+        {/* Image Container */}
+        <div className="relative h-48 overflow-hidden bg-gray-100">
           <img
             src={property.image_url || "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1600&auto=format&fit=crop"}
             alt={property.project_name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             onError={(e) => {
               console.log('Image failed to load:', property.image_url);
               e.target.src = "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1600&auto=format&fit=crop";
             }}
           />
-
-          <div className="absolute top-4 left-4 bg-white/90 text-gray-900 text-[10px] font-bold uppercase px-3 py-1 rounded-full">
-            {property.project_status || 'Coming Soon'}
+          
+          {/* Status Badge */}
+          <div className="absolute top-3 left-3">
+            <span className={`px-2.5 py-1 rounded-md text-[10px] font-semibold uppercase tracking-wide shadow-sm ${
+              property.project_status === 'RTM' 
+                ? 'bg-green-100 text-green-700 border border-green-200' 
+                : property.project_status === 'UC'
+                ? 'bg-yellow-100 text-yellow-700 border border-yellow-200'
+                : 'bg-blue-100 text-blue-700 border border-blue-200'
+            }`}>
+              {property.project_status || 'Coming Soon'}
+            </span>
           </div>
+
+          {/* Like Button */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsLiked(!isLiked);
+            }}
+            className="absolute top-3 right-3 p-1.5 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white transition-all duration-300 shadow-sm"
+          >
+            <Heart 
+              size={14} 
+              className={`transition-colors duration-300 ${
+                isLiked ? 'fill-red-500 text-red-500' : 'text-gray-600'
+              }`} 
+            />
+          </button>
         </div>
 
-        <div className="p-6 flex flex-col flex-1">
-          <div className="space-y-2">
-            <h3 className="text-lg font-bold text-gray-900 leading-snug line-clamp-2">
+        {/* Content Section */}
+        <div className="p-4 flex flex-col flex-1">
+          {/* Title and Location */}
+          <div className="space-y-1.5 mb-3">
+            <h3 className="text-base font-bold text-gray-900 leading-snug line-clamp-1">
               {property.project_name}
             </h3>
 
-            <p className="text-sm text-gray-500 flex items-center gap-2">
-              <MapPin size={15} className="text-gray-400" />
-              {property.project_location || 'Location coming soon'}
-            </p>
-
-            <p className="text-xs text-gray-500 uppercase tracking-wide flex items-center gap-2">
-              <span className="text-lg">{getIcon(property.project_type?.toLowerCase())}</span>
-              {property.project_type || 'Property'}
+            <p className="text-xs text-gray-500 flex items-center gap-1.5">
+              <MapPin size={12} className="text-gray-400 flex-shrink-0" />
+              <span className="truncate">{property.project_location || 'Location coming soon'}</span>
             </p>
           </div>
 
-          <div className="border-t border-gray-200 pt-4 mt-auto flex items-center justify-between">
+          {/* Property Type Badge */}
+          <div className="mb-3">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-100 text-gray-700 rounded-md text-[10px] font-medium">
+              <Home size={10} />
+              {property.project_type || 'Property'}
+            </span>
+          </div>
+
+          {/* Description Preview */}
+          {property.property_description && (
+            <div className="mb-3">
+              <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed">
+                {property.property_description}
+              </p>
+            </div>
+          )}
+
+          {/* Features Grid */}
+          <div className="grid grid-cols-3 gap-1.5 mb-3">
+            {bhkInfo && (
+              <div className="flex flex-col items-center p-1.5 bg-gray-50 rounded-lg">
+                <BedDouble size={12} className="text-gray-600 mb-0.5" />
+                <span className="text-[10px] font-medium text-gray-700">{bhkInfo}</span>
+              </div>
+            )}
+            {property.sba && (
+              <div className="flex flex-col items-center p-1.5 bg-gray-50 rounded-lg">
+                <Square size={12} className="text-gray-600 mb-0.5" />
+                <span className="text-[10px] font-medium text-gray-700">SBA</span>
+              </div>
+            )}
+            {property.total_acres && (
+              <div className="flex flex-col items-center p-1.5 bg-gray-50 rounded-lg">
+                <Maximize2 size={12} className="text-gray-600 mb-0.5" />
+                <span className="text-[10px] font-medium text-gray-700">{property.total_acres} ac</span>
+              </div>
+            )}
+          </div>
+
+          {/* Price and Action Row */}
+          <div className="flex items-center justify-between mt-auto pt-2 border-t border-gray-100">
             <div>
-              <p className="text-[11px] text-gray-500 uppercase tracking-[0.15em] mb-1">
+              <p className="text-[9px] text-gray-500 uppercase tracking-wider mb-0.5">
                 Starting From
               </p>
-
-              <p className="text-blue-600 font-bold text-lg whitespace-nowrap tabular-nums">
+              <p className="text-sm font-bold text-blue-600">
                 {property.price || 'On Request'}
               </p>
             </div>
 
             <button
               onClick={() => handleViewDetails(property.slug)}
-              className="w-[150px] h-[42px] flex items-center justify-center
-              rounded-full text-sm font-semibold text-white
-              bg-gradient-to-r from-blue-600 to-purple-600
-              shadow-md hover:shadow-lg hover:scale-105
-              transition-all duration-300"
+              className="px-3 py-1.5 rounded-lg text-xs font-medium text-white
+                bg-gradient-to-r from-blue-600 to-purple-600
+                hover:from-blue-700 hover:to-purple-700
+                shadow-sm hover:shadow-md
+                transition-all duration-300 flex items-center gap-1"
             >
-              View Details
+              View
+              <svg 
+                className="w-3 h-3" 
+                fill="none" 
+                stroke="currentColor" 
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
             </button>
           </div>
         </div>

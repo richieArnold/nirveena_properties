@@ -20,7 +20,6 @@ function toNumber(value) {
   const cleaned = value.toString().replace(/[^\d.]/g, "");
   return cleaned ? Number(cleaned) : null;
 }
-
 exports.importProjects = async (req, res) => {
   try {
     const filePath = path.join(__dirname, "../data/output/projects.json");
@@ -46,10 +45,11 @@ exports.importProjects = async (req, res) => {
           typology,
           sba,
           price,
-          rera_completion
+          rera_completion,
+          property_description
         )
         VALUES (
-          $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14
+          $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15  // ADD $15
         )
         ON CONFLICT (project_id) DO NOTHING
         `,
@@ -68,6 +68,7 @@ exports.importProjects = async (req, res) => {
           project.sba?.trim() || null,
           project.price?.trim() || null,
           project.rera_completion?.trim() || null,
+          project.property_description?.trim() || null,
         ],
       );
     }
@@ -159,7 +160,7 @@ exports.getAllProjects = async (req, res) => {
         p.typology,
         p.sba,
         p.rera_completion,
-        p.property_description,  // ADD THIS
+        p.property_description,
         p.created_at,
         p.updated_at,
         img.image_url
@@ -213,7 +214,7 @@ exports.getAllPropertiesUnfiltered = async (req, res) => {
         p.price,
         p.project_type,
         p.project_status,
-        p.property_description,  // ADD THIS
+        p.property_description,  
         img.image_url
       FROM projects p
       LEFT JOIN LATERAL (
@@ -225,7 +226,6 @@ exports.getAllPropertiesUnfiltered = async (req, res) => {
       ) img ON true
       ORDER BY p.id DESC
       `,
-      // [limit]
     );
     // console.log(result);
     res.json({
@@ -562,9 +562,9 @@ exports.updateProject = async (req, res) => {
       sba,
       price,
       rera_completion,
-      property_description, // ADD THIS - new field
-      existing_images = [], // Array of image URLs that should be kept
-      new_images = [], // New images to upload
+      property_description, 
+      existing_images = [], 
+      new_images = [],
     } = req.body;
 
     // Basic validation
@@ -610,9 +610,9 @@ exports.updateProject = async (req, res) => {
         sba = $12,
         price = $13,
         rera_completion = $14,
-        property_description = $15,  // ADD THIS
+        property_description = $15,  
         updated_at = NOW()
-      WHERE id = $16  // CHANGED from $15 to $16
+      WHERE id = $16  
       `,
       [
         Number(project_id),
@@ -629,7 +629,7 @@ exports.updateProject = async (req, res) => {
         sba || null,
         price || null,
         rera_completion || null,
-        property_description || null, // ADD THIS
+        property_description || null,
         id,
       ],
     );

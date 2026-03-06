@@ -45,11 +45,11 @@ const PropertyCard = ({ property, className = "" }) => {
       whileHover={{ y: -8, scale: 1.02 }}
       className={`group relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer ${className}`}
     >
-      {/* Property Image Container with Overlay */}
-      <div className="relative h-72 overflow-hidden">
+      {/* Property Image Container */}
+      <div className="relative h-96 overflow-hidden">
         {/* Skeleton Loader */}
         {!imageLoaded && (
-          <div className="absolute inset-0 bg-linear-to-br from-gray-100 to-gray-200 animate-pulse"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 animate-pulse"></div>
         )}
 
         {/* Main Image */}
@@ -62,56 +62,56 @@ const PropertyCard = ({ property, className = "" }) => {
           } group-hover:scale-110`}
         />
 
-        {/* Gradient Overlay for better text readability */}
-        <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/30 to-transparent"></div>
+        {/* Gradient Overlay - Only at bottom for text readability */}
+        <div className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-black/90 via-black/60 to-transparent"></div>
 
-        {/* Property Info Overlay on Image - ONLY THIS SECTION */}
-        <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
+        {/* Property Info Overlay */}
+        <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
           {/* Property Title */}
-          <h3 className="text-xl font-bold mb-1">{property.title}</h3>
+          <h3 className="text-2xl font-bold mb-2 line-clamp-1">{property.title}</h3>
           
           {/* Developer */}
           <div className="flex items-center gap-1.5 mb-3">
-            <Building className="w-3.5 h-3.5" />
-            <span className="text-sm font-medium opacity-90">
+            <Building className="w-4 h-4 text-white/90" />
+            <span className="text-sm font-medium text-white/90">
               {property.developer}
             </span>
           </div>
 
           {/* Configuration */}
           <div className="flex items-center gap-2 mb-3">
-            <Home className="w-4 h-4 opacity-80" />
-            <span className="text-sm font-semibold">
+            <Home className="w-4 h-4 text-white/90" />
+            <span className="text-sm font-semibold text-white/90">
               {getConfigTypes()}
             </span>
           </div>
 
           {/* Location */}
           <div className="flex items-start gap-2 mb-4">
-            <MapPin className="w-4 h-4 mt-0.5 shrink-0 opacity-80" />
+            <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-white/90" />
             <div>
-              <p className="text-sm font-medium" style={{textTransform:"capitalize"}}>
+              <p className="text-sm font-medium text-white/90 capitalize">
                 {property.location?.area || property.location?.address}
               </p>
-              <p className="text-sm opacity-90">
+              <p className="text-sm text-white/80">
                 {property.location?.city}
               </p>
             </div>
           </div>
 
-          {/* Price - Most prominent */}
+          {/* Price and Button */}
           <div className="mt-4 pt-4 border-t border-white/20">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs uppercase tracking-wider opacity-80 mb-1">Starting Price</p>
-                <div className="text-xl font-bold">
+                <p className="text-xs uppercase tracking-wider text-white/70 mb-1">Starting Price</p>
+                <div className="text-xl font-bold text-white">
                   {getPriceDisplay()}
                 </div>
               </div>
               
               {/* View Details Button */}
               <motion.button
-                whileHover={{ scale: 1.1 }}
+                whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="flex items-center gap-1 bg-white text-gray-900 px-4 py-2.5 rounded-lg font-semibold text-sm hover:bg-gray-100 transition-colors duration-200 shadow-lg"
               >

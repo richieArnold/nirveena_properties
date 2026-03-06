@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Download, Upload, AlertCircle, CheckCircle, XCircle, FileSpreadsheet, ChevronDown, ChevronUp } from 'lucide-react';
+import { Download, Upload, AlertCircle, CheckCircle, XCircle, FileSpreadsheet, ChevronDown, ChevronUp, FileText } from 'lucide-react';
 import axiosInstance from '../../utils/Instance';
 
 const ExcelImport = () => {
@@ -251,11 +251,25 @@ const ExcelImport = () => {
           {/* Mapping Preview Cards */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 mb-3">
             {mappingLogs.filter(log => log.type === 'success').map((log, index) => (
-              <div key={index} className="bg-white p-2 rounded border text-xs">
-                <span className="font-medium text-gray-700 truncate block" title={log.excelColumn}>
-                  {log.excelColumn}:
+              <div 
+                key={index} 
+                className={`bg-white p-2 rounded border text-xs ${
+                  log.databaseField === 'property_description' ? 'border-purple-300 bg-purple-50' : ''
+                }`}
+              >
+                <div className="flex items-center gap-1">
+                  {log.databaseField === 'property_description' && (
+                    <FileText size={10} className="text-purple-600" />
+                  )}
+                  <span className="font-medium text-gray-700 truncate block" title={log.excelColumn}>
+                    {log.excelColumn}:
+                  </span>
+                </div>
+                <span className={`font-medium ${
+                  log.databaseField === 'property_description' ? 'text-purple-600' : 'text-green-600'
+                }`}>
+                  → {log.databaseField}
                 </span>
-                <span className="text-green-600 font-medium">→ {log.databaseField}</span>
               </div>
             ))}
           </div>
@@ -289,7 +303,9 @@ const ExcelImport = () => {
                       <span className="text-gray-400"> "{log.excelColumn}"</span>
                     )}
                     {log.databaseField && log.databaseField !== 'ignored' && (
-                      <span className="text-purple-400"> → {log.databaseField}</span>
+                      <span className={log.databaseField === 'property_description' ? 'text-purple-400' : 'text-green-400'}>
+                        {' '}→ {log.databaseField}
+                      </span>
                     )}
                     {log.databaseField === 'ignored' && (
                       <span className="text-yellow-400"> → ignored</span>

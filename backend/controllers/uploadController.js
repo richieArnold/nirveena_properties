@@ -48,6 +48,7 @@ const upload = multer({
 exports.uploadImages = upload.array('images', 10);
 
 // Controller to handle property + images upload (CREATE)
+// Controller to handle property + images upload (CREATE)
 exports.addProjectWithImages = async (req, res) => {
   const client = await pool.connect();
 
@@ -65,7 +66,8 @@ exports.addProjectWithImages = async (req, res) => {
       typology,
       sba,
       price,
-      rera_completion
+      rera_completion,
+      property_description  
     } = req.body;
 
     // Basic validation
@@ -86,7 +88,7 @@ exports.addProjectWithImages = async (req, res) => {
 
     await client.query("BEGIN");
 
-    // Insert project
+    // Insert project - ADD property_description to query
     await client.query(
       `
       INSERT INTO projects (
@@ -103,9 +105,10 @@ exports.addProjectWithImages = async (req, res) => {
         typology,
         sba,
         price,
-        rera_completion
+        rera_completion,
+        property_description
       )
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) 
       `,
       [
         Number(project_id),
@@ -122,9 +125,11 @@ exports.addProjectWithImages = async (req, res) => {
         sba || null,
         price || null,
         rera_completion || null,
+        property_description || null,
       ]
     );
 
+    // Rest of the function remains the same...
     // Insert image records if files were uploaded
     if (req.files && req.files.length > 0) {
       for (let i = 0; i < req.files.length; i++) {
@@ -187,6 +192,7 @@ exports.updateProjectWithImages = async (req, res) => {
       sba,
       price,
       rera_completion,
+      property_description, 
       existing_images
     } = req.body;
 
@@ -244,7 +250,7 @@ exports.updateProjectWithImages = async (req, res) => {
     for (const img of imagesToDelete) {
       try {
         const url = new URL(img.image_url);
-        const key = url.pathname.substring(1); // Remove leading slash
+        const key = url.pathname.substring(1);
         
         console.log("Attempting to delete from S3:", key);
         
@@ -275,7 +281,7 @@ exports.updateProjectWithImages = async (req, res) => {
       .replace(/\s+/g, "-")
       .replace(/-+/g, "-");
 
-    // Update project
+    // Update project - ADD property_description
     await client.query(
       `
       UPDATE projects SET
@@ -293,8 +299,9 @@ exports.updateProjectWithImages = async (req, res) => {
         sba = $12,
         price = $13,
         rera_completion = $14,
+        property_description = $15, 
         updated_at = NOW()
-      WHERE id = $15
+      WHERE id = $16  
       `,
       [
         projectIdValue,
@@ -311,10 +318,12 @@ exports.updateProjectWithImages = async (req, res) => {
         sba || null,
         price || null,
         rera_completion || null,
+        property_description || null, 
         id
       ]
     );
 
+    // Rest of the function remains the same...
     // Delete images from database that are NOT in imagesToKeep
     if (imagesToKeep.length > 0) {
       await client.query(

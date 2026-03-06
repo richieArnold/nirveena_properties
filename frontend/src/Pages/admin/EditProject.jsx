@@ -6,7 +6,6 @@ import AdminLayout from "../../components/admin/AdminLayout";
 import AlertMessage from "../../components/admin/AlertMessage";
 import axiosInstance from "../../utils/Instance";
 
-
 const EditProject = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -32,7 +31,8 @@ const EditProject = () => {
     typology: "",
     sba: "",
     price: "",
-    rera_completion: ""
+    rera_completion: "",
+    property_description: ""  // ADD THIS
   });
 
   useEffect(() => {
@@ -66,7 +66,8 @@ const EditProject = () => {
         typology: project.typology || "",
         sba: project.sba || "",
         price: project.price || "",
-        rera_completion: project.rera_completion || ""
+        rera_completion: project.rera_completion || "",
+        property_description: project.property_description || ""  // ADD THIS
       });
       
       const images = project.images || [];
@@ -479,6 +480,22 @@ const EditProject = () => {
                 className={inputClasses}
                 placeholder="e.g., December 2025"
               />
+            </div>
+
+            {/* Property Description - NEW FIELD */}
+            <div className="md:col-span-2">
+              <label className={labelClasses}>Property Description</label>
+              <textarea
+                name="property_description"
+                value={formData.property_description}
+                onChange={handleInputChange}
+                rows="5"
+                className={`${inputClasses} resize-y`}
+                placeholder="Enter detailed description of the property, its features, location benefits, amenities, etc."
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Describe the property in detail - this will be displayed on the property page
+              </p>
             </div>
 
             {/* Existing Images */}

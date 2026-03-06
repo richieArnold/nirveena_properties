@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
 import PropertyCard from "./PropertyCard";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ChevronRight, ChevronLeft, Sparkles } from "lucide-react";
 import axiosInstance from "../../utils/Instance";
-
 import { useNavigate } from "react-router-dom";
 
 const tabs = [
@@ -18,6 +17,8 @@ const PropertyTabs = () => {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [scrollPosition, setScrollPosition] = useState(0);
+  const [maxScroll, setMaxScroll] = useState(0);
 
   const navigate = useNavigate();
 
@@ -83,6 +84,39 @@ const PropertyTabs = () => {
     };
   }, [activeTab]);
 
+  // Update max scroll for progress line
+  useEffect(() => {
+    const container = document.getElementById('properties-scroll-container');
+    if (container) {
+      setMaxScroll(container.scrollWidth - container.clientWidth);
+      
+      const handleScroll = () => {
+        setScrollPosition(container.scrollLeft);
+      };
+      
+      container.addEventListener('scroll', handleScroll);
+      return () => container.removeEventListener('scroll', handleScroll);
+    }
+  }, [properties]);
+
+  const handleScroll = (direction) => {
+    const container = document.getElementById('properties-scroll-container');
+    if (container) {
+      const scrollAmount = 400;
+      const newPosition = direction === 'left' 
+        ? container.scrollLeft - scrollAmount 
+        : container.scrollLeft + scrollAmount;
+      
+      container.scrollTo({
+        left: newPosition,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  // Calculate progress percentage
+  const progressPercentage = maxScroll > 0 ? (scrollPosition / maxScroll) * 100 : 0;
+
   // Animation variants
   const headerVariants = {
     hidden: { opacity: 0, y: 40 },
@@ -130,14 +164,15 @@ const PropertyTabs = () => {
         className="text-center mb-16"
       >
         <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 px-4 py-2 rounded-full mb-4">
+          <Sparkles size={16} />
           <span className="text-xs font-bold uppercase tracking-widest">
             Featured Properties
           </span>
         </div>
-        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-800 mb-4">
+        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-800 mb-4 font-serif">
           Explore Properties
         </h2>
-        <p className="text-gray-600 max-w-2xl mx-auto text-lg">
+        <p className="text-gray-600 max-w-2xl mx-auto text-lg font-sans">
           Browse by category to find the property that fits your lifestyle.
         </p>
       </motion.div>
@@ -159,7 +194,7 @@ const PropertyTabs = () => {
             whileTap="tap"
             className={`px-6 py-3 rounded-full font-medium text-sm md:text-base transition-all duration-300 ${
               activeTab === tab.id
-                ? "bg-linear-to-r from-blue-600 to-purple-600 text-white shadow-lg"
+                ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg"
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
           >
@@ -168,7 +203,7 @@ const PropertyTabs = () => {
         ))}
       </motion.div>
 
-      {/* Properties Grid */}
+      {/* Properties Grid with Progress Line */}
       <AnimatePresence mode="wait">
         {loading ? (
           <motion.div
@@ -244,26 +279,73 @@ const PropertyTabs = () => {
             </p>
           </motion.div>
         ) : (
-          <motion.div
-            key={activeTab}
-            variants={containerVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.2 }}
-            exit={{ opacity: 0 }}
-            className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide"
-          >
-            {properties.map((property) => (
-              <motion.div
-                key={property.id}
-                variants={itemVariants}
-                whileHover={{ y: -5, transition: { duration: 0.3 } }}
-                className="group min-w-[320px] md:min-w-[380px]"
+          <div className="relative">
+            {/* Scroll Controls - Removed gradient overlays */}
+            <div className="absolute -left-4 top-1/2 -translate-y-1/2 z-10 hidden lg:block">
+              <motion.button
+                whileHover={{ scale: 1.1, x: -2 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => handleScroll('left')}
+                className="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-600 hover:text-blue-600 transition-colors border border-gray-100"
+                disabled={scrollPosition <= 0}
               >
-                <PropertyCard property={property} />
-              </motion.div>
-            ))}
-          </motion.div>
+                <ChevronLeft size={20} />
+              </motion.button>
+            </div>
+            
+            <div className="absolute -right-4 top-1/2 -translate-y-1/2 z-10 hidden lg:block">
+              <motion.button
+                whileHover={{ scale: 1.1, x: 2 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => handleScroll('right')}
+                className="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-600 hover:text-blue-600 transition-colors border border-gray-100"
+                disabled={scrollPosition >= maxScroll}
+              >
+                <ChevronRight size={20} />
+              </motion.button>
+            </div>
+
+            {/* Properties Container - No gradient overlays */}
+            <motion.div
+              key={activeTab}
+              variants={containerVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, amount: 0.2 }}
+              exit={{ opacity: 0 }}
+              id="properties-scroll-container"
+              className="flex gap-6 overflow-x-auto pb-8 scrollbar-hide scroll-smooth"
+            >
+              {properties.map((property) => (
+                <motion.div
+                  key={property.id}
+                  variants={itemVariants}
+                  whileHover={{ y: -5, transition: { duration: 0.3 } }}
+                  className="group min-w-[320px] md:min-w-[380px] flex-shrink-0"
+                >
+                  <PropertyCard property={property} />
+                </motion.div>
+              ))}
+            </motion.div>
+
+            {/* Elegant Progress Line */}
+            <div className="mt-6 flex items-center gap-4">
+              {/* Progress track */}
+              <div className="flex-1 h-0.5 bg-gray-100 rounded-full overflow-hidden">
+                <motion.div
+                  className="h-full bg-gradient-to-r from-blue-600 to-purple-600 rounded-full"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${progressPercentage}%` }}
+                  transition={{ duration: 0.1, ease: "linear" }}
+                />
+              </div>
+              
+              {/* Minimal percentage indicator */}
+              <div className="text-xs font-mono text-gray-400 font-medium tabular-nums">
+                {Math.round(progressPercentage)}%
+              </div>
+            </div>
+          </div>
         )}
       </AnimatePresence>
 

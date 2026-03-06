@@ -58,6 +58,7 @@ exports.getColumnMappingGuide = (req, res) => {
     { excelColumn: 'SBA', databaseField: 'sba', required: false, description: 'Super Built-up Area (e.g., "2500 - 4500 sq.ft")' },
     { excelColumn: 'Price', databaseField: 'price', required: false, description: 'Price range (e.g., "2.5 Cr - 4.5 Cr")' },
     { excelColumn: 'RERA Completion', databaseField: 'rera_completion', required: false, description: 'RERA completion date (e.g., "December 2025")' },
+    { excelColumn: 'Property Description', databaseField: 'property_description', required: false, description: 'Detailed description of the property' },
   ];
 
   res.json({
@@ -77,10 +78,12 @@ exports.getColumnMappingGuide = (req, res) => {
       'Typology': '3 BHK, 4 BHK',
       'SBA': '2500 - 4500 sq.ft',
       'Price': '2.5 Cr - 4.5 Cr',
-      'RERA Completion': 'December 2025'
+      'RERA Completion': 'December 2025',
+      'Property Description': 'Luxurious villas with modern amenities, located in the heart of the city...'
     }
   });
 };
+
 // Import projects from Excel
 exports.importProjectsFromExcel = async (req, res) => {
   const client = await pool.connect();
@@ -96,6 +99,7 @@ exports.importProjectsFromExcel = async (req, res) => {
   // Arrays to store mapping information for frontend
   const mappingLogs = [];
   const unmatchedColumns = [];
+  const missingFields = []; // ADD THIS
 
   try {
     if (!req.file) {
@@ -146,7 +150,8 @@ exports.importProjectsFromExcel = async (req, res) => {
       typology: ['typology', 'unit types', 'bhk', 'configuration', 'room types'],
       sba: ['sba', 'super built', 'built up area', 'carpet area', 'area sqft'],
       price: ['price', 'cost', 'value', 'rate', 'amount', 'budget'],
-      rera_completion: ['rera', 'completion', 'rera completion', 'handover', 'possession']
+      rera_completion: ['rera', 'completion', 'rera completion', 'handover', 'possession'],
+      property_description: ['description', 'property description', 'details', 'overview', 'about', 'desc']
     };
 
     // Create column mapping with flexible matching
@@ -222,6 +227,7 @@ exports.importProjectsFromExcel = async (req, res) => {
         foundColumns: headers.filter(h => h),
         mappingLogs,
         unmatchedColumns,
+        missingFields, // ADD THIS
         note: 'Please ensure your Excel has columns for Project ID and Project Name'
       });
     }
@@ -230,6 +236,38 @@ exports.importProjectsFromExcel = async (req, res) => {
     console.log('Column mappings found:', Object.keys(columnMap).map(key => 
       `${key} → Column ${columnMap[key]}`
     ));
+
+    // ADD THIS - Check which database fields were not found in the Excel file
+    const allDatabaseFields = [
+      'project_id', 'project_name', 'project_type', 'project_status', 
+      'project_location', 'total_acres', 'no_of_units', 'club_house_size',
+      'structure', 'typology', 'sba', 'price', 'rera_completion', 
+      'property_description'
+    ];
+
+    // Find fields that are not in columnMap (excluding required fields which we already checked)
+    allDatabaseFields.forEach(field => {
+      if (!columnMap[field] && field !== 'project_id' && field !== 'project_name') {
+        missingFields.push(field);
+      }
+    });
+
+    if (missingFields.length > 0) {
+      console.log('⚠️ Missing fields in Excel:', missingFields);
+      mappingLogs.push({
+        type: 'warning',
+        message: `The following fields were not found in Excel and will be left empty: ${missingFields.join(', ')}`
+      });
+      
+      // Also add individual logs for each missing field
+      missingFields.forEach(field => {
+        mappingLogs.push({
+          type: 'warning',
+          databaseField: field,
+          note: 'Column not found in Excel - will be left empty'
+        });
+      });
+    }
 
     // Process rows (starting from row 2)
     let rowCount = 0;
@@ -267,6 +305,7 @@ exports.importProjectsFromExcel = async (req, res) => {
           sba: getCellValue(columnMap.sba),
           price: getCellValue(columnMap.price),
           rera_completion: getCellValue(columnMap.rera_completion),
+          property_description: getCellValue(columnMap.property_description)
         };
 
         // Validate required fields
@@ -286,8 +325,8 @@ exports.importProjectsFromExcel = async (req, res) => {
           INSERT INTO projects (
             project_id, project_name, slug, project_type, project_status,
             project_location, total_acres, no_of_units, club_house_size,
-            structure, typology, sba, price, rera_completion
-          ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)
+            structure, typology, sba, price, rera_completion, property_description
+          ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
           ON CONFLICT (project_id) DO UPDATE SET
             project_name = EXCLUDED.project_name,
             slug = EXCLUDED.slug,
@@ -302,6 +341,7 @@ exports.importProjectsFromExcel = async (req, res) => {
             sba = EXCLUDED.sba,
             price = EXCLUDED.price,
             rera_completion = EXCLUDED.rera_completion,
+            property_description = EXCLUDED.property_description,
             updated_at = NOW()
           `,
           [
@@ -319,6 +359,7 @@ exports.importProjectsFromExcel = async (req, res) => {
             projectData.sba ? projectData.sba.toString().trim() : null,
             projectData.price ? projectData.price.toString().trim() : null,
             projectData.rera_completion ? projectData.rera_completion.toString().trim() : null,
+            projectData.property_description ? projectData.property_description.toString().trim() : null,
           ]
         );
 
@@ -365,7 +406,8 @@ exports.importProjectsFromExcel = async (req, res) => {
       message: `Import completed. ${results.successful} of ${results.total} projects imported successfully.`,
       results,
       mappingLogs,
-      unmatchedColumns
+      unmatchedColumns,
+      missingFields // ADD THIS
     });
 
   } catch (error) {
@@ -382,7 +424,8 @@ exports.importProjectsFromExcel = async (req, res) => {
       message: 'Failed to import projects',
       error: error.message,
       mappingLogs,
-      unmatchedColumns
+      unmatchedColumns,
+      missingFields // ADD THIS
     });
   } finally {
     client.release();
@@ -410,6 +453,7 @@ exports.downloadSampleTemplate = async (req, res) => {
       { header: 'SBA', key: 'sba', width: 20 },
       { header: 'Price', key: 'price', width: 20 },
       { header: 'RERA Completion', key: 'rera_completion', width: 20 },
+      { header: 'Property Description', key: 'property_description', width: 40 },
     ];
 
     worksheet.columns = columns;
@@ -438,7 +482,8 @@ exports.downloadSampleTemplate = async (req, res) => {
       typology: '3 BHK, 4 BHK',
       sba: '2500 - 4500 sq.ft',
       price: '2.5 Cr - 4.5 Cr',
-      rera_completion: 'December 2025'
+      rera_completion: 'December 2025',
+      property_description: 'Luxurious villas with modern amenities, located in the heart of the city with excellent connectivity.'
     });
 
     // Add note worksheet
@@ -464,15 +509,17 @@ exports.downloadSampleTemplate = async (req, res) => {
     notesWorksheet.getCell('A16').value = '• SBA (e.g., "2500 - 4500 sq.ft")';
     notesWorksheet.getCell('A17').value = '• Price (e.g., "2.5 Cr - 4.5 Cr")';
     notesWorksheet.getCell('A18').value = '• RERA Completion (e.g., "December 2025")';
+    notesWorksheet.getCell('A19').value = '• Property Description (detailed description of the property)';
 
-    notesWorksheet.getCell('A20').value = 'Note: Column headers are flexible. The system will match:';
-    notesWorksheet.getCell('A20').font = { bold: true };
-    notesWorksheet.getCell('A21').value = '• "ID", "Project ID", "Code" → maps to project_id';
-    notesWorksheet.getCell('A22').value = '• "Name", "Project Name" → maps to project_name';
-    notesWorksheet.getCell('A23').value = '• "Status", "Stage" → maps to project_status';
-    notesWorksheet.getCell('A24').value = '• "Location", "Address" → maps to project_location';
-    notesWorksheet.getCell('A25').value = '• "Price", "Cost" → maps to price';
-    notesWorksheet.getCell('A26').value = '• And many more keywords...';
+    notesWorksheet.getCell('A21').value = 'Note: Column headers are flexible. The system will match:';
+    notesWorksheet.getCell('A21').font = { bold: true };
+    notesWorksheet.getCell('A22').value = '• "ID", "Project ID", "Code" → maps to project_id';
+    notesWorksheet.getCell('A23').value = '• "Name", "Project Name" → maps to project_name';
+    notesWorksheet.getCell('A24').value = '• "Status", "Stage" → maps to project_status';
+    notesWorksheet.getCell('A25').value = '• "Location", "Address" → maps to project_location';
+    notesWorksheet.getCell('A26').value = '• "Price", "Cost" → maps to price';
+    notesWorksheet.getCell('A27').value = '• "Description", "About", "Details" → maps to property_description';
+    notesWorksheet.getCell('A28').value = '• And many more keywords...';
 
     // Set response headers
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');

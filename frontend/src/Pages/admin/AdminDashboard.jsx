@@ -76,7 +76,7 @@ const AdminDashboard = () => {
     total: projects.length,
     rtm: projects.filter((p) => p.project_status === "RTM").length,
     uc: projects.filter((p) => p.project_status === "UC").length,
-    totalCustomers: 0, // You'll need to fetch this from your API
+    totalCustomers: 0, 
   };
 
   if (loading) {
@@ -267,7 +267,6 @@ const AdminDashboard = () => {
               <div className="mt-6">
                 <DashboardCard
                   title="Customers"
-                  count={stats.totalCustomers || 0}
                   icon={<Users className="w-8 h-8" />}
                   color="orange"
                   link="/admin/customers"
