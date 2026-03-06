@@ -90,7 +90,7 @@ exports.importProjects = async (req, res) => {
 //   try {
 //     const result = await pool.query(
 //       `
-//       SELECT 
+//       SELECT
 //         p.id,
 //         p.slug,
 //         p.project_name,
@@ -128,8 +128,6 @@ exports.importProjects = async (req, res) => {
 //   }
 // };
 
-
-
 // controllers/propertyControllers.js
 
 exports.getAllProjects = async (req, res) => {
@@ -139,7 +137,7 @@ exports.getAllProjects = async (req, res) => {
     const offset = (page - 1) * limit;
 
     // Get total count for pagination
-    const countResult = await pool.query('SELECT COUNT(*) FROM projects');
+    const countResult = await pool.query("SELECT COUNT(*) FROM projects");
     const totalCount = parseInt(countResult.rows[0].count);
 
     // Get paginated projects with images
@@ -161,6 +159,7 @@ exports.getAllProjects = async (req, res) => {
         p.typology,
         p.sba,
         p.rera_completion,
+        p.property_description,  // ADD THIS
         p.created_at,
         p.updated_at,
         img.image_url
@@ -175,7 +174,7 @@ exports.getAllProjects = async (req, res) => {
       ORDER BY p.id DESC
       LIMIT $1 OFFSET $2
       `,
-      [limit, offset]
+      [limit, offset],
     );
 
     console.log("Query successful, rows:", result.rows.length);
@@ -187,8 +186,8 @@ exports.getAllProjects = async (req, res) => {
         currentPage: page,
         totalPages: Math.ceil(totalCount / limit),
         totalCount: totalCount,
-        limit: limit
-      }
+        limit: limit,
+      },
     });
   } catch (error) {
     console.error("ERROR in getAllProjects:", error);
@@ -199,7 +198,6 @@ exports.getAllProjects = async (req, res) => {
     });
   }
 };
-
 
 exports.getAllPropertiesUnfiltered = async (req, res) => {
   try {
@@ -215,6 +213,7 @@ exports.getAllPropertiesUnfiltered = async (req, res) => {
         p.price,
         p.project_type,
         p.project_status,
+        p.property_description,  // ADD THIS
         img.image_url
       FROM projects p
       LEFT JOIN LATERAL (
@@ -228,13 +227,12 @@ exports.getAllPropertiesUnfiltered = async (req, res) => {
       `,
       // [limit]
     );
-// console.log(result);
+    // console.log(result);
     res.json({
       success: true,
       count: result.rows.length,
       data: result.rows,
     });
-
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -243,8 +241,6 @@ exports.getAllPropertiesUnfiltered = async (req, res) => {
     });
   }
 };
-
-
 
 exports.getProjectBySlug = async (req, res) => {
   try {
@@ -308,6 +304,7 @@ exports.addProject = async (req, res) => {
       sba,
       price,
       rera_completion,
+      property_description,
       images = [],
     } = req.body;
 
@@ -340,10 +337,11 @@ exports.addProject = async (req, res) => {
         typology,
         sba,
         price,
-        rera_completion
+        rera_completion,
+        property_description
       )
       VALUES (
-        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14
+        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15
       )
       `,
       [
@@ -361,6 +359,7 @@ exports.addProject = async (req, res) => {
         sba || null,
         price || null,
         rera_completion || null,
+        property_description || null,
       ],
     );
 
@@ -396,7 +395,6 @@ exports.addProject = async (req, res) => {
   }
 };
 
-
 const { S3Client, DeleteObjectCommand } = require("@aws-sdk/client-s3");
 
 // Configure S3 (add this at the top of your file with other imports)
@@ -411,35 +409,37 @@ const s3 = new S3Client({
 // Delete project (with S3 cleanup)
 exports.deleteProject = async (req, res) => {
   const client = await pool.connect();
-  
+
   try {
     const { id } = req.params;
-    
+
     await client.query("BEGIN");
-    
+
     // First, get the project details to know the slug and project_id
     const projectResult = await client.query(
       "SELECT project_id, slug FROM projects WHERE id = $1",
-      [id]
+      [id],
     );
-    
+
     if (projectResult.rows.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "Project not found"
+        message: "Project not found",
       });
     }
-    
+
     const { project_id, slug } = projectResult.rows[0];
-    
+
     // Get all image URLs for this project
     const imagesResult = await client.query(
       `SELECT image_url FROM project_images WHERE project_id = $1`,
-      [project_id]
+      [project_id],
     );
-    
-    console.log(`Deleting ${imagesResult.rows.length} images from S3 for project: ${slug}`);
-    
+
+    console.log(
+      `Deleting ${imagesResult.rows.length} images from S3 for project: ${slug}`,
+    );
+
     // Delete images from S3
     for (const row of imagesResult.rows) {
       try {
@@ -447,51 +447,49 @@ exports.deleteProject = async (req, res) => {
         // URL format: https://bucket-name.s3.region.amazonaws.com/images/slug/filename.jpg
         const url = new URL(row.image_url);
         const key = url.pathname.substring(1); // Remove leading slash
-        
+
         console.log("Deleting from S3:", key);
-        
+
         const deleteCommand = new DeleteObjectCommand({
           Bucket: process.env.AWS_BUCKET_NAME,
-          Key: key
+          Key: key,
         });
-        
+
         await s3.send(deleteCommand);
       } catch (s3Error) {
         console.error("Error deleting from S3:", s3Error);
         // Continue with database deletion even if S3 delete fails
       }
     }
-    
+
     // Delete from project_images
-    await client.query(
-      "DELETE FROM project_images WHERE project_id = $1",
-      [project_id]
-    );
-    
+    await client.query("DELETE FROM project_images WHERE project_id = $1", [
+      project_id,
+    ]);
+
     // Delete from projects
     const result = await client.query(
       "DELETE FROM projects WHERE id = $1 RETURNING *",
-      [id]
+      [id],
     );
-    
+
     await client.query("COMMIT");
-    
+
     res.json({
       success: true,
       message: `Project deleted successfully. Removed ${imagesResult.rows.length} images from S3.`,
       data: {
         project: result.rows[0],
-        images_deleted: imagesResult.rows.length
-      }
+        images_deleted: imagesResult.rows.length,
+      },
     });
-    
   } catch (error) {
     await client.query("ROLLBACK");
     console.error("Delete project error:", error);
     res.status(500).json({
       success: false,
       message: "Failed to delete project",
-      error: error.message
+      error: error.message,
     });
   } finally {
     client.release();
@@ -507,13 +505,13 @@ exports.getProjectById = async (req, res) => {
 
     const projectResult = await pool.query(
       `SELECT * FROM projects WHERE id = $1`,
-      [id]
+      [id],
     );
 
     if (projectResult.rows.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "Project not found"
+        message: "Project not found",
       });
     }
 
@@ -525,22 +523,21 @@ exports.getProjectById = async (req, res) => {
        FROM project_images 
        WHERE project_id = $1 
        ORDER BY sort_order ASC`,
-      [project.project_id]
+      [project.project_id],
     );
 
     project.images = imagesResult.rows;
 
     res.json({
       success: true,
-      data: project
+      data: project,
     });
-
   } catch (error) {
     console.error("Get project by ID error:", error);
     res.status(500).json({
       success: false,
       message: "Failed to fetch project",
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -565,28 +562,29 @@ exports.updateProject = async (req, res) => {
       sba,
       price,
       rera_completion,
+      property_description, // ADD THIS - new field
       existing_images = [], // Array of image URLs that should be kept
-      new_images = []       // New images to upload
+      new_images = [], // New images to upload
     } = req.body;
 
     // Basic validation
     if (!project_id || !project_name) {
       return res.status(400).json({
         success: false,
-        message: "project_id and project_name are required"
+        message: "project_id and project_name are required",
       });
     }
 
     // Check if project exists
     const projectCheck = await client.query(
       "SELECT * FROM projects WHERE id = $1",
-      [id]
+      [id],
     );
 
     if (projectCheck.rows.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "Project not found"
+        message: "Project not found",
       });
     }
 
@@ -594,7 +592,7 @@ exports.updateProject = async (req, res) => {
 
     await client.query("BEGIN");
 
-    // Update project
+    // Update project - ADD property_description to the query
     await client.query(
       `
       UPDATE projects SET
@@ -612,8 +610,9 @@ exports.updateProject = async (req, res) => {
         sba = $12,
         price = $13,
         rera_completion = $14,
+        property_description = $15,  // ADD THIS
         updated_at = NOW()
-      WHERE id = $15
+      WHERE id = $16  // CHANGED from $15 to $16
       `,
       [
         Number(project_id),
@@ -630,8 +629,9 @@ exports.updateProject = async (req, res) => {
         sba || null,
         price || null,
         rera_completion || null,
-        id
-      ]
+        property_description || null, // ADD THIS
+        id,
+      ],
     );
 
     // Handle images if provided
@@ -639,7 +639,7 @@ exports.updateProject = async (req, res) => {
       // Delete images that are no longer needed
       await client.query(
         "DELETE FROM project_images WHERE project_id = $1 AND image_url NOT IN (SELECT unnest($2::text[]))",
-        [Number(project_id), existing_images]
+        [Number(project_id), existing_images],
       );
 
       // Add new images
@@ -651,7 +651,7 @@ exports.updateProject = async (req, res) => {
           VALUES ($1, $2, $3)
           ON CONFLICT DO NOTHING
           `,
-          [Number(project_id), new_images[i], nextSortOrder + i]
+          [Number(project_id), new_images[i], nextSortOrder + i],
         );
       }
     }
@@ -660,20 +660,17 @@ exports.updateProject = async (req, res) => {
 
     res.json({
       success: true,
-      message: "Project updated successfully"
+      message: "Project updated successfully",
     });
-
   } catch (error) {
     await client.query("ROLLBACK");
     console.error("Update project error:", error);
     res.status(500).json({
       success: false,
       message: "Failed to update project",
-      error: error.message
+      error: error.message,
     });
   } finally {
     client.release();
   }
 };
-
-

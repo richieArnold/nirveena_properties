@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { Save, Upload, ArrowLeft, CheckCircle, XCircle, X } from 'lucide-react';
+import { Save, Upload, ArrowLeft, CheckCircle, XCircle, X } from "lucide-react";
 import AdminLayout from "../../components/admin/AdminLayout";
 import AlertMessage from "../../components/admin/AlertMessage";
 import axiosInstance from "../../utils/Instance";
-
 
 const AddProject = () => {
   const navigate = useNavigate();
@@ -13,7 +12,11 @@ const AddProject = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
   const [showNotification, setShowNotification] = useState(false);
-  const [notification, setNotification] = useState({ type: "", title: "", message: "" });
+  const [notification, setNotification] = useState({
+    type: "",
+    title: "",
+    message: "",
+  });
   const [images, setImages] = useState([]);
   const [formData, setFormData] = useState({
     project_id: "",
@@ -28,25 +31,26 @@ const AddProject = () => {
     typology: "",
     sba: "",
     price: "",
-    rera_completion: ""
+    rera_completion: "",
+    property_description: "", // ADD THIS
   });
 
   useEffect(() => {
-    const token = localStorage.getItem('adminToken');
-    const userData = localStorage.getItem('adminUser');
-    
+    const token = localStorage.getItem("adminToken");
+    const userData = localStorage.getItem("adminUser");
+
     if (!token) {
-      navigate('/admin/login');
+      navigate("/admin/login");
     } else {
       setUser(JSON.parse(userData));
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
     }
   }, [navigate]);
 
   const handleInputChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -58,10 +62,10 @@ const AddProject = () => {
     setNotification({
       type: "success",
       title: "Project Added Successfully!",
-      message: `"${projectName}" has been added with ${imageCount} image(s).`
+      message: `"${projectName}" has been added with ${imageCount} image(s).`,
     });
     setShowNotification(true);
-    
+
     setTimeout(() => {
       setShowNotification(false);
     }, 5000);
@@ -71,10 +75,10 @@ const AddProject = () => {
     setNotification({
       type: "error",
       title: "Failed to Add Project",
-      message: errorMsg || "An error occurred while adding the project."
+      message: errorMsg || "An error occurred while adding the project.",
     });
     setShowNotification(true);
-    
+
     setTimeout(() => {
       setShowNotification(false);
     }, 5000);
@@ -85,32 +89,32 @@ const AddProject = () => {
     setLoading(true);
 
     const data = new FormData();
-    Object.keys(formData).forEach(key => {
+    Object.keys(formData).forEach((key) => {
       data.append(key, formData[key]);
     });
-    images.forEach(image => {
-      data.append('images', image);
+    images.forEach((image) => {
+      data.append("images", image);
     });
 
     try {
       const response = await axiosInstance.post(
         "/api/projects/addProject",
         data,
-        { headers: { "Content-Type": "multipart/form-data" } }
+        { headers: { "Content-Type": "multipart/form-data" } },
       );
 
       if (response.data.success) {
         setMessage({ type: "success", text: "Project added successfully!" });
-        
+
         showSuccessNotification(
           formData.project_name,
-          response.data.data?.images_uploaded || images.length
+          response.data.data?.images_uploaded || images.length,
         );
-        
-        setTimeout(() => navigate('/admin/list'), 2000);
+
+        setTimeout(() => navigate("/admin/list"), 2000);
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
       const errorMsg = error.response?.data?.message || "Failed to add project";
       setMessage({ type: "error", text: errorMsg });
       showErrorNotification(errorMsg);
@@ -119,20 +123,25 @@ const AddProject = () => {
     }
   };
 
-  const inputClasses = "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition";
+  const inputClasses =
+    "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition";
   const labelClasses = "block text-sm font-medium text-gray-700 mb-1";
 
   return (
     <AdminLayout user={user}>
       {/* Custom Notification */}
       {showNotification && (
-        <div className={`fixed top-24 right-6 z-50 max-w-md w-full bg-white rounded-xl shadow-2xl border-l-4 ${
-          notification.type === 'success' ? 'border-green-500' : 'border-red-500'
-        } overflow-hidden animate-slide-in`}>
+        <div
+          className={`fixed top-24 right-6 z-50 max-w-md w-full bg-white rounded-xl shadow-2xl border-l-4 ${
+            notification.type === "success"
+              ? "border-green-500"
+              : "border-red-500"
+          } overflow-hidden animate-slide-in`}
+        >
           <div className="p-4">
             <div className="flex items-start">
               <div className="flex-shrink-0">
-                {notification.type === 'success' ? (
+                {notification.type === "success" ? (
                   <CheckCircle className="w-6 h-6 text-green-500" />
                 ) : (
                   <XCircle className="w-6 h-6 text-red-500" />
@@ -147,7 +156,7 @@ const AddProject = () => {
                 </p>
                 <div className="mt-3 flex gap-2">
                   <button
-                    onClick={() => navigate('/admin/list')}
+                    onClick={() => navigate("/admin/list")}
                     className="text-sm bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700 transition"
                   >
                     View All Projects
@@ -168,14 +177,16 @@ const AddProject = () => {
               </button>
             </div>
           </div>
-          <div className={`h-1 ${notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'} animate-progress`} />
+          <div
+            className={`h-1 ${notification.type === "success" ? "bg-green-500" : "bg-red-500"} animate-progress`}
+          />
         </div>
       )}
 
       {/* Back button and title */}
       <div className="flex items-center gap-4 mb-6">
         <button
-          onClick={() => navigate('/admin')}
+          onClick={() => navigate("/admin")}
           className="p-2 hover:bg-gray-100 rounded-lg transition"
         >
           <ArrowLeft className="w-5 h-5" />
@@ -183,13 +194,16 @@ const AddProject = () => {
         <h1 className="text-2xl font-bold text-gray-900">Add New Project</h1>
       </div>
 
-      <AlertMessage 
-        message={message.text} 
-        type={message.type} 
-        onClose={() => setMessage({ type: "", text: "" })} 
+      <AlertMessage
+        message={message.text}
+        type={message.type}
+        onClose={() => setMessage({ type: "", text: "" })}
       />
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-lg p-6">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white rounded-xl shadow-lg p-6"
+      >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Project ID */}
           <div>
@@ -365,6 +379,23 @@ const AddProject = () => {
             />
           </div>
 
+          {/* Property Description - NEW FIELD */}
+          <div className="md:col-span-2">
+            <label className={labelClasses}>Property Description</label>
+            <textarea
+              name="property_description"
+              value={formData.property_description}
+              onChange={handleInputChange}
+              rows="5"
+              className={`${inputClasses} resize-y`}
+              placeholder="Enter detailed description of the property, its features, location benefits, amenities, etc."
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Describe the property in detail - this will be displayed on the
+              property page
+            </p>
+          </div>
+
           {/* Image Upload */}
           <div className="md:col-span-2">
             <label className={labelClasses}>Project Images</label>
@@ -399,7 +430,7 @@ const AddProject = () => {
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:bg-blue-300 flex items-center gap-2"
           >
             <Save className="w-4 h-4" />
-            {loading ? 'Adding Project...' : 'Add Project'}
+            {loading ? "Adding Project..." : "Add Project"}
           </button>
         </div>
       </form>
@@ -415,16 +446,20 @@ const AddProject = () => {
             opacity: 1;
           }
         }
-        
+
         @keyframes progress {
-          from { width: 100%; }
-          to { width: 0%; }
+          from {
+            width: 100%;
+          }
+          to {
+            width: 0%;
+          }
         }
-        
+
         .animate-slide-in {
           animation: slideIn 0.3s ease-out;
         }
-        
+
         .animate-progress {
           animation: progress 5s linear;
         }
