@@ -9,7 +9,6 @@ import { useState } from "react";
 import Home from "@/pages/Home";
 import About from "@/pages/About";
 import Contact from "@/pages/Contact";
-import PropertyDetails from "../pages/PropertyDetails";
 import PropertiesPage from "../Pages/PropertiesPage";
 import PropertyDetailsPage from "../Pages/PropertyDetailsPage";
 import LeadsList from "../Pages/admin/LeadsList";
@@ -22,10 +21,12 @@ import EditProject from "../Pages/admin/EditProject";
 import ViewProject from "../Pages/admin/ViewProject";
 import ProjectsList from "../Pages/admin/ProjectsList";
 
-
 import AddBlog from "../Pages/admin/AddBlog";
 import BlogsList from "../Pages/admin/BlogsList";
 import EditBlog from "../Pages/admin/EditBlog";
+import ViewBlog from "../Pages/admin/ViewBlog";
+
+
 
 import CustomersList from "../Pages/admin/CustomersList";
 import CustomerDetails from "../Pages/admin/CustomerDetails";
@@ -51,11 +52,10 @@ const PageRoutes = () => {
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/property" element={<PropertiesPage />} />
-        <Route path="/property/:slug" element={<PropertyDetails />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/properties/:slug" element={<PropertyDetailsPage />} />
         <Route path="/blogs" element={<BlogsPage />} />
-<Route path="/blogs/:slug" element={<BlogDetails />} />
+        <Route path="/blogs/:slug" element={<BlogDetails />} />
       </Route>
 
       {/* Admin Routes - NO Layout */}
@@ -160,15 +160,13 @@ const PageRoutes = () => {
       />
 
       <Route path="/admin/blogs/create" element={<AddBlog />} />
-<Route path="/admin/blogs" element={<BlogsList />} />
-<Route path="/admin/blogs/edit/:id" element={<EditBlog />} />
+      <Route path="/admin/blogs" element={<BlogsList />} />
+      <Route path="/admin/blogs/edit/:id" element={<EditBlog />} />
+      <Route path="/admin/blogs/view/:slug" element={<ViewBlog />} />
 
-
-<Route path="/blogs" element={<BlogsPage />} />
-<Route path="/blogs/:slug" element={<BlogDetails />} />
+      <Route path="/blogs" element={<BlogsPage />} />
+      <Route path="/blogs/:slug" element={<BlogDetails />} />
     </Routes>
-
-    
   );
 };
 

@@ -161,12 +161,6 @@ const Hero = () => {
             animate="show"
             className="space-y-6 sm:space-y-8"
           >
-            {/* Pre-heading - Mobile Optimized */}
-            <motion.div variants={fadeUp}>
-              <span className="inline-block px-3 py-1 text-[10px] sm:text-xs font-medium tracking-[0.2em] sm:tracking-[0.3em] uppercase text-white/80 border border-white/20 rounded-full bg-white/5 backdrop-blur-sm">
-                Since 2005
-              </span>
-            </motion.div>
 
             {/* Main Heading - Mobile Optimized */}
             <motion.h1

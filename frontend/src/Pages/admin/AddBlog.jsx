@@ -9,36 +9,28 @@ const AddBlog = () => {
   const [body, setBody] = useState("");
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
-const handleImageUpload = async (e) => {
+  const handleImageUpload = async (e) => {
+    const files = e.target.files;
+    const formData = new FormData();
 
-  const files = e.target.files;
+    for (let file of files) {
+      formData.append("images", file);
+    }
 
-  const formData = new FormData();
-
-  for (let file of files) {
-    formData.append("images", file);
-  }
-
-  try {
-
-    const res = await axiosInstance.post(
-      "/api/blogs/upload",
-      formData,
-      {
+    try {
+      const res = await axiosInstance.post("/api/blogs/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
-      }
-    );
+      });
 
-    setImages((prev) => [...prev, ...res.data.images]);
-
-  } catch (error) {
-    console.error("Upload failed", error);
-  }
-
-};
+      setImages((prev) => [...prev, ...res.data.images]);
+    } catch (error) {
+      console.error("Upload failed", error);
+    }
+  };
 
   const removeImage = (index) => {
     const newImages = images.filter((_, i) => i !== index);
@@ -58,17 +50,25 @@ const handleImageUpload = async (e) => {
         images,
       };
 
-      await axiosInstance.post("/api/blogs", payload);
+      const res = await axiosInstance.post("/api/blogs", payload);
 
-      alert("Blog created successfully!");
+      console.log("Blog created:", res.data);
 
+      // reset form
       setTitle("");
       setAuthor("");
       setBody("");
       setImages([]);
+
+      // show success alert
+      setSuccess(true);
+
+      setTimeout(() => {
+        setSuccess(false);
+      }, 4000);
+
     } catch (error) {
-      console.error(error);
-      alert("Failed to create blog");
+      console.error("Blog creation failed:", error);
     } finally {
       setLoading(false);
     }
@@ -83,6 +83,13 @@ const handleImageUpload = async (e) => {
           <h1 className="text-2xl font-bold mb-6">
             Create Blog
           </h1>
+
+          {/* SUCCESS ALERT */}
+          {success && (
+            <div className="mb-6 rounded-lg border border-green-300 bg-green-50 p-4 text-green-700">
+              ✅ Blog successfully created!
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
 
@@ -130,7 +137,6 @@ const handleImageUpload = async (e) => {
                 className="mb-3"
               />
 
-              {/* Image Preview */}
               <div className="flex flex-wrap gap-3">
                 {images.map((img, index) => (
                   <div key={index} className="relative">
@@ -175,6 +181,7 @@ const handleImageUpload = async (e) => {
           </form>
 
         </div>
+
       </div>
     </AdminLayout>
   );

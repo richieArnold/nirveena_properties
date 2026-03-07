@@ -4,22 +4,13 @@ import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import logo from "../assets/NirveenaLogo.jpeg";
 
-// CTA Button - Always blue gradient, never changes
-const CTAButton = ({ onClick }) => (
-  <button
-    onClick={onClick}
-    className="bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold px-3 py-1.5 sm:px-4 sm:py-2 rounded-md hover:shadow-md transition-all duration-300 flex items-center gap-1 text-xs sm:text-sm"
-  >
-    <Phone size={12} className="sm:w-3.5 sm:h-3.5" />
-    <span className="hidden xs:inline">GET IN TOUCH</span>
-    <span className="xs:hidden">GET IN TOUCH</span>
-  </button>
-);
-
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
+  const isBlogPage = location.pathname.startsWith("/blogs");
+  const isDetailsPage = location.pathname.startsWith("/properties");
+
   const activeTab = location.pathname;
 
   const navItems = [
@@ -27,7 +18,7 @@ const Header = () => {
     { name: "About Us", path: "/about" },
     { name: "Property", path: "/property" },
     { name: "Contact Us", path: "/contact" },
-      { name: "Blogs", path: "/blogs" },
+    { name: "Blogs", path: "/blogs" },
 
   ];
 
@@ -41,6 +32,8 @@ const Header = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+
 
   // Prevent body scroll when mobile menu open
   useEffect(() => {
@@ -57,13 +50,13 @@ const Header = () => {
   };
 
   return (
-    <header
-      className={`w-full fixed top-0 z-50 transition-all duration-500 ${
-        isScrolled 
-          ? "bg-white shadow-lg py-1.5 sm:py-2" 
-          : "bg-transparent py-2 sm:py-3"
-      }`}
-    >
+<header
+  className={`w-full fixed top-0 z-50 transition-all duration-500 ${
+    isScrolled || isBlogPage
+      ? "bg-white shadow-lg py-1.5 sm:py-2"
+      : "bg-transparent py-2 sm:py-3"
+  }`}
+>
       <div className="container mx-auto px-3 sm:px-4 lg:px-6 flex items-center justify-between">
         {/* Logo Section - Smaller on mobile */}
         <Link to="/" className="flex items-center gap-1 sm:gap-2">
@@ -75,8 +68,7 @@ const Header = () => {
             />
           </div>
           <h1 className={`text-sm sm:text-base md:text-lg lg:text-xl font-serif tracking-wide transition-colors duration-300 ${
-            isScrolled ? 'text-gray-900' : 'text-white'
-          }`}>
+isScrolled || isBlogPage ? 'text-gray-900' : 'text-white'          }`}>
             NIRVEENA
           </h1>
         </Link>
@@ -90,7 +82,7 @@ const Header = () => {
                 key={item.name}
                 to={item.path}
                 className={`font-semibold text-xs xl:text-sm tracking-wide relative py-1 transition-all duration-300 ${
-                  isScrolled
+                  isScrolled || isBlogPage || isDetailsPage
                     ? isActive
                       ? "text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600"
                       : "text-gray-600 hover:text-gray-900"
@@ -104,7 +96,7 @@ const Header = () => {
                   <motion.span
                     layoutId="activeNav"
                     className={`absolute bottom-0 left-0 w-full h-0.5 ${
-                      isScrolled
+                      isScrolled || isBlogPage || isDetailsPage
                         ? 'bg-gradient-to-r from-blue-600 to-purple-600'
                         : 'bg-white'
                     }`}
@@ -118,13 +110,10 @@ const Header = () => {
 
         {/* Right Side */}
         <div className="flex items-center gap-1 sm:gap-2 md:gap-3">
-          {/* CTA Button - Always the same blue gradient */}
-          <CTAButton onClick={() => console.log("CTA Click")} />
-
           {/* Mobile Menu Button */}
           <button
             className={`lg:hidden p-1 transition-colors ${
-              isScrolled ? 'text-gray-600 hover:text-gray-900' : 'text-white hover:text-white/80'
+              isScrolled || isBlogPage || isDetailsPage ? 'text-gray-600 hover:text-gray-900' : 'text-white hover:text-white/80'
             }`}
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label={isMenuOpen ? "Close menu" : "Open menu"}

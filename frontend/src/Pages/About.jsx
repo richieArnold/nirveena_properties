@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import {
   Target,
   Users,
-  
   TrendingUp,
   Heart,
   Home,
@@ -27,6 +26,7 @@ import {
   useSpring,
   useTransform,
 } from "framer-motion";
+import { Link } from "react-router-dom";
 
 /**
  * REUSABLE COMPONENTS
@@ -411,31 +411,30 @@ const About = () => {
             alt="Modern Architecture"
             className="absolute inset-0 w-full h-full object-cover opacity-50"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent opacity-60"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent"></div>
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-left">
             <motion.div
-              className="max-w-2xl"
+              className="max-w-xl backdrop-blur-[2px]"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-6 leading-tight">
-                Nirveena Property
+              <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-6 leading-tight drop-shadow-xl" style={{fontFamily: "'Playfair Display', serif" }}>
+                Nirveena Realty
               </h1>
-              <p className="text-lg text-gray-200 mb-8 leading-relaxed font-light">
-                We're more than just a real estate agency. We're your partners
-                in finding the space where your life happens.{" "}
-                <br className="hidden md:block" />
-                <span className="font-semibold text-white mt-2 inline-block italic">
-                  Ready to come home, to your dream home?
-                </span>
+
+              <p className="text-lg text-gray-100 mb-8 leading-relaxed font-light" style={{ fontFamily: "'Inter', sans-serif" }}>
+                At Nirveena Realty, we specialize in premium apartments, luxury
+                villas, villa plots, and high-value farmland investments. With
+                nearly two decades of expertise and RERA-certified
+                professionals, we guide you toward properties that elevate your
+                lifestyle and secure your future.
               </p>
-              <button
-                onClick={() => setIsModalOpen(true)}
-                className="bg-white text-gray-900 px-8 py-3.5 rounded-lg font-bold hover:bg-blue-50 transition-all shadow-xl"
-              >
-                View Properties
-              </button>
+              <Link to="/property">
+                <button className="bg-white text-gray-900 px-8 py-3.5 rounded-lg font-bold hover:bg-blue-50 transition-all shadow-xl">
+                  View Properties
+                </button>
+              </Link>
             </motion.div>
           </div>
         </section>
@@ -455,17 +454,35 @@ const About = () => {
                   <span className="text-blue-600 font-bold uppercase tracking-widest text-sm">
                     Our Heritage
                   </span>
-                  <h2 className="text-4xl font-bold text-gray-900 mt-2 mb-6 text-left tracking-tight">
+                  <h2 className="text-4xl font-bold text-gray-900 mt-2 mb-6 text-left tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
                     Crafting Elegant Living
                   </h2>
                 </div>
-                <div className="space-y-6 text-lg text-gray-600 leading-relaxed">
+
+                <div className="space-y-6 text-lg text-gray-600 leading-relaxed" style={{ fontFamily: "'Inter', sans-serif" }}>
                   <p>
-                    Nirveena Property has been at the forefront of the real
-                    estate industry, helping thousands of families find their
-                    perfect homes. Our commitment to excellence and customer
-                    satisfaction has made us one of the most trusted names in
-                    real estate.
+                    Nirveena Realty is a premier real estate firm specializing
+                    in thoughtfully curated apartments, luxury villas, villa
+                    plots, and premium farmland investments. Backed by nearly
+                    two decades of industry experience, our RERA-certified
+                    professionals are committed to delivering a seamless and
+                    transparent property experience for every client.
+                  </p>
+
+                  <p>
+                    We offer a comprehensive end-to-end solution that supports
+                    you at every stage of your property journey, from
+                    identifying the right opportunity to ensuring a secure and
+                    legally compliant transaction. Our approach combines deep
+                    market intelligence, thorough legal due diligence, and
+                    data-driven investment insights.
+                  </p>
+
+                  <p>
+                    At Nirveena Realty, we believe a property should be more
+                    than just a purchase, it should be a long-term asset that
+                    enhances your lifestyle while building lasting value for the
+                    future.
                   </p>
                   <div className="flex items-center gap-3 bg-gray-50 p-4 rounded-lg w-fit">
                     <CheckCircle className="text-blue-600" size={20} />
@@ -511,7 +528,7 @@ const About = () => {
               <span className="text-blue-600 font-bold uppercase tracking-widest text-sm">
                 Why Choose Us
               </span>
-              <h2 className="text-4xl font-bold text-gray-900 mt-2 tracking-tight">
+              <h2 className="text-4xl font-bold text-gray-900 mt-2 tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
                 Our Core Values
               </h2>
             </div>
@@ -524,81 +541,6 @@ const About = () => {
                   isValueCard={true}
                 />
               ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Contact Section */}
-        <section className="py-24 bg-gray-50 overflow-hidden">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-100 flex flex-col lg:flex-row items-stretch">
-              <div className="lg:w-1/2 p-8 md:p-16 flex flex-col justify-center text-left">
-                <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 px-4 py-2 rounded-lg text-xs font-bold mb-6 w-fit">
-                  <MessageSquare size={14} /> <span>CONTACT US</span>
-                </div>
-                <h2 className="text-4xl font-black text-gray-900 mb-6 leading-tight">
-                  Ready to come home to <br />{" "}
-                  <span className="text-blue-600">your dream home?</span>
-                </h2>
-                <div className="space-y-6 mb-10">
-                  <div className="flex items-start gap-4">
-                    <div className="bg-blue-50 p-3 rounded-lg text-blue-600">
-                      <MapPin size={22} />
-                    </div>
-                    <div>
-                      <p className="font-bold text-gray-900">
-                        Visit Our Office
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        Prestige Tech Park, Bangalore, India
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-4">
-                    <div className="bg-blue-50 p-3 rounded-lg text-blue-600">
-                      <Phone size={22} />
-                    </div>
-                    <div>
-                      <p className="font-bold text-gray-900">Call Us</p>
-                      <p className="text-sm text-gray-600">+971 4 123 4567</p>
-                    </div>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setIsModalOpen(true)}
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-8 py-4 rounded-lg font-bold flex items-center gap-2 hover:shadow-lg transition-all w-fit group"
-                >
-                  Schedule a Consultation{" "}
-                  <ArrowRight
-                    size={18}
-                    className="group-hover:translate-x-1 transition-transform"
-                  />
-                </button>
-              </div>
-              <div className="lg:w-1/2 relative min-h-[400px]">
-                <div className="absolute inset-4 rounded-xl overflow-hidden">
-                  <ImageWithFallback
-                    src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&q=80"
-                    alt="HQ"
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute bottom-6 left-6 right-6 bg-white/95 backdrop-blur-md p-5 rounded-lg border border-white/50 shadow-lg">
-                    <div className="flex items-center gap-4 text-left">
-                      <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white">
-                        <Clock size={20} />
-                      </div>
-                      <div>
-                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">
-                          Hours
-                        </p>
-                        <p className="text-gray-900 font-bold text-sm">
-                          Mon - Sat: 9AM - 7PM
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </section>

@@ -5,6 +5,7 @@ import AdminLayout from "../../components/admin/AdminLayout";
 
 const BlogsList = () => {
   const navigate = useNavigate();
+
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -28,10 +29,12 @@ const BlogsList = () => {
 
     try {
       await axiosInstance.delete(`/api/blogs/${id}`);
-      setBlogs(blogs.filter((blog) => blog.id !== id));
+
+      setBlogs((prevBlogs) =>
+        prevBlogs.filter((blog) => blog.id !== id)
+      );
     } catch (error) {
       console.error("Delete failed", error);
-      alert("Failed to delete blog");
     }
   };
 
@@ -88,37 +91,56 @@ const BlogsList = () => {
                     className="border-t hover:bg-gray-50"
                   >
 
-                    <td className="p-4">
+                    {/* Title */}
+                    <td className="p-4 font-medium">
                       {blog.title}
                     </td>
 
+                    {/* Author */}
                     <td className="p-4">
                       {blog.author}
                     </td>
 
+                    {/* Date */}
                     <td className="p-4">
                       {new Date(blog.created_at).toLocaleDateString()}
                     </td>
 
-                    <td className="p-4 text-center flex justify-center gap-3">
+                    {/* Actions */}
+                    <td className="p-4 text-center">
+                      <div className="flex justify-center gap-3">
 
-                      <button
-                        onClick={() =>
-                          navigate(`/admin/blogs/edit/${blog.id}`)
-                        }
-                        className="px-3 py-1 bg-green-500 text-white rounded"
-                      >
-                        Edit
-                      </button>
+                        {/* View */}
+                        <button
+                          onClick={() =>
+                            navigate(`/admin/blogs/view/${blog.slug}`)
+                          }
+                          className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+                        >
+                          View
+                        </button>
 
-                      <button
-                        onClick={() => handleDelete(blog.id)}
-                        className="px-3 py-1 bg-red-500 text-white rounded"
-                      >
-                        Delete
-                      </button>
+                        {/* Edit */}
+                        <button
+                          onClick={() =>
+                            navigate(`/admin/blogs/edit/${blog.id}`)
+                          }
+                          className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600"
+                        >
+                          Edit
+                        </button>
 
+                        {/* Delete */}
+                        <button
+                          onClick={() => handleDelete(blog.id)}
+                          className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                        >
+                          Delete
+                        </button>
+
+                      </div>
                     </td>
+
                   </tr>
                 ))
               )}

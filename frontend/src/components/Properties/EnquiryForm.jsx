@@ -22,7 +22,8 @@ function EnquiryForm({ projectId, onSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
+console.log(formData,
+        projectId,)
     try {
       const res = await axiosInstance.post("/api/customers/create", {
         ...formData,

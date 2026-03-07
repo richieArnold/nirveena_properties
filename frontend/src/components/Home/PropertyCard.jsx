@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { Building, MapPin, Home, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 const PropertyCard = ({ property, className = "" }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
+
+  const navigate = useNavigate();
 
   // Get configuration types
   const getConfigTypes = () => {
@@ -110,14 +113,15 @@ const PropertyCard = ({ property, className = "" }) => {
               </div>
               
               {/* View Details Button */}
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="flex items-center gap-1 bg-white text-gray-900 px-4 py-2.5 rounded-lg font-semibold text-sm hover:bg-gray-100 transition-colors duration-200 shadow-lg"
-              >
-                View Details
-                <ChevronRight className="w-4 h-4" />
-              </motion.button>
+<motion.button
+  whileHover={{ scale: 1.05 }}
+  whileTap={{ scale: 0.95 }}
+  onClick={() => navigate(`/properties/${property.slug}`)}
+  className="flex items-center gap-1 bg-white text-gray-900 px-4 py-2.5 rounded-lg font-semibold text-sm hover:bg-gray-100 transition-colors duration-200 shadow-lg"
+>
+  View Details
+  <ChevronRight className="w-4 h-4" />
+</motion.button>
             </div>
           </div>
         </div>

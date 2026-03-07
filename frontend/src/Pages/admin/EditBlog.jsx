@@ -29,7 +29,6 @@ const EditBlog = () => {
       }
     } catch (error) {
       console.error("Failed to fetch blog", error);
-      alert("Failed to load blog");
     } finally {
       setLoading(false);
     }
@@ -67,13 +66,11 @@ const handleSubmit = async (e) => {
 
     await axiosInstance.put(`/api/blogs/${id}`, payload);
 
-    alert("Blog updated successfully!");
 
     navigate("/admin/blogs");
 
   } catch (error) {
     console.error("Update failed", error);
-    alert("Failed to update blog");
   } finally {
     setSaving(false);
   }

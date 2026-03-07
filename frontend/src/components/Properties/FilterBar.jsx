@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 function FilterBar() {
 
@@ -11,13 +11,8 @@ function FilterBar() {
 
         const projectTypes = [
     "all",
-    ...new Set(properties.map((p) => p.project_type?.toLowerCase())),
   ];
 
-  const projectStatuses = [
-    "all",
-    ...new Set(properties.map((p) => p.project_status?.toLowerCase())),
-  ];
   return (
     <>
             {/* 🔎 FILTER BAR */}

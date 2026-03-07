@@ -45,6 +45,7 @@ const ProjectsList = () => {
       setTotalCount(response.data.pagination.totalCount);
     } catch (error) {
       setMessage({ type: "error", text: "Failed to load projects" });
+      console.log(error)
     } finally {
       setLoading(false);
     }

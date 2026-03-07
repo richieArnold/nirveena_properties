@@ -11,8 +11,9 @@ function PropertiesFilterBar({
 }) {
   return (
     <div className="bg-white border-b border-gray-200 shadow-sm">
-      <div className="w-full px-6 py-5 flex items-center gap-6">
-        <div className="relative w-80">
+      <div className="w-full px-4 sm:px-6 py-5 flex flex-col lg:flex-row lg:items-center gap-4">
+        <div className="relative w-full lg:w-80">
+          {" "}
           <input
             type="text"
             placeholder="Search project..."
@@ -22,7 +23,7 @@ function PropertiesFilterBar({
           />
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex gap-3 overflow-x-auto pb-2">
           {projectTypes.map((type) => {
             const isActive = selectedType === type;
 
@@ -45,18 +46,20 @@ function PropertiesFilterBar({
           })}
         </div>
 
-        <div className="flex-1" />
+        <div className="hidden lg:block flex-1" />
 
-        <select
-          value={selectedStatus}
-          onChange={(e) => setSelectedStatus(e.target.value)}
-          className="px-4 py-3 rounded-xl border border-gray-200 bg-gray-100 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="all">All Status</option>
-          <option value="rtm">RTM</option>
-          <option value="uc">UC</option>
-          <option value="eoi">EOI</option>
-        </select>
+        <div className="w-full lg:w-auto">
+          <select
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e.target.value)}
+            className="px-4 py-3 rounded-xl border border-gray-200 bg-gray-100 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="all">All Status</option>
+            <option value="rtm">RTM</option>
+            <option value="uc">UC</option>
+            <option value="eoi">EOI</option>
+          </select>
+        </div>
       </div>
     </div>
   );

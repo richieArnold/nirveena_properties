@@ -72,12 +72,6 @@ const AdminDashboard = () => {
     }
   };
 
-  const stats = {
-    total: projects.length,
-    rtm: projects.filter((p) => p.project_status === "RTM").length,
-    uc: projects.filter((p) => p.project_status === "UC").length,
-    totalCustomers: 0, 
-  };
 
   if (loading) {
     return (
