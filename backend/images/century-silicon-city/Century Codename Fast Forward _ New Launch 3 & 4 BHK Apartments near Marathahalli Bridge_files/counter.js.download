@@ -1,0 +1,95 @@
+// Counter Animation Script
+class CounterAnimator {
+    constructor() {
+        this.counters = document.querySelectorAll('.stat-number');
+        this.isAnimated = false;
+        this.init();
+    }
+
+    init() {
+        // Only animate when scrolling into view
+        this.setupScrollTrigger();
+    }
+
+    animateCounters() {
+        if (this.isAnimated) return;
+        this.isAnimated = true;
+
+        this.counters.forEach((counter) => {
+            const target = parseInt(counter.getAttribute('data-target'));
+            const duration = 2000; // 2 seconds
+            const increment = target / (duration / 16); // 60fps
+            let current = 0;
+
+            const updateCounter = () => {
+                current += increment;
+                
+                if (current < target) {
+                    counter.textContent = this.formatNumber(Math.floor(current)) + '+';
+                    requestAnimationFrame(updateCounter);
+                } else {
+                    counter.textContent = this.formatNumber(target) + '+';
+                }
+            };
+
+            updateCounter();
+        });
+    }
+
+    formatNumber(num) {
+        // Add commas to numbers >= 1000
+        if (num >= 1000) {
+            return num.toLocaleString();
+        }
+        return num;
+    }
+
+    setupScrollTrigger() {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !this.isAnimated) {
+                    this.animateCounters();
+                }
+            });
+        }, {
+            threshold: 0.5
+        });
+
+        // Observe the stats container
+        const statsContainer = document.querySelector('.stats-container');
+        if (statsContainer) {
+            observer.observe(statsContainer);
+        }
+    }
+
+    // Method to reset and replay animation
+    resetAndReplay() {
+        this.isAnimated = false;
+        this.counters.forEach(counter => {
+            counter.textContent = '0+';
+        });
+        setTimeout(() => {
+            this.animateCounters();
+        }, 100);
+    }
+}
+
+// Initialize the counter animator when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    const counterAnimator = new CounterAnimator();
+    
+    // Optional: Add a replay button for demonstration
+    // Uncomment the following lines if you want a replay button
+    /*
+    const replayBtn = document.createElement('button');
+    replayBtn.textContent = 'Replay Animation';
+    replayBtn.className = 'btn btn-primary mt-4';
+    replayBtn.onclick = () => counterAnimator.resetAndReplay();
+    document.querySelector('.stats-container').appendChild(replayBtn);
+    */
+});
+
+// Export for potential module usage
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = CounterAnimator;
+}

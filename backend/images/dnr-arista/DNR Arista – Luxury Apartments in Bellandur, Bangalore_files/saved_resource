@@ -1,0 +1,160 @@
+ 
+
+
+
+
+
+
+
+var asyncLoadFlag = "1";
+
+var protocalType  = (window.location.protocol.indexOf("https") != -1 ? 'https' : 'http') 
+
+var timeHour1 = parseInt("10");
+timeHour1 = timeHour1+1;
+
+function livsrvgetCookie(cookiename)
+{
+	var cookiestring=""+document.cookie;
+	var index1=cookiestring.indexOf(cookiename);
+	if (index1==-1 || cookiename=="") return "";
+	var index2=cookiestring.indexOf(';',index1);
+	if (index2==-1) index2=cookiestring.length;
+	return unescape(cookiestring.substring(index1+cookiename.length+1,index2));
+}
+
+//---------------retriv the queryString parameter----------
+function getParameter( parameterName ) {
+	var queryString = "";
+	try
+	{
+	   queryString = window.top.location.search.substring(1);
+	}catch(e){}
+ 
+  var parameters = new Array();
+  parameters = queryString.split('&');
+  for(var i = 0; i < parameters.length; i++) {
+    if (parameters[i].indexOf(parameterName)>=0) {
+      var parameterValue = new Array();
+      parameterValue = parameters[i].split('=');
+      return parameterValue[1];
+    }
+  }
+  return 0;
+}
+
+var lschatWinLoadStatus = getParameter("ls_cs");
+var ls_chatsess_s = escape(livsrvgetCookie("ls_chatsess6171"));
+var ls_chatbox_s  = escape(livsrvgetCookie("ls_chatbox6171"));
+var ls_brodet_s	  = escape(livsrvgetCookie("ls_brodet6171"));
+
+var tls_tempcs_id = livsrvgetCookie("ls_tempcs_id6171");
+var tls_serverip = livsrvgetCookie("ls_serverip6171");
+var pInitSess = livsrvgetCookie("ls_initsess6171");
+
+if (tls_tempcs_id == "")
+{
+	tls_tempcs_id =  "NA";
+	tls_serverip = "NA";
+}
+if(pInitSess == "")
+{
+	pInitSess = "NA";
+}
+
+var ls_nexturl = "";
+var did = "6171";
+
+
+var pageUrl = "NA";
+
+try{
+pageUrl = escape(window.top.location.href);
+}
+catch(e){}
+
+
+var testpageUrl = "";
+try
+{
+    testpageUrl = window.location.search.substring(1);
+}
+catch(e)
+{}
+
+
+
+if(pageUrl.indexOf("livserv_cs_id")>=0 || testpageUrl.indexOf("test_cs_id") != -1)
+{
+	ls_chatsess_s = "";
+}
+
+var livpropSessionId = "";
+
+try{
+  livpropSessionId = document.getElementById("UserSessionID").value;
+}
+catch(e){
+}
+
+var ls_chat_url = "";
+
+if(pageUrl.indexOf("brigadegroup.com/residential/helpful-tools/electronic-fund-transfer")== -1){
+    if (ls_chatsess_s == "")
+    {
+    	ls_nexturl = '<script src="' + protocalType + '://sub2.livserv.in/livserv/livservtemp3/index.jsp?did=6171&pid=1&gtm=null' + '&count=' + new Date().getTime() + '"></script>';
+    	ls_chat_url = protocalType + '://sub2.livserv.in/livserv/livservtemp3/index.jsp?did=6171&pid=1&gtm=null' + '&count=' + new Date().getTime();
+    }
+    else
+    {
+    	ls_nexturl = '<script src="' + protocalType + '://sub2.livserv.in/livserv/livservtemp3/GetLivservWindow.jsp?did=6171&pid=1&exParam=null&browserUrl=' +  pageUrl + '&ls_chatsess=' + ls_chatsess_s + '&ls_chatbox=' + ls_chatbox_s + '&ls_brodet=' + ls_brodet_s + '&pCsid=' + tls_tempcs_id + '&pSrvid=' + tls_serverip + '&pInitSess=' + pInitSess + '&livpropSessionId=' + livpropSessionId +  '&count=' + new Date().getTime() + '" ></script>';
+
+    	ls_chat_url = protocalType + '://sub2.livserv.in/livserv/livservtemp3/GetLivservWindow.jsp?did=6171&pid=1&exParam=null&browserUrl=' +  pageUrl + '&ls_chatsess=' + ls_chatsess_s + '&ls_chatbox=' + ls_chatbox_s + '&ls_brodet=' + ls_brodet_s + '&pCsid=' + tls_tempcs_id + '&pSrvid=' + tls_serverip + '&pInitSess=' + pInitSess + '&livpropSessionId=' + livpropSessionId +  '&count=' + new Date().getTime();
+    }
+}
+
+var gptstatus = 1;
+
+
+if(pageUrl.indexOf("dnrgroup.in/highline-officia")== -1 && pageUrl.indexOf("dnrgroup.in/spring-leaf-official") == -1)
+	{
+		hideCwc();//DNR GROUP
+        var ls_chat_urlgpt = "https://backend.livhousing.com/bot/create-script-tag?token=f27369ec-965d-4678-9bf6-7e8b9dea5da2";
+        loadLsChatGpt(ls_chat_urlgpt)
+	}else{}
+
+
+function loadLsChat(){
+
+	(function(){
+		var s = document.createElement('script');
+		s.type = "text/javascript";
+		s.async = true;
+		s.src = ls_chat_url;
+		document.body.appendChild(s);
+	})();
+}
+
+function loadLsChatGpt(ls_chat_url){
+
+	if(gptstatus == 1){
+		(function(){
+			var s = document.createElement('script');
+			s.type = "text/javascript";
+			s.async = true;
+			s.src = ls_chat_url;
+			document.body.appendChild(s);
+		})();
+	}else{
+		loadLsChat();
+	}
+}
+
+function hideCwc(){
+    var hidecwc = "<style>#livprop_chatbox{display:none} #livprop_popup{display:none !important} .chatWithUsMessageWrapper{display:none !important} .chat_slide, .chat_title{display:none !important}</style>";
+    document.body.insertAdjacentHTML("beforeEnd", hidecwc);
+}
+function dacChatButtonHeight(){
+    var buttonheight = "<style>@media only screen and (max-width: 768px) {#liv-prop-chat-root {bottom: 75px !important;}}</style>";
+    document.body.insertAdjacentHTML("beforeEnd", buttonheight);
+}

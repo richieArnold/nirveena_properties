@@ -1,0 +1,180 @@
+(function() {
+	// --------------------------------------------------------
+	// 1. CONFIGURATION
+	// Modify these values to customize the badge.
+	// --------------------------------------------------------
+	const config = {
+		// Desktop Settings
+		badgeSizeDesktop: '100px',
+		leftOffsetDesktop: '0px',
+		bottomOffsetDesktop: '0px',
+		
+		// Mobile Settings (Applies to screens under 600px wide)
+		badgeSizeMobile: '90px',
+		leftOffsetMobile: '0px',
+		bottomOffsetMobile: '60px',
+
+		// Scroll Behavior
+		scrollThresholdPixels: 800, // Distance in pixels scrolled before hiding
+		imageSrc: 'https://lpimages.b-cdn.net/pride-award.png', // The source URL for the badge image
+		imageAlt: 'Luxury Project Of The Year 2025 Award Badge'
+	};
+
+	let isManuallyClosed = false;
+	let badgeContainer;
+
+	// --------------------------------------------------------
+	// 2. INJECT CSS STYLES (Includes Mobile Responsiveness)
+	// --------------------------------------------------------
+	function createStyles() {
+		const style = document.createElement('style');
+		style.type = 'text/css';
+		const styles = `
+/* BASE STYLES (DESKTOP) */
+#award-badge-container {
+	position: fixed;
+	z-index: 1000;
+	transition: opacity 0.3s ease-in-out;
+	opacity: 1; 
+	pointer-events: auto;
+
+	/* Desktop Configuration */
+	width: ${config.badgeSizeDesktop};
+	height: ${config.badgeSizeDesktop};
+	bottom: ${config.bottomOffsetDesktop};
+	left: ${config.leftOffsetDesktop};
+}
+
+/* MOBILE RESPONSIVENESS (Screens less than 600px wide) */
+@media (max-width: 600px) {
+	#award-badge-container {
+		width: ${config.badgeSizeMobile};
+		height: ${config.badgeSizeMobile};
+		bottom: ${config.bottomOffsetMobile};
+		left: ${config.leftOffsetMobile};
+	}
+}
+
+#award-badge {
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+
+/* Close Button Styling */
+#award-close-button {
+	position: absolute;
+	top: 5px;
+	right: 5px;
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	background-color: #000;
+	color: #fff;
+	font-size: 20px;
+	font-weight: bold;
+	line-height: 22px;
+	text-align: center;
+	cursor: pointer;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+	border: 1px solid #fff;
+}
+
+/* State for hidden badge (used by JS scroll listener) */
+.hidden {
+	opacity: 0 !important;
+	pointer-events: none !important;
+}
+		`;
+		style.appendChild(document.createTextNode(styles));
+		document.head.appendChild(style);
+	}
+
+
+	// --------------------------------------------------------
+	// 3. CREATE HTML STRUCTURE
+	// --------------------------------------------------------
+	function createBadgeElements() {
+		// Main Container DIV
+		badgeContainer = document.createElement('div');
+		badgeContainer.id = 'award-badge-container';
+
+		// Badge Image
+		const badgeImage = document.createElement('img');
+		badgeImage.id = 'award-badge';
+		badgeImage.src = config.imageSrc;
+		badgeImage.alt = config.imageAlt;
+
+		// Close Button
+		const closeButton = document.createElement('div');
+		closeButton.id = 'award-close-button';
+		closeButton.innerHTML = '&times;'; 
+		
+		badgeContainer.appendChild(badgeImage);
+		badgeContainer.appendChild(closeButton);
+		document.body.appendChild(badgeContainer);
+
+		return closeButton; 
+	}
+
+
+	// --------------------------------------------------------
+	// 4. SETUP LOGIC (Scroll and Close handlers)
+	// Uses the highly efficient window.scrollY check.
+	// --------------------------------------------------------
+	function setupLogic(closeButton) {
+		
+		const checkScroll = () => {
+			// Optimization: Remove listener if manually closed to save resources
+			if (isManuallyClosed) {
+				window.removeEventListener('scroll', checkScroll);
+				return;
+			}
+
+			const scrolled = window.scrollY;
+
+			if (scrolled > config.scrollThresholdPixels) {
+				// Smoothly hide
+				badgeContainer.classList.add('hidden');
+			} else {
+				// Smoothly show
+				badgeContainer.classList.remove('hidden');
+			}
+		};
+
+		// Manual close handler: Hide permanently for the current session
+		closeButton.addEventListener('click', () => {
+			badgeContainer.classList.add('hidden');
+			isManuallyClosed = true;
+			window.removeEventListener('scroll', checkScroll);
+		});
+
+		// Attach scroll listener
+		window.addEventListener('scroll', checkScroll);
+
+		// Crucial: Run once immediately to set the correct initial state
+		checkScroll();
+	}
+
+
+	// 5. INITIALIZATION
+	// Ensures the script waits for the necessary page elements to load.
+	function initializeBadge() {
+		if (document.readyState === 'loading') {
+			document.addEventListener('DOMContentLoaded', () => {
+				createStyles();
+				const closeButton = createBadgeElements();
+				setupLogic(closeButton);
+			});
+		} else {
+			// Execute immediately if the DOM is already ready
+			createStyles();
+			const closeButton = createBadgeElements();
+			setupLogic(closeButton);
+		}
+	}
+
+	// Start the widget
+	initializeBadge();
+
+})();

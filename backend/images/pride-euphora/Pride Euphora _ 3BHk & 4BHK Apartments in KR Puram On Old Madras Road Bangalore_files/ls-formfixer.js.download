@@ -1,0 +1,930 @@
+(function () {
+  "use strict";
+
+  // =========================
+  // Safe helpers
+  // =========================
+  function q(sel, root) { try { return (root || document).querySelector(sel); } catch (e) { return null; } }
+  function hasEl(el) { return !!(el && el.nodeType === 1); }
+  function attrLower(el, name) {
+    try { return String(el.getAttribute(name) || "").toLowerCase().trim(); } catch (e) { return ""; }
+  }
+  function setAttrSafe(el, name, val) {
+    try { el.setAttribute(name, val); } catch (e) {}
+    try { el[name] = val; } catch (e) {}
+  }
+  function onlyDigits(s) { return String(s || "").replace(/\D+/g, ""); }
+
+  // =========================
+  // Find fields (id-first, then safe fallback)
+  // =========================
+  function findPhoneInput() {
+    var el = document.getElementById("phonenumb");
+    if (hasEl(el)) return el;
+
+    // common phone-like
+    el = q('input[type="tel"][id*="phone" i],input[type="tel"][name*="phone" i],input[type="tel"][id*="mobile" i],input[type="tel"][name*="mobile" i]');
+    if (hasEl(el)) return el;
+
+    // SAFE fallback: only pick a tel input if it is inside an intl-tel wrapper
+    var tel = q('input[type="tel"]');
+    if (hasEl(tel)) {
+      try {
+        var wrap = (typeof tel.closest === "function") ? tel.closest(".intl-tel-input, .iti") : null;
+        if (wrap) return tel;
+      } catch (e) {}
+    }
+    return null;
+  }
+
+  function findNameInput() {
+    var el = document.getElementById("userName");
+    if (hasEl(el)) return el;
+    el = q('input[type="text"][autocomplete="name"],input[type="text"][name*="name" i],input[type="text"][id*="name" i]');
+    return hasEl(el) ? el : null;
+  }
+
+  function findEmailInput() {
+    var el = document.getElementById("userEmail");
+    if (hasEl(el)) return el;
+    el = q('input[type="email"],input[type="text"][name*="email" i],input[type="text"][id*="email" i]');
+    return hasEl(el) ? el : null;
+  }
+
+  // =========================
+  // Autocomplete (only if missing/empty/off)
+  // =========================
+  function ensureAutocomplete(el, val) {
+    if (!hasEl(el)) return;
+    var cur = attrLower(el, "autocomplete");
+    if (!cur || cur === "off") setAttrSafe(el, "autocomplete", val);
+  }
+
+  function ensureFormAutocompleteOn(input) {
+    try {
+      if (input && input.form) {
+        var fcur = attrLower(input.form, "autocomplete");
+        if (fcur === "off") input.form.setAttribute("autocomplete", "on");
+      }
+    } catch (e) {}
+  }
+
+  // =========================
+  // Dial detection (NO guesswork)
+  // Reads only from THIS input's wrapper flag title "...: +91"
+  // =========================
+  function findSelectedFlagForInput(input) {
+    try {
+      var wrap = (typeof input.closest === "function")
+        ? input.closest(".intl-tel-input, .iti")
+        : null;
+      if (!wrap) return null;
+      return wrap.querySelector(".selected-flag, .iti__selected-flag");
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function dialFromFlagTitle(flagEl) {
+    try {
+      if (!flagEl) return "";
+      var title = (flagEl.getAttribute && flagEl.getAttribute("title")) || "";
+      if (!title) return "";
+      var m = title.match(/:\s*\+?\s*([\d\s]+)\s*$/);
+      if (!m) return "";
+      var dial = onlyDigits(String(m[1] || "").replace(/\s+/g, ""));
+      return dial || "";
+    } catch (e) {
+      return "";
+    }
+  }
+
+  // =========================
+  // ISD helper injection (outside iti wrapper)
+  // - not display:none
+  // - stable marker, no duplicates
+  // =========================
+  function findExistingHelper(forId) {
+    try {
+      var all = document.querySelectorAll('input[data-sf-isd-helper="1"]');
+      for (var i = 0; i < all.length; i++) {
+        if (all[i] && all[i].getAttribute("data-for") === forId) return all[i];
+      }
+    } catch (e) {}
+    return null;
+  }
+
+  function ensureIsdHelper(input) {
+    if (!hasEl(input)) return null;
+
+    var inputId = input.id || "phonenumb";
+    var existing = findExistingHelper(inputId);
+    if (hasEl(existing)) return existing;
+
+    var helper = document.createElement("input");
+    helper.type = "tel";
+    helper.inputMode = "tel";
+    helper.tabIndex = -1;
+    helper.setAttribute("aria-hidden", "true");
+
+    helper.name = "sf_isd_" + Math.random().toString(36).slice(2, 9);
+    helper.id   = "sf_isd_" + Math.random().toString(36).slice(2, 9);
+    helper.setAttribute("autocomplete", "tel-country-code");
+
+    helper.setAttribute("data-sf-isd-helper", "1");
+    helper.setAttribute("data-for", inputId);
+
+    // off-screen but "present"
+    helper.style.position = "absolute";
+    helper.style.left = "-9999px";
+    helper.style.top = "0";
+    helper.style.width = "1px";
+    helper.style.height = "1px";
+    helper.style.opacity = "0.01";   // NOT 0
+    helper.style.pointerEvents = "none";
+
+    // insert OUTSIDE wrapper so iti never removes it
+    try {
+      var wrap = (typeof input.closest === "function") ? input.closest(".intl-tel-input, .iti") : null;
+      if (wrap && wrap.parentNode) wrap.parentNode.insertBefore(helper, wrap.nextSibling);
+      else if (input.parentNode) input.parentNode.insertBefore(helper, input.nextSibling);
+      else document.body.appendChild(helper);
+    } catch (e) {}
+
+    return helper;
+  }
+
+  function syncHelperWithFlag(input, helper) {
+    if (!hasEl(input) || !hasEl(helper)) return;
+    var flag = findSelectedFlagForInput(input);
+    var dial = dialFromFlagTitle(flag);
+    if (!dial) return; // no dial => do nothing
+    helper.value = "+" + dial;
+  }
+
+  // =========================
+  // Submit-only cleanup (NO guesswork)
+  // =========================
+  function stripDialIfExactMatch_submitOnly(input) {
+    if (!hasEl(input)) return;
+
+    var raw = String(input.value || "").trim();
+    if (!raw || raw.charAt(0) !== "+") return;
+
+    var flag = findSelectedFlagForInput(input);
+    var dial = dialFromFlagTitle(flag);
+    if (!dial) return;
+
+    var digits = onlyDigits(raw);
+    if (digits.indexOf(dial) !== 0) return;
+    if (digits.length <= dial.length) return;
+
+    var national = digits.slice(dial.length).replace(/^0+/, "");
+    if (!national) return;
+
+    input.value = national;
+  }
+
+  // =========================
+  // Init + wiring
+  // =========================
+  function init() {
+    var nameEl  = findNameInput();
+    var emailEl = findEmailInput();
+    var phoneEl = findPhoneInput();
+
+    if (!hasEl(nameEl) && !hasEl(emailEl) && !hasEl(phoneEl)) return;
+
+    ensureAutocomplete(nameEl, "name");
+    ensureAutocomplete(emailEl, "email");
+    ensureAutocomplete(phoneEl, "tel");
+    if (hasEl(phoneEl)) ensureFormAutocompleteOn(phoneEl);
+
+    if (!hasEl(phoneEl)) return;
+
+    // HARD GUARD: only run helper/strip logic if it's actually an intl-tel input
+    var wrap = null;
+    try { wrap = (typeof phoneEl.closest === "function") ? phoneEl.closest(".intl-tel-input, .iti") : null; } catch (e) {}
+    if (!wrap) return;
+
+    var helper = ensureIsdHelper(phoneEl);
+    syncHelperWithFlag(phoneEl, helper);
+
+    try {
+      phoneEl.addEventListener("countrychange", function () {
+        syncHelperWithFlag(phoneEl, helper);
+      }, true);
+    } catch (e) {}
+
+    function cleanup() {
+      syncHelperWithFlag(phoneEl, helper);
+      stripDialIfExactMatch_submitOnly(phoneEl);
+    }
+
+    try {
+      var form = phoneEl.form || (phoneEl.closest ? phoneEl.closest("form") : null);
+      if (form) form.addEventListener("submit", cleanup, true);
+
+      if (form) {
+        form.addEventListener("click", function (ev) {
+          var t = ev && ev.target;
+          if (!t) return;
+          var tag = (t.tagName || "").toUpperCase();
+          var type = String(t.type || "").toLowerCase();
+          if ((tag === "BUTTON" && type === "submit") || (tag === "INPUT" && type === "submit")) cleanup();
+        }, true);
+      }
+    } catch (e) {}
+
+    var btn = document.getElementById("myBtn");
+    if (hasEl(btn)) {
+      try { btn.addEventListener("click", cleanup, true); } catch (e) {}
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init, { once: true });
+  } else {
+    init();
+  }
+})();
+
+
+
+
+
+
+
+
+
+
+
+/* =========================================================
+   IFRAME FORM FIXER (your current working script - unchanged)
+   ========================================================= */
+(function () {
+  "use strict";
+
+  // =========================
+  // Safe helpers
+  // =========================
+  function q(sel, root) { try { return (root || document).querySelector(sel); } catch (e) { return null; } }
+  function hasEl(el) { return !!(el && el.nodeType === 1); }
+  function attrLower(el, name) {
+    try { return String(el.getAttribute(name) || "").toLowerCase().trim(); } catch (e) { return ""; }
+  }
+  function setAttrSafe(el, name, val) {
+    try { el.setAttribute(name, val); } catch (e) {}
+    try { el[name] = val; } catch (e) {}
+  }
+  function onlyDigits(s) { return String(s || "").replace(/\D+/g, ""); }
+
+  // =========================
+  // Find fields (id-first, then safe fallback)
+  // =========================
+  function findPhoneInput() {
+    var el = document.getElementById("phonenumb");
+    if (hasEl(el)) return el;
+
+    // common phone-like
+    el = q('input[type="tel"][id*="phone" i],input[type="tel"][name*="phone" i],input[type="tel"][id*="mobile" i],input[type="tel"][name*="mobile" i]');
+    if (hasEl(el)) return el;
+
+    // SAFE fallback: only pick a tel input if it is inside an intl-tel wrapper
+    var tel = q('input[type="tel"]');
+    if (hasEl(tel)) {
+      try {
+        var wrap = (typeof tel.closest === "function") ? tel.closest(".intl-tel-input, .iti") : null;
+        if (wrap) return tel;
+      } catch (e) {}
+    }
+    return null;
+  }
+
+  function findNameInput() {
+    var el = document.getElementById("userName");
+    if (hasEl(el)) return el;
+    el = q('input[type="text"][autocomplete="name"],input[type="text"][name*="name" i],input[type="text"][id*="name" i]');
+    return hasEl(el) ? el : null;
+  }
+
+  function findEmailInput() {
+    var el = document.getElementById("userEmail");
+    if (hasEl(el)) return el;
+    el = q('input[type="email"],input[type="text"][name*="email" i],input[type="text"][id*="email" i]');
+    return hasEl(el) ? el : null;
+  }
+
+  // =========================
+  // Autocomplete (only if missing/empty/off)
+  // =========================
+  function ensureAutocomplete(el, val) {
+    if (!hasEl(el)) return;
+    var cur = attrLower(el, "autocomplete");
+    if (!cur || cur === "off") setAttrSafe(el, "autocomplete", val);
+  }
+
+  function ensureFormAutocompleteOn(input) {
+    try {
+      if (input && input.form) {
+        var fcur = attrLower(input.form, "autocomplete");
+        if (fcur === "off") input.form.setAttribute("autocomplete", "on");
+      }
+    } catch (e) {}
+  }
+
+  // =========================
+  // Dial detection (NO guesswork)
+  // Reads only from THIS input's wrapper flag title "...: +91"
+  // =========================
+  function findSelectedFlagForInput(input) {
+    try {
+      var wrap = (typeof input.closest === "function")
+        ? input.closest(".intl-tel-input, .iti")
+        : null;
+      if (!wrap) return null;
+      return wrap.querySelector(".selected-flag, .iti__selected-flag");
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function dialFromFlagTitle(flagEl) {
+    try {
+      if (!flagEl) return "";
+      var title = (flagEl.getAttribute && flagEl.getAttribute("title")) || "";
+      if (!title) return "";
+      var m = title.match(/:\s*\+?\s*([\d\s]+)\s*$/);
+      if (!m) return "";
+      var dial = onlyDigits(String(m[1] || "").replace(/\s+/g, ""));
+      return dial || "";
+    } catch (e) {
+      return "";
+    }
+  }
+
+  // =========================
+  // ISD helper injection (outside iti wrapper)
+  // - not display:none
+  // - stable marker, no duplicates
+  // =========================
+  function findExistingHelper(forId) {
+    try {
+      var all = document.querySelectorAll('input[data-sf-isd-helper="1"]');
+      for (var i = 0; i < all.length; i++) {
+        if (all[i] && all[i].getAttribute("data-for") === forId) return all[i];
+      }
+    } catch (e) {}
+    return null;
+  }
+
+  function ensureIsdHelper(input) {
+    if (!hasEl(input)) return null;
+
+    var inputId = input.id || "phonenumb";
+    var existing = findExistingHelper(inputId);
+    if (hasEl(existing)) return existing;
+
+    var helper = document.createElement("input");
+    helper.type = "tel";
+    helper.inputMode = "tel";
+    helper.tabIndex = -1;
+    helper.setAttribute("aria-hidden", "true");
+
+    helper.name = "sf_isd_" + Math.random().toString(36).slice(2, 9);
+    helper.id   = "sf_isd_" + Math.random().toString(36).slice(2, 9);
+    helper.setAttribute("autocomplete", "tel-country-code");
+
+    helper.setAttribute("data-sf-isd-helper", "1");
+    helper.setAttribute("data-for", inputId);
+
+    // off-screen but "present"
+    helper.style.position = "absolute";
+    helper.style.left = "-9999px";
+    helper.style.top = "0";
+    helper.style.width = "1px";
+    helper.style.height = "1px";
+    helper.style.opacity = "0.01";   // NOT 0
+    helper.style.pointerEvents = "none";
+
+    // insert OUTSIDE wrapper so iti never removes it
+    try {
+      var wrap = (typeof input.closest === "function") ? input.closest(".intl-tel-input, .iti") : null;
+      if (wrap && wrap.parentNode) wrap.parentNode.insertBefore(helper, wrap.nextSibling);
+      else if (input.parentNode) input.parentNode.insertBefore(helper, input.nextSibling);
+      else document.body.appendChild(helper);
+    } catch (e) {}
+
+    return helper;
+  }
+
+  function syncHelperWithFlag(input, helper) {
+    if (!hasEl(input) || !hasEl(helper)) return;
+    var flag = findSelectedFlagForInput(input);
+    var dial = dialFromFlagTitle(flag);
+    if (!dial) return; // no dial => do nothing
+    helper.value = "+" + dial;
+  }
+
+  // =========================
+  // Submit-only cleanup (NO guesswork)
+  // =========================
+  function stripDialIfExactMatch_submitOnly(input) {
+    if (!hasEl(input)) return;
+
+    var raw = String(input.value || "").trim();
+    if (!raw || raw.charAt(0) !== "+") return;
+
+    var flag = findSelectedFlagForInput(input);
+    var dial = dialFromFlagTitle(flag);
+    if (!dial) return;
+
+    var digits = onlyDigits(raw);
+    if (digits.indexOf(dial) !== 0) return;
+    if (digits.length <= dial.length) return;
+
+    var national = digits.slice(dial.length).replace(/^0+/, "");
+    if (!national) return;
+
+    input.value = national;
+  }
+
+  // =========================
+  // Init + wiring
+  // =========================
+  function init() {
+    var nameEl  = findNameInput();
+    var emailEl = findEmailInput();
+    var phoneEl = findPhoneInput();
+
+    if (!hasEl(nameEl) && !hasEl(emailEl) && !hasEl(phoneEl)) return;
+
+    ensureAutocomplete(nameEl, "name");
+    ensureAutocomplete(emailEl, "email");
+    ensureAutocomplete(phoneEl, "tel");
+    if (hasEl(phoneEl)) ensureFormAutocompleteOn(phoneEl);
+
+    if (!hasEl(phoneEl)) return;
+
+    // HARD GUARD: only run helper/strip logic if it's actually an intl-tel input
+    var wrap = null;
+    try { wrap = (typeof phoneEl.closest === "function") ? phoneEl.closest(".intl-tel-input, .iti") : null; } catch (e) {}
+    if (!wrap) return;
+
+    var helper = ensureIsdHelper(phoneEl);
+    syncHelperWithFlag(phoneEl, helper);
+
+    try {
+      phoneEl.addEventListener("countrychange", function () {
+        syncHelperWithFlag(phoneEl, helper);
+      }, true);
+    } catch (e) {}
+
+    function cleanup() {
+      syncHelperWithFlag(phoneEl, helper);
+      stripDialIfExactMatch_submitOnly(phoneEl);
+    }
+
+    try {
+      var form = phoneEl.form || (phoneEl.closest ? phoneEl.closest("form") : null);
+      if (form) form.addEventListener("submit", cleanup, true);
+
+      if (form) {
+        form.addEventListener("click", function (ev) {
+          var t = ev && ev.target;
+          if (!t) return;
+          var tag = (t.tagName || "").toUpperCase();
+          var type = String(t.type || "").toLowerCase();
+          if ((tag === "BUTTON" && type === "submit") || (tag === "INPUT" && type === "submit")) cleanup();
+        }, true);
+      }
+    } catch (e) {}
+
+    var btn = document.getElementById("myBtn");
+    if (hasEl(btn)) {
+      try { btn.addEventListener("click", cleanup, true); } catch (e) {}
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init, { once: true });
+  } else {
+    init();
+  }
+})();
+
+
+/* =========================================================
+   SMART FORM ASSIST (MOBILE ONLY + DOMAIN ALLOWLIST)
+   - Button is injected INSIDE the SAME DIV as #myBtn
+   - Bottom-right, small chip, no layout shift
+   - Focuses the CORRECT empty field: Name -> Email -> Phone
+   - Only runs after intl-tel-input flag exists (so form is ready)
+   - Absolutely no value changes
+   ========================================================= */
+(function () {
+  "use strict";
+
+  /* =========================
+     DOMAIN CONTROL (EDIT THIS)
+     Safety default = OFF if list empty
+     ========================= */
+  var ALLOW_DOMAINS = [
+  "*.*",
+    "lp.grandus.in",
+	"antheiaenhance.com",
+	"antheiaaesthetics.com",
+	"souloftheseasons.nbrgroup.in",
+	"prideeuphora.net",
+	"lp.poetryofearth.in",
+	"atmos.elegantbuildersanddevelopers.com",
+	"elegantatmos.in",
+    // "example.com",
+    // "*.example.com",
+  ];
+
+  function hostAllowed() {
+    if (!ALLOW_DOMAINS || !ALLOW_DOMAINS.length) return false;
+    var host = "";
+    try { host = String(location.hostname || "").toLowerCase(); } catch (e) { return false; }
+    if (!host) return false;
+
+    for (var i = 0; i < ALLOW_DOMAINS.length; i++) {
+      var rule = String(ALLOW_DOMAINS[i] || "").toLowerCase().trim();
+      if (!rule) continue;
+
+      // exact
+      if (rule.indexOf("*.") !== 0) {
+        if (host === rule) return true;
+        continue;
+      }
+
+      // wildcard subdomains
+      var base = rule.slice(2);
+      if (!base) continue;
+      if (host !== base && host.endsWith("." + base)) return true;
+    }
+    return false;
+  }
+
+  //if (!hostAllowed()) return;
+
+  /* =========================
+     MOBILE ONLY
+     ========================= */
+  function isMobileLike() {
+    try {
+      if (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) return true;
+    } catch (e) {}
+    var ua = "";
+    try { ua = String(navigator.userAgent || ""); } catch (e) { ua = ""; }
+    return /Android|iPhone|iPad|iPod|Mobile/i.test(ua);
+  }
+  if (!isMobileLike()) return;
+
+  /* =========================
+     Safe helpers
+     ========================= */
+  function hasEl(el) { return !!(el && el.nodeType === 1); }
+
+  function usable(el) {
+    if (!hasEl(el)) return false;
+    try {
+      if (el.disabled) return false;
+      if (el.readOnly) return false;
+      if ((el.type || "").toLowerCase() === "hidden") return false;
+
+      var cs = window.getComputedStyle ? getComputedStyle(el) : null;
+      if (cs && (cs.display === "none" || cs.visibility === "hidden")) return false;
+
+      return true;
+    } catch (e) {
+      return true;
+    }
+  }
+
+  function empty(el) {
+    try { return !String(el.value || "").trim(); } catch (e) { return true; }
+  }
+
+  function focusNudge(el) {
+    if (!usable(el)) return false;
+
+    // Keep it gentle, no value changes
+    try { el.scrollIntoView({ block: "center", inline: "nearest" }); } catch (e) {}
+    try { el.focus(); } catch (e) { try { el.focus(); } catch (_) {} }
+
+    // iOS: selecting often triggers the keyboard autofill strip nicely
+    try {
+      var v = String(el.value || "");
+      if (typeof el.setSelectionRange === "function") el.setSelectionRange(v.length, v.length);
+    } catch (e) {}
+
+    // "Tap" simulation (safe)
+    try { el.click(); } catch (e) {}
+    return true;
+  }
+
+  function now() { return Date.now ? Date.now() : +new Date(); }
+
+  function markTouched(el) {
+    if (!usable(el)) return;
+    try { el.setAttribute("data-sf-touched", String(now())); } catch (e) {}
+  }
+
+  function lastTouched(el) {
+    try { return parseInt(el.getAttribute("data-sf-touched") || "0", 10) || 0; } catch (e) { return 0; }
+  }
+
+  /* =========================
+     Wait until intl-tel-input is actually ready
+     (flag exists => form is set up)
+     ========================= */
+  function itiReady(phone) {
+    try {
+      if (!hasEl(phone) || typeof phone.closest !== "function") return false;
+      var wrap = phone.closest(".intl-tel-input, .iti");
+      if (!wrap) return false;
+      var flag = wrap.querySelector(".selected-flag, .iti__selected-flag");
+      return !!flag;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function waitUntilReady(fn) {
+    var tries = 0;
+    var maxTries = 60;     // 60 * 100ms = 6s max
+    var delay = 100;
+
+    var t = setInterval(function () {
+      tries++;
+      try {
+        if (fn()) { clearInterval(t); }
+        else if (tries >= maxTries) { clearInterval(t); }
+      } catch (e) {
+        if (tries >= maxTries) clearInterval(t);
+      }
+    }, delay);
+  }
+
+  /* =========================
+     Main init
+     ========================= */
+  function initAssist() {
+    // Your known IDs (email may not exist on some)
+    var nameEl  = document.getElementById("userName");
+    var emailEl = document.getElementById("userEmail");
+    var phoneEl = document.getElementById("phonenumb");
+    var submitBtn = document.getElementById("myBtn");
+
+    // Hard requirements for assist button in your iframe forms:
+    // - needs submit button
+    // - needs at least one input
+    if (!hasEl(submitBtn)) return;
+    if (!hasEl(nameEl) && !hasEl(emailEl) && !hasEl(phoneEl)) return;
+
+    // Wait until iti flag exists if phone exists + is iti-based.
+    // If phone doesn't exist, we still allow assist (name/email only).
+    if (hasEl(phoneEl)) {
+      waitUntilReady(function () {
+        if (!itiReady(phoneEl)) return false;
+        return setup(nameEl, emailEl, phoneEl, submitBtn);
+      });
+    } else {
+      setup(nameEl, emailEl, null, submitBtn);
+    }
+  }
+
+  function setup(nameEl, emailEl, phoneEl, submitBtn) {
+    // Prevent duplicates
+    try {
+      if (document.querySelector('[data-sf-assist="1"]')) return true;
+    } catch (e) {}
+
+    // IMPORTANT: Put button in SAME DIV as submit button
+    var host = null;
+    try { host = submitBtn.parentNode; } catch (e) { host = null; }
+    if (!hasEl(host)) return true;
+
+    // Make the submit container a positioning context
+    try {
+      var pos = "";
+      try { pos = String(getComputedStyle(host).position || ""); } catch (e) { pos = ""; }
+      if (!pos || pos === "static") host.style.position = "relative";
+    } catch (e) {}
+
+    // Track last touched correctly (no var-closure bug)
+    var trackEvents = ["input", "change", "keyup", "paste", "blur"];
+    function bindTrack(el) {
+      if (!usable(el)) return;
+      for (var i = 0; i < trackEvents.length; i++) {
+        try {
+          el.addEventListener(trackEvents[i], function () { markTouched(this); }, true);
+        } catch (e) {}
+      }
+      if (!empty(el)) markTouched(el);
+    }
+    bindTrack(nameEl);
+    bindTrack(emailEl);
+    bindTrack(phoneEl);
+
+    function chooseTarget() {
+      // ✅ Strict “first empty” order YOU want: Name -> Email -> Phone
+      if (usable(nameEl)  && empty(nameEl))  return nameEl;
+      if (usable(emailEl) && empty(emailEl)) return emailEl;
+      if (usable(phoneEl) && empty(phoneEl)) return phoneEl;
+
+      // Otherwise most recently touched among existing fields
+      var best = null, bestTs = -1;
+      var cands = [nameEl, emailEl, phoneEl];
+      for (var i = 0; i < cands.length; i++) {
+        var el = cands[i];
+        if (!usable(el)) continue;
+        var ts = lastTouched(el);
+        if (ts > bestTs) { bestTs = ts; best = el; }
+      }
+
+      // Fallback preference if none touched
+      if (best) return best;
+      if (usable(nameEl)) return nameEl;
+      if (usable(emailEl)) return emailEl;
+      return usable(phoneEl) ? phoneEl : null;
+    }
+
+    // Create the small chip button
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = "Quick fill";
+    btn.setAttribute("data-sf-assist", "1");
+    btn.setAttribute("aria-label", "Quick fill");
+
+    // Style: bottom-right inside submit div, tiny, no overlap issues
+    // (you said right spacing = 0 on small devices)
+    btn.style.position = "absolute";
+    btn.style.right = "0px";
+    btn.style.bottom = "20px";
+    btn.style.transform = "translate(20%, 35%)"; // pushes it slightly outside button area, avoids covering
+    btn.style.zIndex = "9999";
+
+    btn.style.border = "1px solid rgba(0,0,0,.10)";
+    btn.style.background = "rgba(255,255,255,.98)";
+    btn.style.color = "#111";
+    btn.style.borderRadius = "999px";
+    btn.style.padding = "6px 6px";
+    btn.style.fontSize = "11px";
+    btn.style.lineHeight = "1";
+    btn.style.fontWeight = "600";
+    btn.style.boxShadow = "0 4px 12px rgba(0,0,0,.12)";
+    btn.style.webkitTapHighlightColor = "transparent";
+
+    // Don’t let it accidentally submit the form
+    btn.addEventListener("click", function (ev) {
+      try { ev.preventDefault(); ev.stopPropagation(); } catch (e) {}
+      var target = chooseTarget();
+      if (!target) return;
+      focusNudge(target);
+    }, true);
+
+    // Inject INSIDE the same container as submit button
+    try { host.appendChild(btn); } catch (e) {}
+
+    return true;
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initAssist, { once: true });
+  } else {
+    initAssist();
+  }
+})();
+
+
+
+
+
+
+/* =========================================================
+   LS Iframe OTP Form Spam Shield (SAFE + minimal, unbreakable)
+   - Runs ONLY on pages that look like your OTP iframe form:
+       #myBtn + #phonenumb + (#otpdone OR #otpdiv)
+   - Email check is OPTIONAL (works even if email/name fields don't exist)
+   - Blocks ONLY exact matches:
+       • email (case-insensitive exact)
+       • phone (last 10 digits exact)
+   - If matched: stops OTP flow + shows thank-you + clears entered values
+   ========================================================= */
+(function () {
+  "use strict";
+
+  /* CONFIG */
+  var BLOCK_EMAILS = ["pandupatil123@gmail.com","asmitakalal123@gmail.com","sunilparishwadkar@gmail.com","meghakalal123@gmail.com"];
+  var BLOCK_PHONE_LAST10 = ["9945009592","7338688377","9731974661","7019951271"];
+  var THANKS_MSG = "Thank you for filling the details. We will get in touch shortly.";
+
+  var BTN_ID = "myBtn";
+  var PHONE_ID = "phonenumb";
+  var EMAIL_ID = "userEmail"; // optional
+
+  function normEmail(v){ return String(v || "").trim().toLowerCase(); }
+  function last10(v){
+    var d = String(v || "").replace(/\D+/g, "");
+    return d.length > 10 ? d.slice(-10) : d;
+  }
+  function toSet(arr, norm){
+    var s = Object.create(null);
+    for (var i=0;i<arr.length;i++){
+      var v = norm(arr[i]);
+      if (v) s[v] = 1;
+    }
+    return s;
+  }
+
+  var EMAIL_SET = toSet(BLOCK_EMAILS, normEmail);
+  var PHONE_SET = toSet(BLOCK_PHONE_LAST10, last10);
+
+  function isOtpIframePage(){
+    var btn = document.getElementById(BTN_ID);
+    if (!btn) return false;
+
+    var phoneEl = document.getElementById(PHONE_ID);
+    if (!phoneEl) return false;
+
+    if (!document.getElementById("otpdone") && !document.getElementById("otpdiv")) return false;
+
+    return true;
+  }
+
+  function isBlocked(){
+    // phone is required on these forms (by gate), but still safe-guarded
+    var phoneEl = document.getElementById(PHONE_ID);
+    var p = last10(phoneEl && phoneEl.value);
+    if (p && PHONE_SET[p]) return true;
+
+    // email is optional: only check if present
+    var emailEl = document.getElementById(EMAIL_ID);
+    if (emailEl) {
+      var e = normEmail(emailEl.value);
+      if (e && EMAIL_SET[e]) return true;
+    }
+    return false;
+  }
+
+  function clearIfExists(id, value){
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.value = (value !== undefined ? value : "");
+  }
+
+  function clearSpamInputs(){
+    clearIfExists("userName", "");
+    clearIfExists("userEmail", "");
+    clearIfExists("phonenumb", "");
+    clearIfExists("otpfield", "");
+    clearIfExists("otpdone", "false");
+
+    var otpdiv = document.getElementById("otpdiv");
+    if (otpdiv) otpdiv.style.display = "none";
+
+    var msg = document.getElementById("otp-messages");
+    if (msg) msg.textContent = "";
+
+    var v = document.getElementById("valid-msg");
+    if (v && v.classList) v.classList.add("hide");
+
+    var er = document.getElementById("error-msg");
+    if (er) { er.textContent = ""; if (er.classList) er.classList.add("hide"); }
+  }
+
+  function init(){
+    if (!isOtpIframePage()) return;
+
+    var btn = document.getElementById(BTN_ID);
+    if (!btn || btn.__lsSpamShieldWired) return;
+    btn.__lsSpamShieldWired = true;
+
+    var shown = false;
+
+    // Capture-phase blocks BEFORE inline onclick="sendOTP();"
+    btn.addEventListener("click", function(ev){
+      if (!isBlocked()) return;
+
+      ev.preventDefault();
+      ev.stopPropagation();
+      if (ev.stopImmediatePropagation) ev.stopImmediatePropagation();
+
+      if (!shown){
+        shown = true;
+        alert(THANKS_MSG);
+        clearSpamInputs();
+      }
+      return false;
+    }, true);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+})();
