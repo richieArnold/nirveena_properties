@@ -190,7 +190,7 @@ const Hero = () => {
               className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 md:gap-8 pt-2 sm:pt-4"
             >
               <div className="text-center">
-                <div className="text-xl sm:text-2xl md:text-3xl font-bold text-white">120k+</div>
+                <div className="text-xl sm:text-2xl md:text-3xl font-bold text-white">15k+</div>
                 <div className="text-[10px] sm:text-xs md:text-sm text-white/60 mt-0.5 sm:mt-1">Happy Clients</div>
               </div>
               <div className="w-px h-6 sm:h-8 bg-white/20" />

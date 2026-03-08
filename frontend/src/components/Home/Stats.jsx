@@ -1,7 +1,7 @@
 import { motion, useInView } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
 
-const StatsItem = ({ endValue, label, suffix = "", duration = 2 }) => {
+const StatsItem = ({ endValue, label = "", duration = 2 }) => {
   const [count, setCount] = useState(0);
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
@@ -12,45 +12,32 @@ const StatsItem = ({ endValue, label, suffix = "", duration = 2 }) => {
     let startTime;
     let animationFrame;
 
-    const animateCount = (timestamp) => {
-      if (!startTime) startTime = timestamp;
-      const elapsedTime = timestamp - startTime;
-      const progress = Math.min(elapsedTime / (duration * 1000), 1);
+const animateCount = (timestamp) => {
+  if (!startTime) startTime = timestamp;
+  const elapsedTime = timestamp - startTime;
+  const progress = Math.min(elapsedTime / (duration * 1000), 1);
 
-      // Handle different types of values
-      if (endValue.includes("/")) {
-        // For ratings like "4.9/5"
-        const [numerator, denominator] = endValue.split("/");
-        if (progress >= 1) {
-          setCount(parseFloat(numerator));
-        } else {
-          setCount(progress * parseFloat(numerator));
-        }
-      } else if (endValue.includes("%")) {
-        // For percentages like "99%"
-        const numericValue = parseFloat(endValue);
-        if (progress >= 1) {
-          setCount(numericValue);
-        } else {
-          setCount(progress * numericValue);
-        }
-      } else if (endValue.includes("+")) {
-        // For values like "500+"
-        const numericValue = parseInt(endValue);
-        if (progress >= 1) {
-          setCount(numericValue);
-        } else {
-          setCount(progress * numericValue);
-        }
-      } else if (endValue.includes("/")) {
-        // For time like "24/7"
-        setCount(endValue);
-      }
+  // Rating like "4.9/5"
+  if (endValue.includes("/") && endValue !== "24/7") {
+    const [numerator] = endValue.split("/");
+    const numericValue = parseFloat(numerator);
+    setCount(progress * numericValue);
+  }
+  // Percentage
+  else if (endValue.includes("%")) {
+    const numericValue = parseFloat(endValue);
+    setCount(progress * numericValue);
+  }
+  // Plus values
+  else if (endValue.includes("+")) {
+    const numericValue = parseInt(endValue);
+    setCount(progress * numericValue);
+  }
 
-      if (progress < 1) {
-        animationFrame = requestAnimationFrame(animateCount);
-      }
-    };
+  if (progress < 1) {
+    animationFrame = requestAnimationFrame(animateCount);
+  }
+};
 
     animationFrame = requestAnimationFrame(animateCount);
 
@@ -61,21 +48,26 @@ const StatsItem = ({ endValue, label, suffix = "", duration = 2 }) => {
     };
   }, [isInView, endValue, duration]);
 
-  const formatCount = () => {
-    if (endValue.includes("/") && !endValue.includes("+") && !endValue.includes("%")) {
-      // For ratings like "4.9/5"
-      const [_, denominator] = endValue.split("/");
-      return `${count.toFixed(1)}/${denominator}`;
-    } else if (endValue.includes("%")) {
-      // For percentages
-      return `${Math.round(count)}%`;
-    } else if (endValue.includes("+")) {
-      // For values like "500+"
-      return `${Math.round(count)}+`;
-    }
-    // For "24/7" or other non-numeric
-    return endValue;
-  };
+const formatCount = () => {
+  if (endValue === "24/7") {
+    return "24/7";
+  }
+
+  if (endValue.includes("/") && endValue !== "24/7") {
+    const [, denominator] = endValue.split("/");
+    return `${count.toFixed(1)}/${denominator}`;
+  }
+
+  if (endValue.includes("%")) {
+    return `${Math.round(count)}%`;
+  }
+
+  if (endValue.includes("+")) {
+    return `${Math.round(count)}+`;
+  }
+
+  return Math.round(count);
+};
 
   return (
     <motion.div

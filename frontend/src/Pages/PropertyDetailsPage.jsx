@@ -276,7 +276,7 @@ console.log(res)
           {/* CONTACT FORM */}
           <div className="lg:col-span-1">
             <div className="sticky top-24 bg-white p-6 rounded-2xl shadow-xl border">
-              <h4 className="text-xl font-bold mb-6">Schedule a Viewing</h4>
+              <h4 className="text-xl font-bold mb-6">Schedule A Sure Visit</h4>
 
               <EnquiryForm
                 projectId={project.id}

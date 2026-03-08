@@ -191,7 +191,7 @@ const Contact = () => {
                     {
                       icon: MapPin,
                       title: "Visit Office",
-                      detail: "Prestige Tech Park, Bangalore",
+                      detail: "#202, Share Spare, Borewell Road, Whitefield",
                       sub: "Karnataka, India",
                       color: "from-blue-500/20 to-purple-500/20"
                     }
@@ -231,7 +231,7 @@ const Contact = () => {
                 >
                   {[
                     { value: "24/7", label: "Support Available" },
-                    { value: "1 day", label: "Average Response" }
+                    { value: "1 Hour", label: "Average Response" }
                   ].map((stat, index) => (
                     <motion.div
                       key={index}
