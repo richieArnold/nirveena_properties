@@ -3,11 +3,11 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
 <url>
-<loc>https://www.nirveena.com/</loc>
+<loc>https://api.nirveena.com/sitemap.xml</loc>
 <priority>1.0</priority>
 </url>
 
-<url>
+<!-- <url>
 <loc>https://www.nirveena.com/property</loc>
 <priority>0.9</priority>
 </url>
@@ -25,6 +25,6 @@
 <url>
 <loc>https://www.nirveena.com/blogs</loc>
 <priority>0.6</priority>
-</url>
+</url> -->
 
 </urlset>
