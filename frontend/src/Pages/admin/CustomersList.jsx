@@ -11,13 +11,15 @@ import {
   Eye,
   RefreshCw,
   Clock,
-  ChevronRight
+  ChevronRight,
+  ArrowLeft,
+  User,
+  MessageCircle
 } from 'lucide-react';
 import AdminLayout from "../../components/admin/AdminLayout";
 import Pagination from "../../components/admin/Pagination";
 import AlertMessage from "../../components/admin/AlertMessage";
 import axiosInstance from "../../utils/Instance";
-
 
 const CustomersList = () => {
   const navigate = useNavigate();
@@ -82,19 +84,12 @@ const CustomersList = () => {
     navigate(`/admin/customers/${id}`);
   };
 
-  // FIXED: Format date to show IST correctly without double conversion
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
-    
-    // Create date object - the string from backend is already in IST
     const date = new Date(dateString);
-    
-    // Check if date is valid
     if (isNaN(date.getTime())) return 'Invalid Date';
-    
-    // Format in IST without timezone conversion
     return date.toLocaleString('en-IN', {
-      timeZone: 'Asia/Kolkata', // Explicitly set to IST
+      timeZone: 'Asia/Kolkata',
       day: '2-digit',
       month: 'short',
       year: 'numeric',
@@ -104,17 +99,12 @@ const CustomersList = () => {
     });
   };
 
-  // Alternative: If you want relative time (Today, Yesterday, etc.)
   const formatRelativeTime = (dateString) => {
     if (!dateString) return 'N/A';
-    
     const date = new Date(dateString);
     const now = new Date();
-    
-    // Convert both to IST for comparison
     const istDate = new Date(date.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
     const istNow = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' }));
-    
     const diffTime = Math.abs(istNow - istDate);
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     const diffHours = Math.ceil(diffTime / (1000 * 60 * 60));
@@ -126,25 +116,35 @@ const CustomersList = () => {
       }
       return `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
     }
-    
     if (diffDays === 1) return 'Yesterday';
     if (diffDays < 7) return `${diffDays} days ago`;
     if (diffDays < 30) return `${Math.floor(diffDays / 7)} week${Math.floor(diffDays / 7) !== 1 ? 's' : ''} ago`;
-    
     return formatDate(dateString);
   };
 
   return (
     <AdminLayout user={user}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center mb-6">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
+        {/* Back Button */}
+        <div className="mb-4">
+          <button
+            onClick={() => navigate('/admin')}
+            className="inline-flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Dashboard
+          </button>
+        </div>
+
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Customer Management</h1>
-            <p className="text-sm text-gray-500 mt-1">Total: {totalCount} customers</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Customer Management</h1>
+            <p className="text-xs sm:text-sm text-gray-500 mt-1">Total: {totalCount} customers</p>
           </div>
           <button
             onClick={fetchCustomers}
-            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition flex items-center gap-2"
+            className="w-full sm:w-auto px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition flex items-center justify-center gap-2 text-sm"
           >
             <RefreshCw className="w-4 h-4" />
             Refresh
@@ -163,90 +163,86 @@ const CustomersList = () => {
           </div>
         ) : (
           <>
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+            {/* Desktop Table View */}
+            <div className="hidden md:block bg-white rounded-xl shadow-lg overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contact</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Latest Enquiry</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Registered (IST)</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                      <th className="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
+                      <th className="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contact</th>
+                      <th className="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Latest Enquiry</th>
+                      <th className="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
+                      <th className="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Registered</th>
+                      <th className="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {customers.map((customer) => (
-                      <tr 
-                        key={customer.id} 
-                        className="hover:bg-gray-50 transition"
-                      >
-                        <td className="px-6 py-4">
+                      <tr key={customer.id} className="hover:bg-gray-50 transition">
+                        <td className="px-4 lg:px-6 py-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center text-white font-bold">
+                            <div className="w-8 h-8 lg:w-10 lg:h-10 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center text-white font-bold text-sm lg:text-base">
                               {customer.first_name[0]}{customer.last_name[0]}
                             </div>
                             <div>
                               <div className="text-sm font-medium text-gray-900">
                                 {customer.first_name} {customer.last_name}
                               </div>
-                              <div className="text-xs text-gray-500">
-                                ID: #{customer.id}
-                              </div>
+                              <div className="text-xs text-gray-500">ID: #{customer.id}</div>
                             </div>
                           </div>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-4 lg:px-6 py-4">
                           <div className="flex flex-col gap-1">
-                            <div className="flex items-center gap-2 text-sm text-gray-600">
-                              <Mail className="w-3 h-3" />
-                              <span className="truncate max-w-[150px]">{customer.email}</span>
+                            <div className="flex items-center gap-2 text-xs lg:text-sm text-gray-600">
+                              <Mail className="w-3 h-3 flex-shrink-0" />
+                              <span className="truncate max-w-[120px] lg:max-w-[150px]">{customer.email}</span>
                             </div>
                             {customer.contact && (
-                              <div className="flex items-center gap-2 text-sm text-gray-600">
-                                <Phone className="w-3 h-3" />
+                              <div className="flex items-center gap-2 text-xs lg:text-sm text-gray-600">
+                                <Phone className="w-3 h-3 flex-shrink-0" />
                                 <span>{customer.contact}</span>
                               </div>
                             )}
                           </div>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-4 lg:px-6 py-4">
                           {customer.latest_enquiry ? (
-                            <div className="flex flex-col">
-                              <div className="flex items-center gap-1 text-sm text-gray-900">
-                                <Home className="w-3 h-3 text-blue-600" />
-                                <span className="font-medium">
-                                  {customer.latest_enquiry.project_name || 'Unknown Project'}
+                            <div className="flex flex-col max-w-[200px]">
+                              <div className="flex items-center gap-1 text-xs lg:text-sm text-gray-900">
+                                <Home className="w-3 h-3 text-blue-600 flex-shrink-0" />
+                                <span className="font-medium truncate">
+                                  {customer.latest_enquiry.project_name || 'Unknown'}
                                 </span>
                               </div>
                               <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
-                                <Clock className="w-3 h-3" />
-                                <span title={formatDate(customer.latest_enquiry.enquired_at)}>
+                                <Clock className="w-3 h-3 flex-shrink-0" />
+                                <span className="truncate">
                                   {formatRelativeTime(customer.latest_enquiry.enquired_at)}
                                 </span>
                               </div>
                             </div>
                           ) : (
-                            <span className="text-sm text-gray-400">No enquiries</span>
+                            <span className="text-xs text-gray-400">No enquiries</span>
                           )}
                         </td>
-                        <td className="px-6 py-4">
-                          <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
+                        <td className="px-4 lg:px-6 py-4">
+                          <span className="px-2 lg:px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
                             {customer.total_enquiries || 0}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-500">
+                        <td className="px-4 lg:px-6 py-4 text-xs lg:text-sm text-gray-500">
                           <div className="flex flex-col">
-                            <span>{formatDate(customer.created_at)}</span>
+                            <span>{formatDate(customer.created_at).split(',')[0]}</span>
                             <span className="text-xs text-gray-400">IST</span>
                           </div>
                         </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-2">
+                        <td className="px-4 lg:px-6 py-4">
+                          <div className="flex items-center gap-1 lg:gap-2">
                             <button
                               onClick={() => handleViewCustomer(customer.id)}
-                              className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                              className="p-1.5 lg:p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"
                               title="View Details"
                             >
                               <Eye className="w-4 h-4" />
@@ -254,7 +250,7 @@ const CustomersList = () => {
                             <button
                               onClick={() => handleDelete(customer.id, `${customer.first_name} ${customer.last_name}`)}
                               disabled={deleteLoading === customer.id}
-                              className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition disabled:opacity-50"
+                              className="p-1.5 lg:p-2 text-red-600 hover:bg-red-50 rounded-lg transition disabled:opacity-50"
                               title="Delete Customer"
                             >
                               {deleteLoading === customer.id ? (
@@ -270,13 +266,108 @@ const CustomersList = () => {
                   </tbody>
                 </table>
               </div>
-
-              {customers.length === 0 && (
-                <div className="text-center py-16">
-                  <p className="text-gray-500">No customers found</p>
-                </div>
-              )}
             </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-4">
+              {customers.map((customer) => (
+                <div key={customer.id} className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+                  {/* Customer Header */}
+                  <div className="p-4 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center text-white font-bold text-lg">
+                          {customer.first_name[0]}{customer.last_name[0]}
+                        </div>
+                        <div>
+                          <h3 className="text-base font-semibold text-gray-900">
+                            {customer.first_name} {customer.last_name}
+                          </h3>
+                          <p className="text-xs text-gray-500">ID: #{customer.id}</p>
+                        </div>
+                      </div>
+                      <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+                        {customer.total_enquiries || 0} enquiries
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Customer Details */}
+                  <div className="p-4 space-y-3">
+                    {/* Contact Info */}
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2 text-sm">
+                        <Mail className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                        <span className="text-gray-600 truncate">{customer.email}</span>
+                      </div>
+                      {customer.contact && (
+                        <div className="flex items-center gap-2 text-sm">
+                          <Phone className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                          <span className="text-gray-600">{customer.contact}</span>
+                        </div>
+                      )}
+                      <div className="flex items-center gap-2 text-sm">
+                        <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                        <span className="text-gray-600">
+                          Registered: {formatDate(customer.created_at).split(',')[0]}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Latest Enquiry */}
+                    {customer.latest_enquiry ? (
+                      <div className="bg-blue-50 rounded-lg p-3">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Home className="w-4 h-4 text-blue-600" />
+                          <span className="text-sm font-medium text-gray-900">
+                            {customer.latest_enquiry.project_name || 'Unknown Project'}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 text-xs text-gray-600">
+                          <Clock className="w-3 h-3" />
+                          <span>{formatRelativeTime(customer.latest_enquiry.enquired_at)}</span>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="bg-gray-50 rounded-lg p-3 text-center">
+                        <MessageCircle className="w-5 h-5 text-gray-400 mx-auto mb-1" />
+                        <p className="text-xs text-gray-500">No enquiries yet</p>
+                      </div>
+                    )}
+
+                    {/* Action Buttons */}
+                    <div className="flex items-center gap-2 pt-2">
+                      <button
+                        onClick={() => handleViewCustomer(customer.id)}
+                        className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition text-sm"
+                      >
+                        <Eye className="w-4 h-4" />
+                        View
+                      </button>
+                      <button
+                        onClick={() => handleDelete(customer.id, `${customer.first_name} ${customer.last_name}`)}
+                        disabled={deleteLoading === customer.id}
+                        className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition text-sm disabled:opacity-50"
+                      >
+                        {deleteLoading === customer.id ? (
+                          <div className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                          <Trash2 className="w-4 h-4" />
+                        )}
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {customers.length === 0 && (
+              <div className="text-center py-16 bg-white rounded-xl shadow-lg">
+                <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-500">No customers found</p>
+              </div>
+            )}
 
             <Pagination
               currentPage={currentPage}

@@ -52,8 +52,12 @@ const Footer = () => {
           {" "}
           {/* Company Info */}
           <div className="lg:col-span-1">
-            <div className="mb-4">
-              <img src={logo} alt="Nirveena Realty" className="h-14 mb-4 w-auto" />
+            <div className="mb-4 ">
+              <img
+                src={logo}
+                alt="Nirveena Realty"
+                className="h-14 mb-4 w-auto rounded-full"
+              />
             </div>
             <p className="text-gray-400 text-sm mb-6 max-w-md">
               Nirveena Realty helps you discover premium homes and smart
