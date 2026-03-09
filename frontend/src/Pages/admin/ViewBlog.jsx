@@ -97,7 +97,7 @@ const ViewBlog = () => {
 
         {/* Blog Content */}
         <div
-          className="prose prose-lg max-w-none"
+          className="prose prose-lg max-w-none [&_a]:text-blue-600 [&_a]:underline [&_a]:font-medium"
           dangerouslySetInnerHTML={{ __html: blog.body }}
         />
 

@@ -242,7 +242,7 @@ const Hero = () => {
                 <Star size={10} className="sm:w-3 sm:h-3" /> 5 Star Rated
               </span>
               <span className="flex items-center gap-1">
-                <Users size={10} className="sm:w-3 sm:h-3" /> 120k+ Trusted
+                <Users size={10} className="sm:w-3 sm:h-3" /> 15k+ Trusted
               </span>
             </motion.div>
           </motion.div>

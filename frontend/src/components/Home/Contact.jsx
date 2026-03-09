@@ -1,17 +1,17 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Phone, 
-  Mail, 
-  MapPin, 
-  Clock, 
-  MessageSquare, 
+import {
+  Phone,
+  Mail,
+  MapPin,
+  Clock,
+  MessageSquare,
   Send,
   CheckCircle,
   User,
   Building,
   Home,
-  Map
+  Map,
 } from "lucide-react";
 
 const Contact = () => {
@@ -20,9 +20,9 @@ const Contact = () => {
     phone: "",
     email: "",
     message: "",
-    propertyType: ""
+    propertyType: "",
   });
-  
+
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeField, setActiveField] = useState(null);
@@ -30,14 +30,14 @@ const Contact = () => {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false);
@@ -47,9 +47,9 @@ const Contact = () => {
         phone: "",
         email: "",
         message: "",
-        propertyType: ""
+        propertyType: "",
       });
-      
+
       // Reset success message after 3 seconds
       setTimeout(() => {
         setIsSubmitted(false);
@@ -64,9 +64,9 @@ const Contact = () => {
       opacity: 1,
       transition: {
         staggerChildren: 0.1,
-        delayChildren: 0.2
-      }
-    }
+        delayChildren: 0.2,
+      },
+    },
   };
 
   const itemVariants = {
@@ -74,27 +74,27 @@ const Contact = () => {
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.5, ease: "easeOut" }
-    }
+      transition: { duration: 0.5, ease: "easeOut" },
+    },
   };
 
   const iconVariants = {
-    hover: { 
+    hover: {
       rotate: 5,
       scale: 1.1,
-      transition: { type: "spring", stiffness: 300 }
-    }
+      transition: { type: "spring", stiffness: 300 },
+    },
   };
 
   const inputVariants = {
-    focus: { 
+    focus: {
       scale: 1.02,
-      transition: { duration: 0.2 }
+      transition: { duration: 0.2 },
     },
-    blur: { 
+    blur: {
       scale: 1,
-      transition: { duration: 0.2 }
-    }
+      transition: { duration: 0.2 },
+    },
   };
 
   return (
@@ -123,7 +123,7 @@ const Contact = () => {
                 transition={{
                   duration: 8,
                   repeat: Infinity,
-                  ease: "easeInOut"
+                  ease: "easeInOut",
                 }}
               />
               <motion.div
@@ -135,15 +135,12 @@ const Contact = () => {
                 transition={{
                   duration: 10,
                   repeat: Infinity,
-                  ease: "easeInOut"
+                  ease: "easeInOut",
                 }}
               />
 
               <div className="relative z-10">
-                <motion.div
-                  variants={itemVariants}
-                  className="mb-10"
-                >
+                <motion.div variants={itemVariants} className="mb-10">
                   <motion.div
                     whileHover={{ scale: 1.05 }}
                     className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-md px-4 py-2.5 rounded-full mb-6 border border-white/20"
@@ -163,8 +160,8 @@ const Contact = () => {
                     variants={itemVariants}
                     className="text-gray-300 text-base md:text-lg leading-relaxed"
                   >
-                    Fill out the form and our experts will reach out to you within 
-                    24 hours to help you find the perfect home.
+                    Fill out the form, and our experts will reach out to you
+                    within 1 working hour to help you find the perfect home.
                   </motion.p>
                 </motion.div>
 
@@ -179,22 +176,22 @@ const Contact = () => {
                       title: "Call Us",
                       detail: "+91 98765 43210",
                       sub: "Mon-Sat, 9AM-7PM",
-                      color: "from-blue-500/20 to-purple-500/20"
+                      color: "from-blue-500/20 to-purple-500/20",
                     },
                     {
                       icon: Mail,
                       title: "Email Us",
                       detail: "info@nirveenaproperty.com",
-                      sub: "Response within 4 hours",
-                      color: "from-blue-500/20 to-purple-500/20"
+                      sub: "Response within 1 hours",
+                      color: "from-blue-500/20 to-purple-500/20",
                     },
                     {
                       icon: MapPin,
                       title: "Visit Office",
                       detail: "#202, Share Spare, Borewell Road, Whitefield",
                       sub: "Karnataka, India",
-                      color: "from-blue-500/20 to-purple-500/20"
-                    }
+                      color: "from-blue-500/20 to-purple-500/20",
+                    },
                   ].map((item, index) => (
                     <motion.div
                       key={index}
@@ -231,7 +228,7 @@ const Contact = () => {
                 >
                   {[
                     { value: "24/7", label: "Support Available" },
-                    { value: "1 Hour", label: "Average Response" }
+                    { value: "8 Hour", label: "Average Response" },
                   ].map((stat, index) => (
                     <motion.div
                       key={index}
@@ -250,10 +247,7 @@ const Contact = () => {
             </motion.div>
 
             {/* Right Side - Animated Form */}
-            <motion.div
-              variants={itemVariants}
-              className="p-8 md:p-12 lg:p-16"
-            >
+            <motion.div variants={itemVariants} className="p-8 md:p-12 lg:p-16">
               <AnimatePresence mode="wait">
                 {isSubmitted ? (
                   <motion.div
@@ -286,7 +280,7 @@ const Contact = () => {
                       transition={{ delay: 0.4 }}
                       className="text-gray-600 text-center max-w-md leading-relaxed"
                     >
-                      Our property expert will contact you shortly to discuss 
+                      Our property expert will contact you shortly to discuss
                       your requirements and schedule a viewing.
                     </motion.p>
                   </motion.div>
@@ -316,7 +310,7 @@ const Contact = () => {
                         Our team will contact you within 24 hours
                       </motion.p>
                     </div>
-                    
+
                     <form onSubmit={handleSubmit} className="space-y-6">
                       {/* Name & Phone Row */}
                       <motion.div
@@ -332,14 +326,14 @@ const Contact = () => {
                           </label>
                           <motion.div
                             variants={inputVariants}
-                            animate={activeField === 'name' ? 'focus' : 'blur'}
+                            animate={activeField === "name" ? "focus" : "blur"}
                           >
                             <input
                               type="text"
                               name="name"
                               value={formData.name}
                               onChange={handleChange}
-                              onFocus={() => setActiveField('name')}
+                              onFocus={() => setActiveField("name")}
                               onBlur={() => setActiveField(null)}
                               required
                               placeholder="John Doe"
@@ -347,7 +341,7 @@ const Contact = () => {
                             />
                           </motion.div>
                         </motion.div>
-                        
+
                         <motion.div variants={itemVariants}>
                           <label className="block text-sm font-semibold text-gray-700 mb-2 items-center gap-2">
                             <Phone size={14} />
@@ -355,14 +349,14 @@ const Contact = () => {
                           </label>
                           <motion.div
                             variants={inputVariants}
-                            animate={activeField === 'phone' ? 'focus' : 'blur'}
+                            animate={activeField === "phone" ? "focus" : "blur"}
                           >
                             <input
                               type="tel"
                               name="phone"
                               value={formData.phone}
                               onChange={handleChange}
-                              onFocus={() => setActiveField('phone')}
+                              onFocus={() => setActiveField("phone")}
                               onBlur={() => setActiveField(null)}
                               required
                               placeholder="+91 98765 43210"
@@ -384,14 +378,14 @@ const Contact = () => {
                         </label>
                         <motion.div
                           variants={inputVariants}
-                          animate={activeField === 'email' ? 'focus' : 'blur'}
+                          animate={activeField === "email" ? "focus" : "blur"}
                         >
                           <input
                             type="email"
                             name="email"
                             value={formData.email}
                             onChange={handleChange}
-                            onFocus={() => setActiveField('email')}
+                            onFocus={() => setActiveField("email")}
                             onBlur={() => setActiveField(null)}
                             required
                             placeholder="john@example.com"
@@ -412,13 +406,15 @@ const Contact = () => {
                         </label>
                         <motion.div
                           variants={inputVariants}
-                          animate={activeField === 'propertyType' ? 'focus' : 'blur'}
+                          animate={
+                            activeField === "propertyType" ? "focus" : "blur"
+                          }
                         >
                           <select
                             name="propertyType"
                             value={formData.propertyType}
                             onChange={handleChange}
-                            onFocus={() => setActiveField('propertyType')}
+                            onFocus={() => setActiveField("propertyType")}
                             onBlur={() => setActiveField(null)}
                             className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-3 focus:ring-blue-500/30 focus:border-blue-500 outline-none transition-all text-gray-900 shadow-sm hover:shadow appearance-none cursor-pointer"
                           >
@@ -443,13 +439,13 @@ const Contact = () => {
                         </label>
                         <motion.div
                           variants={inputVariants}
-                          animate={activeField === 'message' ? 'focus' : 'blur'}
+                          animate={activeField === "message" ? "focus" : "blur"}
                         >
                           <textarea
                             name="message"
                             value={formData.message}
                             onChange={handleChange}
-                            onFocus={() => setActiveField('message')}
+                            onFocus={() => setActiveField("message")}
                             onBlur={() => setActiveField(null)}
                             rows="4"
                             placeholder="Tell us about your property requirements, budget, preferred location, etc."
@@ -462,7 +458,10 @@ const Contact = () => {
                       <motion.button
                         type="submit"
                         disabled={isSubmitting}
-                        whileHover={{ scale: 1.02, boxShadow: "0 10px 25px -5px rgba(59, 130, 246, 0.5)" }}
+                        whileHover={{
+                          scale: 1.02,
+                          boxShadow: "0 10px 25px -5px rgba(59, 130, 246, 0.5)",
+                        }}
                         whileTap={{ scale: 0.98 }}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -478,12 +477,16 @@ const Contact = () => {
                           whileHover={{ x: "100%" }}
                           transition={{ duration: 0.6 }}
                         />
-                        
+
                         {isSubmitting ? (
                           <span className="relative flex items-center justify-center gap-3">
                             <motion.div
                               animate={{ rotate: 360 }}
-                              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                              transition={{
+                                duration: 1,
+                                repeat: Infinity,
+                                ease: "linear",
+                              }}
                               className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
                             />
                             Processing...
@@ -491,7 +494,10 @@ const Contact = () => {
                         ) : (
                           <span className="relative flex items-center justify-center gap-3">
                             Send Message
-                            <Send size={18} className="group-hover:translate-x-1 transition-transform" />
+                            <Send
+                              size={18}
+                              className="group-hover:translate-x-1 transition-transform"
+                            />
                           </span>
                         )}
                       </motion.button>
