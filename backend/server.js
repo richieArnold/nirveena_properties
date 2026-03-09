@@ -9,6 +9,7 @@ const leadRoutes = require("./routes/leadRoutes");
 const excelImportRoutes = require('./routes/excelImportRoutes');
 const path = require("path")
 const blogRoutes = require("./routes/blogRoutes");
+const sitemapRoute = require ("./routes/sitemap")
 
 app.set("trust proxy", true);
 
@@ -27,6 +28,7 @@ const s3 = new S3Client({
   },
 });
 
+app.use("/",sitemapRoute)
 
 app.get("/", (req, res) => {
   res.status(200).json({
@@ -55,6 +57,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/leads", leadRoutes);
 app.use('/api/excel-import', excelImportRoutes);
 app.use("/api/blogs", blogRoutes);
+
 
 app.listen(5000, () => {
   console.log("Server running on port 5000");
