@@ -6,7 +6,7 @@ router.get("/sitemap.xml", async (req, res) => {
   try {
 
     const result = await pool.query(
-      "SELECT slug FROM projects WHERE published = true"
+      "SELECT slug FROM projects"
     );
 
     const baseUrl = "https://www.nirveena.com";
