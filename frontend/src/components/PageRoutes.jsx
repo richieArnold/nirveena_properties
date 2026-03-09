@@ -26,7 +26,7 @@ import BlogsList from "../Pages/admin/BlogsList";
 import EditBlog from "../Pages/admin/EditBlog";
 import ViewBlog from "../Pages/admin/ViewBlog";
 
-
+import ScrollToTop from "../components/ScrollToTop";
 
 import CustomersList from "../Pages/admin/CustomersList";
 import CustomerDetails from "../Pages/admin/CustomerDetails";
@@ -46,6 +46,8 @@ const PageRoutes = () => {
   };
 
   return (
+    <>
+    <ScrollToTop/>
     <Routes>
       {/* Public Routes - with Layout */}
       <Route element={<Layout />}>
@@ -167,6 +169,7 @@ const PageRoutes = () => {
       <Route path="/blogs" element={<BlogsPage />} />
       <Route path="/blogs/:slug" element={<BlogDetails />} />
     </Routes>
+    </>
   );
 };
 

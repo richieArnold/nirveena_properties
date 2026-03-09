@@ -281,7 +281,7 @@ const ContactPage = () => {
                           value={formData.phone}
                           onChange={handleChange}
                           required
-                          placeholder="+91 98765 43210"
+                          placeholder="+91 90000 00009"
                           className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-gray-900"
                         />
                       </div>
@@ -289,15 +289,14 @@ const ContactPage = () => {
 
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Email Address *
+                        Email Address 
                       </label>
                       <input
                         type="email"
                         name="email"
                         value={formData.email}
                         onChange={handleChange}
-                        required
-                        placeholder="john@example.com"
+                        placeholder="rahul@example.com"
                         className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-gray-900"
                       />
                     </div>
@@ -332,13 +331,10 @@ const ContactPage = () => {
                           className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-gray-900"
                         >
                           <option value="">Select Budget</option>
-                          <option value="20-40 Lakhs">20-40 Lakhs</option>
-                          <option value="40-60 Lakhs">40-60 Lakhs</option>
-                          <option value="60-80 Lakhs">60-80 Lakhs</option>
-                          <option value="80 Lakhs - 1 Cr">
-                            80 Lakhs - 1 Cr
-                          </option>
-                          <option value="1 Cr+">1 Cr+</option>{" "}
+                          <option value="< 1 Cr"> 1 Cr</option>
+                          <option value="1 - 1.5 Cr">1 - 1.5 Cr</option>
+                          <option value="1.5 - 2 Cr">1.5 - 2 Cr</option>
+                          <option value="2 Cr+">2 Cr+</option>{" "}
                           {/* ← This sends "1 Cr+" to database */}
                         </select>
                       </div>
@@ -452,16 +448,8 @@ const ContactPage = () => {
                 </div>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center pb-3 border-b border-white/20">
-                    <span>Monday - Friday</span>
+                    <span>Monday - Sunday</span>
                     <span className="font-semibold">9:00 AM - 7:00 PM</span>
-                  </div>
-                  <div className="flex justify-between items-center pb-3 border-b border-white/20">
-                    <span>Saturday</span>
-                    <span className="font-semibold">9:00 AM - 5:00 PM</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span>Sunday & Holidays</span>
-                    <span className="font-semibold">Emergency Only</span>
                   </div>
                 </div>
                 <div className="mt-6 p-4 bg-white/10 rounded-xl">
@@ -541,7 +529,7 @@ const ContactPage = () => {
                     <Phone className="w-6 h-6 text-blue-600 mt-1 flex-shrink-0" />
                     <div>
                       <p className="font-medium text-gray-900 mb-1">Phone</p>
-                      <p className="text-gray-600">+91 80 1234 5678</p>
+                      <p className="text-gray-600">+91 9731658272</p>
                     </div>
                   </div>
 
@@ -550,7 +538,7 @@ const ContactPage = () => {
                     <div>
                       <p className="font-medium text-gray-900 mb-1">Email</p>
                       <p className="text-gray-600">
-                        office@nirveenaproperty.com
+                        info@nirveena.com
                       </p>
                     </div>
                   </div>

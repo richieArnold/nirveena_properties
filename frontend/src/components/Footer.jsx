@@ -52,12 +52,16 @@ const Footer = () => {
           {" "}
           {/* Company Info */}
           <div className="lg:col-span-1">
-            <div className="mb-4">
-              <img src={logo} alt="Nirveena Realty" className="h-10 w-auto" />
+            <div className="mb-4 ">
+              <img
+                src={logo}
+                alt="Nirveena Realty"
+                className="h-14 mb-4 w-auto rounded-full"
+              />
             </div>
-            <p className="text-gray-400 text-sm mb-6">
-              Premium real estate solutions for modern living and smart
-              investments in Bangalore's most sought-after locations.
+            <p className="text-gray-400 text-sm mb-6 max-w-md">
+              Nirveena Realty helps you discover premium homes and smart
+              property investments in Bangalore’s most sought-after locations.
             </p>
             <div className="flex space-x-3">
               {socialLinks.map((social, index) => (
@@ -76,7 +80,6 @@ const Footer = () => {
           </div>
           {/* Newsletter & Contact */}
           <div>
-
             <h4 className="text-md font-semibold mb-3 text-white">
               Contact Info
             </h4>
@@ -106,8 +109,7 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row justify-center items-center gap-4">
           <div className="text-center md:text-left">
             <p className="text-gray-500 text-sm">
-              © {new Date().getFullYear()} VEENA Real Estate. All rights
-              reserved.
+              © {new Date().getFullYear()} Nirveena Realty. All rights reserved.
             </p>
           </div>
 

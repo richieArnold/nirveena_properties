@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import axiosInstance from "../../utils/Instance";
 
-
 function EnquiryForm({ projectId, onSuccess }) {
   const [formData, setFormData] = useState({
     first_name: "",
@@ -22,27 +21,26 @@ function EnquiryForm({ projectId, onSuccess }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-console.log(formData,
-        projectId,)
+    console.log(formData, projectId);
+    
     try {
       const res = await axiosInstance.post("/api/customers/create", {
         ...formData,
         project_id: projectId,
       });
-      console.log(res)
+      console.log(res);
 
       if (res.data.success) {
         onSuccess(); // tell parent submission success
       }
-    }catch (err) {
-  console.error(err.response?.data || err);
-  alert(err.response?.data?.message || "Submission failed");
-}
+    } catch (err) {
+      console.error(err.response?.data || err);
+      alert(err.response?.data?.message || "Submission failed");
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-
+    <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <input
           type="text"
@@ -50,7 +48,7 @@ console.log(formData,
           placeholder="First Name"
           required
           onChange={handleChange}
-          className="border rounded-lg px-3 py-2 text-sm"
+          className="w-full px-3 py-2.5 text-sm bg-gray-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition"
         />
 
         <input
@@ -59,7 +57,7 @@ console.log(formData,
           placeholder="Last Name"
           required
           onChange={handleChange}
-          className="border rounded-lg px-3 py-2 text-sm"
+          className="w-full px-3 py-2.5 text-sm bg-gray-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition"
         />
       </div>
 
@@ -69,7 +67,7 @@ console.log(formData,
         placeholder="Contact Number"
         required
         onChange={handleChange}
-        className="border rounded-lg px-3 py-2 w-full text-sm"
+        className="w-full px-3 py-2.5 text-sm bg-gray-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition"
       />
 
       <input
@@ -78,17 +76,16 @@ console.log(formData,
         placeholder="Email Address"
         required
         onChange={handleChange}
-        className="border rounded-lg px-3 py-2 w-full text-sm"
+        className="w-full px-3 py-2.5 text-sm bg-gray-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition"
       />
 
       <button
         type="submit"
         disabled={loading}
-        className="w-full h-10 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-semibold hover:scale-105 transition disabled:opacity-50"
+        className="w-full h-11 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-semibold hover:scale-105 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50"
       >
         {loading ? "Submitting..." : "Submit & Get Brochure"}
       </button>
-
     </form>
   );
 }

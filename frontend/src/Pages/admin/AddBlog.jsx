@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import BlogEditor from "../../components/admin/BlogEditor";
 import axiosInstance from "../../utils/Instance";
 import AdminLayout from "../../components/admin/AdminLayout";
+import { Upload, X, CheckCircle, Loader2, AlertCircle } from "lucide-react";
 
 const AddBlog = () => {
   const [title, setTitle] = useState("");
@@ -9,7 +10,9 @@ const AddBlog = () => {
   const [body, setBody] = useState("");
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState(false);
 
   const handleImageUpload = async (e) => {
     const files = e.target.files;
@@ -20,6 +23,8 @@ const AddBlog = () => {
     }
 
     try {
+      setUploading(true);
+
       const res = await axiosInstance.post("/api/blogs/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -29,6 +34,9 @@ const AddBlog = () => {
       setImages((prev) => [...prev, ...res.data.images]);
     } catch (error) {
       console.error("Upload failed", error);
+      setError(true);
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -42,6 +50,7 @@ const AddBlog = () => {
 
     try {
       setLoading(true);
+      setError(false);
 
       const payload = {
         title,
@@ -50,25 +59,18 @@ const AddBlog = () => {
         images,
       };
 
-      const res = await axiosInstance.post("/api/blogs", payload);
+      await axiosInstance.post("/api/blogs", payload);
 
-      console.log("Blog created:", res.data);
-
-      // reset form
       setTitle("");
       setAuthor("");
       setBody("");
       setImages([]);
 
-      // show success alert
       setSuccess(true);
-
-      setTimeout(() => {
-        setSuccess(false);
-      }, 4000);
 
     } catch (error) {
       console.error("Blog creation failed:", error);
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -76,107 +78,192 @@ const AddBlog = () => {
 
   return (
     <AdminLayout>
-      <div className="max-w-4xl mx-auto p-6">
 
-        <div className="bg-white shadow-lg rounded-xl p-8">
+      {/* Popup Modal */}
+      {(success || error) && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
 
-          <h1 className="text-2xl font-bold mb-6">
-            Create Blog
-          </h1>
+          <div className="bg-white rounded-xl shadow-lg p-8 w-[350px] text-center">
 
-          {/* SUCCESS ALERT */}
-          {success && (
-            <div className="mb-6 rounded-lg border border-green-300 bg-green-50 p-4 text-green-700">
-              ✅ Blog successfully created!
-            </div>
-          )}
+            {success && (
+              <>
+                <CheckCircle className="mx-auto text-green-500 mb-3" size={40} />
+                <h2 className="text-lg font-semibold mb-2">
+                  Blog Published!
+                </h2>
+                <p className="text-gray-500 mb-4">
+                  Your blog has been successfully created.
+                </p>
+              </>
+            )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+            {error && (
+              <>
+                <AlertCircle className="mx-auto text-red-500 mb-3" size={40} />
+                <h2 className="text-lg font-semibold mb-2">
+                  Failed to Publish
+                </h2>
+                <p className="text-gray-500 mb-4">
+                  Something went wrong. Please try again.
+                </p>
+              </>
+            )}
 
-            {/* Title */}
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Blog Title
-              </label>
+            <button
+              onClick={() => {
+                setSuccess(false);
+                setError(false);
+              }}
+              className="bg-blue-600 text-white px-5 py-2 rounded-lg"
+            >
+              Close
+            </button>
 
-              <input
-                type="text"
-                className="w-full border rounded-lg p-3"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                required
-              />
-            </div>
+          </div>
 
-            {/* Author */}
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Author
-              </label>
+        </div>
+      )}
 
-              <input
-                type="text"
-                className="w-full border rounded-lg p-3"
-                value={author}
-                onChange={(e) => setAuthor(e.target.value)}
-                required
-              />
-            </div>
+      <div className="max-w-5xl mx-auto p-8">
 
-            {/* Image Upload */}
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Upload Blog Images
-              </label>
+        <div className="bg-white rounded-2xl shadow-lg border p-8">
 
-              <input
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="mb-3"
-              />
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-800">
+              Create New Blog
+            </h1>
+            <p className="text-gray-500 mt-1">
+              Write and publish a new blog post.
+            </p>
+          </div>
 
-              <div className="flex flex-wrap gap-3">
-                {images.map((img, index) => (
-                  <div key={index} className="relative">
+          <form onSubmit={handleSubmit} className="space-y-8">
 
-                    <img
-                      src={img}
-                      alt="preview"
-                      className="w-32 h-24 object-cover rounded"
-                    />
+            <div className="grid md:grid-cols-2 gap-6">
 
-                    <button
-                      type="button"
-                      onClick={() => removeImage(index)}
-                      className="absolute top-0 right-0 bg-red-500 text-white text-xs px-1 rounded"
-                    >
-                      X
-                    </button>
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-gray-700">
+                  Blog Title
+                </label>
 
-                  </div>
-                ))}
+                <input
+                  type="text"
+                  className="w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Enter blog title"
+                  required
+                />
+
+                <p className="text-xs text-gray-400 mt-1">
+                  {title.length} characters
+                </p>
               </div>
+
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-gray-700">
+                  Author
+                </label>
+
+                <input
+                  type="text"
+                  className="w-full border rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 outline-none"
+                  value={author}
+                  onChange={(e) => setAuthor(e.target.value)}
+                  placeholder="Author name"
+                  required
+                />
+              </div>
+
             </div>
 
-            {/* Blog Editor */}
+            {/* IMAGE UPLOAD */}
             <div>
-              <label className="block text-sm font-medium mb-2">
+
+              <label className="block text-sm font-semibold mb-3 text-gray-700">
+                Blog Images
+              </label>
+
+              <label className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-xl p-10 cursor-pointer hover:border-blue-500 transition relative">
+
+                {uploading ? (
+                  <Loader2 className="animate-spin text-blue-500" size={28} />
+                ) : (
+                  <Upload className="text-gray-400 mb-2" size={28} />
+                )}
+
+                <p className="text-sm text-gray-600">
+                  Click to upload images
+                </p>
+
+                <p className="text-xs text-gray-400 mt-1">
+                  PNG, JPG, WEBP supported
+                </p>
+
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+
+              </label>
+
+              {images.length > 0 && (
+                <div className="grid grid-cols-3 md:grid-cols-4 gap-4 mt-4">
+
+                  {images.map((img, index) => (
+                    <div key={index} className="relative group">
+
+                      <img
+                        src={img}
+                        alt="preview"
+                        className="w-full h-28 object-cover rounded-lg border"
+                      />
+
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition"
+                      >
+                        <X size={14} />
+                      </button>
+
+                    </div>
+                  ))}
+
+                </div>
+              )}
+
+            </div>
+
+            {/* EDITOR */}
+            <div>
+
+              <label className="block text-sm font-semibold mb-3 text-gray-700">
                 Blog Content
               </label>
 
-              <BlogEditor content={body} setContent={setBody} />
+              <div className="border rounded-lg overflow-hidden min-h-[300px]">
+                <BlogEditor content={body} setContent={setBody} />
+              </div>
+
             </div>
 
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700"
-            >
-              {loading ? "Saving..." : "Create Blog"}
-            </button>
+            {/* BUTTON */}
+            <div className="flex justify-end">
+
+              <button
+                type="submit"
+                disabled={loading || !body || !title}
+                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition disabled:opacity-50"
+              >
+                {loading && <Loader2 className="animate-spin" size={18} />}
+                {loading ? "Publishing..." : "Publish Blog"}
+              </button>
+
+            </div>
 
           </form>
 

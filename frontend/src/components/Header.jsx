@@ -16,7 +16,7 @@ const Header = () => {
   const navItems = [
     { name: "Home", path: "/" },
     { name: "About Us", path: "/about" },
-    { name: "Property", path: "/property" },
+    { name: "Properties", path: "/property" },
     { name: "Contact Us", path: "/contact" },
     { name: "Blogs", path: "/blogs" },
 
@@ -201,11 +201,8 @@ isScrolled || isBlogPage ? 'text-gray-900' : 'text-white'          }`}>
 
               <div className="p-4 border-t border-gray-100">
                 <div className="space-y-1 text-xs text-gray-600">
-                  <p className="font-medium">hello@nirveena.com</p>
-                  <p className="font-medium">+1 (234) 567-8900</p>
-                  <p className="text-[10px] text-gray-500 mt-1">
-                    Mon-Fri: 9am - 6pm
-                  </p>
+                  <p className="font-medium">info@nirveena.com</p>
+                  
                 </div>
               </div>
             </motion.div>
