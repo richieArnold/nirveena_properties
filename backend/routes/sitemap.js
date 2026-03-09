@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const pool = require("../db");
+const pool = require("../rds_setup/db/index");
 
 router.get("/sitemap.xml", async (req, res) => {
   try {
