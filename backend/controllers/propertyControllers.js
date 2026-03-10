@@ -1,5 +1,5 @@
 //propertyControllers.js
-
+const { formatPrice, isValidImage } = require("./propertyFormater");
 const fs = require("fs");
 const path = require("path");
 const pool = require("../rds_setup/db/index"); // assuming you export pool from db/index.js
@@ -87,7 +87,6 @@ exports.importProjects = async (req, res) => {
   }
 };
 
-// exports.getAllProjects = async (req, res) => {
 //   try {
 //     const result = await pool.query(
 //       `
@@ -180,9 +179,19 @@ exports.getAllProjects = async (req, res) => {
 
     console.log("Query successful, rows:", result.rows.length);
 
+    // Format prices and Formated images
+    const formattedProjects = result.rows
+      .filter(
+        (project) => !project.image_url || isValidImage(project.image_url),
+      )
+      .map((project) => ({
+        ...project,
+        price: formatPrice(project.price),
+      }));
+
     res.json({
       success: true,
-      data: result.rows,
+      data: formattedProjects,
       pagination: {
         currentPage: page,
         totalPages: Math.ceil(totalCount / limit),
@@ -202,10 +211,7 @@ exports.getAllProjects = async (req, res) => {
 
 exports.getAllPropertiesUnfiltered = async (req, res) => {
   try {
-    // const limit = req.query.limit ? Number(req.query.limit) : 12;
-
-    const result = await pool.query(
-      `
+    const result = await pool.query(`
       SELECT 
         p.id,
         p.slug,
@@ -225,13 +231,22 @@ exports.getAllPropertiesUnfiltered = async (req, res) => {
         LIMIT 1
       ) img ON true
       ORDER BY p.id DESC
-      `,
-    );
-    // console.log(result);
+    `);
+
+    // Format prices and images
+    const formattedData = result.rows
+      .filter(
+        (project) => !project.image_url || isValidImage(project.image_url),
+      )
+      .map((project) => ({
+        ...project,
+        price: formatPrice(project.price),
+      }));
+
     res.json({
       success: true,
-      count: result.rows.length,
-      data: result.rows,
+      count: formattedData.length,
+      data: formattedData,
     });
   } catch (error) {
     res.status(500).json({
@@ -270,12 +285,18 @@ exports.getProjectBySlug = async (req, res) => {
       [project.project_id],
     );
 
-    project.images = imagesResult.rows;
+    // Filter only valid images
+    const validImages = imagesResult.rows.filter((img) =>
+      isValidImage(img.image_url)
+    );
+
+    project.images = validImages;
 
     res.json({
       success: true,
       data: project,
     });
+
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -562,8 +583,8 @@ exports.updateProject = async (req, res) => {
       sba,
       price,
       rera_completion,
-      property_description, 
-      existing_images = [], 
+      property_description,
+      existing_images = [],
       new_images = [],
     } = req.body;
 
