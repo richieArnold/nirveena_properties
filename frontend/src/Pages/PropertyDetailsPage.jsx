@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axiosInstance from "../utils/Instance";
-import { HelmetProvider } from "react-helmet-async";
+import { Helmet } from "react-helmet-async";
 
 import {
   MapPin,
@@ -45,23 +45,25 @@ function PropertyDetailsPage() {
     fetchProject();
   }, [slug]);
 
-  const schemaData = {
-    "@context": "https://schema.org",
-    "@type": "Product",
-    "name": project.title,
-    "description": project.description,
-    "image": project.image,
-    "brand": {
-      "@type": "Brand",
-      "name": "Nirveena"
-    },
-    "offers": {
-      "@type": "Offer",
-      "priceCurrency": "INR",
-      "price": project.price,
-      "availability": "https://schema.org/InStock"
-    }
-  };
+  const schemaData = project
+    ? {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        name: project.project_name,
+        description: project.property_description,
+        image: project.image_url,
+        brand: {
+          "@type": "Brand",
+          name: "Nirveena",
+        },
+        offers: {
+          "@type": "Offer",
+          priceCurrency: "INR",
+          price: project.price,
+          availability: "https://schema.org/InStock",
+        },
+      }
+    : null;
 
   const nextImage = () => {
     setActiveImage((prev) =>
@@ -98,31 +100,33 @@ function PropertyDetailsPage() {
 
   return (
     <>
-    <Helmet>
-        <title>{project.title} | Nirveena</title>
+      {project && (
+        <Helmet>
+          <title>{`${project.project_name} | Nirveena`}</title>
 
-        <meta
-          name="description"
-          content={project.description}
-        />
+          <meta name="description" content={project.property_description} />
 
-        <meta property="og:title" content={project.title} />
+          <meta property="og:title" content={project.project_name} />
 
-        <meta
-          property="og:description"
-          content={project.description}
-        />
+          <meta
+            property="og:description"
+            content={project.property_description}
+          />
 
-        <meta
-          property="og:image"
-          content={project.image}
-        />
+          <meta property="og:image" content={project.image_url} />
 
-        <meta
-          property="og:url"
-          content={`https://www.nirveena.com/property/${project.slug}`}
-        />
-      </Helmet>
+          <meta
+            property="og:url"
+            content={`https://www.nirveena.com/property/${project.slug}`}
+          />
+
+          {schemaData && (
+            <script type="application/ld+json">
+              {JSON.stringify(schemaData)}
+            </script>
+          )}
+        </Helmet>
+      )}
       <div className="min-h-screen bg-slate-50 pb-20">
         {/* NAVBAR */}
         <nav className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 py-3 flex items-center justify-between">
