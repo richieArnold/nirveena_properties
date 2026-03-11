@@ -190,13 +190,7 @@ isScrolled || isBlogPage ? 'text-gray-900' : 'text-white'          }`}>
                 })}
 
                 {/* Mobile Admin Link */}
-                <Link
-                  to="/admin"
-                  className="sm:hidden font-medium py-2.5 px-3 rounded-md text-sm bg-blue-50 text-blue-600 hover:bg-blue-100 transition-all duration-200 mt-2"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  Admin Dashboard
-                </Link>
+
               </div>
 
               <div className="p-4 border-t border-gray-100">

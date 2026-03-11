@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../utils/Instance";
 import AdminLayout from "../../components/admin/AdminLayout";
+import { ArrowLeft } from "lucide-react";
 
 const BlogsList = () => {
   const navigate = useNavigate();
@@ -11,8 +12,13 @@ const BlogsList = () => {
 
   const fetchBlogs = async () => {
     try {
-      const res = await axiosInstance.get("/api/blogs");
-      setBlogs(res.data.data || []);
+      const res = await axiosInstance.get("/api/blogs?limit=100");
+
+      setBlogs(
+        (res.data.data || []).sort(
+          (a, b) => new Date(b.created_at) - new Date(a.created_at)
+        )
+      );
     } catch (error) {
       console.error("Failed to fetch blogs", error);
     } finally {
@@ -30,9 +36,7 @@ const BlogsList = () => {
     try {
       await axiosInstance.delete(`/api/blogs/${id}`);
 
-      setBlogs((prevBlogs) =>
-        prevBlogs.filter((blog) => blog.id !== id)
-      );
+      setBlogs((prevBlogs) => prevBlogs.filter((blog) => blog.id !== id));
     } catch (error) {
       console.error("Delete failed", error);
     }
@@ -51,20 +55,19 @@ const BlogsList = () => {
       <div className="max-w-6xl mx-auto p-6">
 
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Blogs</h1>
-
+        <div className="flex items-center gap-3 mb-6">
           <button
-            onClick={() => navigate("/admin/blogs/create")}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+            onClick={() => navigate("/admin/dashboard")}
+            className="p-2 rounded-lg hover:bg-gray-100"
           >
-            + Add Blog
+            <ArrowLeft size={22} />
           </button>
+
+          <h1 className="text-2xl font-bold">Blogs</h1>
         </div>
 
         {/* Table */}
         <div className="bg-white shadow rounded-lg overflow-hidden">
-
           <table className="w-full text-left">
 
             <thead className="bg-gray-100">
@@ -77,7 +80,6 @@ const BlogsList = () => {
             </thead>
 
             <tbody>
-
               {blogs.length === 0 ? (
                 <tr>
                   <td colSpan="4" className="text-center p-6">
@@ -86,20 +88,13 @@ const BlogsList = () => {
                 </tr>
               ) : (
                 blogs.map((blog) => (
-                  <tr
-                    key={blog.id}
-                    className="border-t hover:bg-gray-50"
-                  >
+                  <tr key={blog.id} className="border-t hover:bg-gray-50">
 
                     {/* Title */}
-                    <td className="p-4 font-medium">
-                      {blog.title}
-                    </td>
+                    <td className="p-4 font-medium">{blog.title}</td>
 
                     {/* Author */}
-                    <td className="p-4">
-                      {blog.author}
-                    </td>
+                    <td className="p-4">{blog.author}</td>
 
                     {/* Date */}
                     <td className="p-4">
@@ -144,11 +139,9 @@ const BlogsList = () => {
                   </tr>
                 ))
               )}
-
             </tbody>
 
           </table>
-
         </div>
 
       </div>

@@ -2,8 +2,14 @@ import React, { useState } from "react";
 import BlogEditor from "../../components/admin/BlogEditor";
 import axiosInstance from "../../utils/Instance";
 import AdminLayout from "../../components/admin/AdminLayout";
-import { Upload, X, CheckCircle, Loader2, AlertCircle } from "lucide-react";
-
+import {
+  Upload,
+  X,
+  CheckCircle,
+  Loader2,
+  AlertCircle,
+  ArrowLeft,
+} from "lucide-react";
 const AddBlog = () => {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
@@ -67,7 +73,6 @@ const AddBlog = () => {
       setImages([]);
 
       setSuccess(true);
-
     } catch (error) {
       console.error("Blog creation failed:", error);
       setError(true);
@@ -78,19 +83,17 @@ const AddBlog = () => {
 
   return (
     <AdminLayout>
-
       {/* Popup Modal */}
       {(success || error) && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/40 z-50">
-
           <div className="bg-white rounded-xl shadow-lg p-8 w-[350px] text-center">
-
             {success && (
               <>
-                <CheckCircle className="mx-auto text-green-500 mb-3" size={40} />
-                <h2 className="text-lg font-semibold mb-2">
-                  Blog Published!
-                </h2>
+                <CheckCircle
+                  className="mx-auto text-green-500 mb-3"
+                  size={40}
+                />
+                <h2 className="text-lg font-semibold mb-2">Blog Published!</h2>
                 <p className="text-gray-500 mb-4">
                   Your blog has been successfully created.
                 </p>
@@ -118,16 +121,21 @@ const AddBlog = () => {
             >
               Close
             </button>
-
           </div>
-
         </div>
       )}
 
       <div className="max-w-5xl mx-auto p-8">
+        {/* Back Button */}
+        <button
+          onClick={() => (window.location.href = "/admin/dashboard")}
+          className="flex items-center gap-2 text-blue-600 hover:text-blue-800 mb-6"
+        >
+          <ArrowLeft size={18} />
+          Back to Dashboard
+        </button>
 
         <div className="bg-white rounded-2xl shadow-lg border p-8">
-
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-gray-800">
               Create New Blog
@@ -138,9 +146,7 @@ const AddBlog = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-8">
-
             <div className="grid md:grid-cols-2 gap-6">
-
               <div>
                 <label className="block text-sm font-semibold mb-2 text-gray-700">
                   Blog Title
@@ -174,27 +180,22 @@ const AddBlog = () => {
                   required
                 />
               </div>
-
             </div>
 
             {/* IMAGE UPLOAD */}
             <div>
-
               <label className="block text-sm font-semibold mb-3 text-gray-700">
                 Blog Images
               </label>
 
               <label className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-xl p-10 cursor-pointer hover:border-blue-500 transition relative">
-
                 {uploading ? (
                   <Loader2 className="animate-spin text-blue-500" size={28} />
                 ) : (
                   <Upload className="text-gray-400 mb-2" size={28} />
                 )}
 
-                <p className="text-sm text-gray-600">
-                  Click to upload images
-                </p>
+                <p className="text-sm text-gray-600">Click to upload images</p>
 
                 <p className="text-xs text-gray-400 mt-1">
                   PNG, JPG, WEBP supported
@@ -207,15 +208,12 @@ const AddBlog = () => {
                   onChange={handleImageUpload}
                   className="hidden"
                 />
-
               </label>
 
               {images.length > 0 && (
                 <div className="grid grid-cols-3 md:grid-cols-4 gap-4 mt-4">
-
                   {images.map((img, index) => (
                     <div key={index} className="relative group">
-
                       <img
                         src={img}
                         alt="preview"
@@ -229,18 +227,14 @@ const AddBlog = () => {
                       >
                         <X size={14} />
                       </button>
-
                     </div>
                   ))}
-
                 </div>
               )}
-
             </div>
 
             {/* EDITOR */}
             <div>
-
               <label className="block text-sm font-semibold mb-3 text-gray-700">
                 Blog Content
               </label>
@@ -248,12 +242,10 @@ const AddBlog = () => {
               <div className="border rounded-lg overflow-hidden min-h-[300px]">
                 <BlogEditor content={body} setContent={setBody} />
               </div>
-
             </div>
 
             {/* BUTTON */}
             <div className="flex justify-end">
-
               <button
                 type="submit"
                 disabled={loading || !body || !title}
@@ -262,13 +254,9 @@ const AddBlog = () => {
                 {loading && <Loader2 className="animate-spin" size={18} />}
                 {loading ? "Publishing..." : "Publish Blog"}
               </button>
-
             </div>
-
           </form>
-
         </div>
-
       </div>
     </AdminLayout>
   );
