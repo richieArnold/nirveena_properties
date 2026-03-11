@@ -1,12 +1,54 @@
 import React from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { LogOut, Home, PlusCircle, List, Settings, Menu, X } from "lucide-react";
-import { useState } from "react";
+import { LogOut, Home, PlusCircle, List, Settings, Menu, X, Clock } from "lucide-react";
+import { useState, useEffect } from "react";
 
 const AdminLayout = ({ children, user }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(180); // 3 minutes in seconds
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimeLeft(prev => {
+        if (prev <= 0) return 0;
+        return prev - 1;
+      });
+    }, 1000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
+  // Reset timer on user activity
+  useEffect(() => {
+    const resetTimer = () => {
+      setTimeLeft(180);
+    };
+
+    const events = ['mousedown', 'keydown', 'scroll', 'mousemove', 'touchstart'];
+    events.forEach(event => {
+      window.addEventListener(event, resetTimer);
+    });
+
+    return () => {
+      events.forEach(event => {
+        window.removeEventListener(event, resetTimer);
+      });
+    };
+  }, []);
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const getTimerColor = () => {
+    if (timeLeft <= 30) return 'text-red-600';
+    if (timeLeft <= 60) return 'text-yellow-600';
+    return 'text-green-600';
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("adminToken");
@@ -60,6 +102,14 @@ const AdminLayout = ({ children, user }) => {
             {/* User Info - Responsive */}
             {user && (
               <div className="flex items-center gap-2 sm:gap-4">
+                {/* Session Timer */}
+                <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 rounded-lg">
+                  <Clock className={`w-4 h-4 ${getTimerColor()}`} />
+                  <span className={`text-xs font-medium ${getTimerColor()}`}>
+                    {formatTime(timeLeft)}
+                  </span>
+                </div>
+
                 {/* Desktop User Info */}
                 <div className="hidden sm:block text-right">
                   <p className="text-xs sm:text-sm font-medium text-gray-900 truncate max-w-[120px]">
@@ -133,6 +183,17 @@ const AdminLayout = ({ children, user }) => {
                 <Settings className="w-4 h-4" />
                 Change Password
               </Link>
+
+              {/* Mobile Timer */}
+              <div className="px-4 py-2 flex items-center justify-between bg-gray-50 rounded-lg mt-2">
+                <div className="flex items-center gap-2">
+                  <Clock className={`w-4 h-4 ${getTimerColor()}`} />
+                  <span className="text-xs text-gray-600">Session</span>
+                </div>
+                <span className={`text-sm font-medium ${getTimerColor()}`}>
+                  {formatTime(timeLeft)}
+                </span>
+              </div>
               
               {/* Mobile User Info */}
               <div className="px-4 py-3 border-t border-gray-100 mt-2">

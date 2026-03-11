@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import Layout from "./Layout";
 import Login from "./Login";
 import ProtectedRoute from "./ProtectedRoute";
+import SessionTracker from "./admin/SessionTracker"; // Import SessionTracker
 import { useState } from "react";
 
 // Public Pages
@@ -63,11 +64,14 @@ const PageRoutes = () => {
       {/* Admin Routes - NO Layout */}
       <Route path="/admin/login" element={<Login onLogin={handleLogin} />} />
 
+      {/* Admin Routes with SessionTracker */}
       <Route
         path="/admin/change-password"
         element={
           <ProtectedRoute>
-            <ChangePassword />
+            <SessionTracker>
+              <ChangePassword />
+            </SessionTracker>
           </ProtectedRoute>
         }
       />
@@ -76,7 +80,9 @@ const PageRoutes = () => {
         path="/admin"
         element={
           <ProtectedRoute>
-            <AdminDashboard />
+            <SessionTracker>
+              <AdminDashboard />
+            </SessionTracker>
           </ProtectedRoute>
         }
       />
@@ -85,7 +91,9 @@ const PageRoutes = () => {
         path="/admin/add"
         element={
           <ProtectedRoute>
-            <AddProject />
+            <SessionTracker>
+              <AddProject />
+            </SessionTracker>
           </ProtectedRoute>
         }
       />
@@ -94,7 +102,9 @@ const PageRoutes = () => {
         path="/admin/list"
         element={
           <ProtectedRoute>
-            <ProjectsList />
+            <SessionTracker>
+              <ProjectsList />
+            </SessionTracker>
           </ProtectedRoute>
         }
       />
@@ -103,7 +113,9 @@ const PageRoutes = () => {
         path="/admin/edit/:id"
         element={
           <ProtectedRoute>
-            <EditProject />
+            <SessionTracker>
+              <EditProject />
+            </SessionTracker>
           </ProtectedRoute>
         }
       />
@@ -112,17 +124,21 @@ const PageRoutes = () => {
         path="/admin/view/:id"
         element={
           <ProtectedRoute>
-            <ViewProject />
+            <SessionTracker>
+              <ViewProject />
+            </SessionTracker>
           </ProtectedRoute>
         }
       />
 
-      {/* LEADS ROUTES - Place these BEFORE the catch-all route */}
+      {/* LEADS ROUTES */}
       <Route
         path="/admin/leads"
         element={
           <ProtectedRoute>
-            <LeadsList />
+            <SessionTracker>
+              <LeadsList />
+            </SessionTracker>
           </ProtectedRoute>
         }
       />
@@ -130,25 +146,21 @@ const PageRoutes = () => {
         path="/admin/leads/:id"
         element={
           <ProtectedRoute>
-            <LeadDetails />
+            <SessionTracker>
+              <LeadDetails />
+            </SessionTracker>
           </ProtectedRoute>
         }
       />
 
-      <Route
-        path="/admin/*"
-        element={
-          <ProtectedRoute>
-            <AdminDashboard />
-          </ProtectedRoute>
-        }
-      />
-
+      {/* CUSTOMERS ROUTES */}
       <Route
         path="/admin/customers"
         element={
           <ProtectedRoute>
-            <CustomersList />
+            <SessionTracker>
+              <CustomersList />
+            </SessionTracker>
           </ProtectedRoute>
         }
       />
@@ -156,16 +168,68 @@ const PageRoutes = () => {
         path="/admin/customers/:id"
         element={
           <ProtectedRoute>
-            <CustomerDetails />
+            <SessionTracker>
+              <CustomerDetails />
+            </SessionTracker>
           </ProtectedRoute>
         }
       />
 
-      <Route path="/admin/blogs/create" element={<AddBlog />} />
-      <Route path="/admin/blogs" element={<BlogsList />} />
-      <Route path="/admin/blogs/edit/:id" element={<EditBlog />} />
-      <Route path="/admin/blogs/view/:slug" element={<ViewBlog />} />
+      {/* BLOG ROUTES */}
+      <Route
+        path="/admin/blogs/create"
+        element={
+          <ProtectedRoute>
+            <SessionTracker>
+              <AddBlog />
+            </SessionTracker>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/blogs"
+        element={
+          <ProtectedRoute>
+            <SessionTracker>
+              <BlogsList />
+            </SessionTracker>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/blogs/edit/:id"
+        element={
+          <ProtectedRoute>
+            <SessionTracker>
+              <EditBlog />
+            </SessionTracker>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/blogs/view/:slug"
+        element={
+          <ProtectedRoute>
+            <SessionTracker>
+              <ViewBlog />
+            </SessionTracker>
+          </ProtectedRoute>
+        }
+      />
 
+      {/* Catch-all admin route */}
+      <Route
+        path="/admin/*"
+        element={
+          <ProtectedRoute>
+            <SessionTracker>
+              <AdminDashboard />
+            </SessionTracker>
+          </ProtectedRoute>
+        }
+      />
+
+      {/* Public Blog Routes */}
       <Route path="/blogs" element={<BlogsPage />} />
       <Route path="/blogs/:slug" element={<BlogDetails />} />
     </Routes>
