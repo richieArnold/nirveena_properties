@@ -30,7 +30,7 @@ function PropertiesFilterBar({
               <button
                 key={type}
                 onClick={() => setSelectedType(type)}
-                className={`px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border whitespace-nowrap
+                className={`px-5 py-2.5 rounded-xl text-xs font-bold uppercase cursor-pointer tracking-wider transition-all border whitespace-nowrap
                 ${
                   isActive
                     ? "bg-blue-600 text-white border-blue-600 shadow-md"
@@ -48,7 +48,7 @@ function PropertiesFilterBar({
         <div className="hidden lg:block flex-1" />
 
         {/* Status Dropdown - Visible only on mobile (below lg) */}
-        <div className="w-full lg:hidden">
+        <div className="w-full lg:hidden ">
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}

@@ -11,7 +11,7 @@ import {
   ArrowLeft,
   FileText,
   Menu,
-  X
+  X,
 } from "lucide-react";
 import AdminLayout from "../../components/admin/AdminLayout";
 import DashboardCard from "../../components/admin/DashboardCard";
@@ -136,19 +136,25 @@ const AdminDashboard = () => {
             <span className="font-medium text-gray-700">Jump to Section</span>
             {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
-          
+
           {mobileMenuOpen && (
             <div className="mt-2 bg-white rounded-lg shadow-lg border border-gray-200 p-2">
               {[
-                { id: 'property', label: 'Property Management', icon: TrendingUp },
-                { id: 'blog', label: 'Blog Management', icon: FileText },
-                { id: 'leads', label: 'Lead Management', icon: Mail },
-                { id: 'bulk', label: 'Bulk Import', icon: FileSpreadsheet },
+                {
+                  id: "property",
+                  label: "Property Management",
+                  icon: TrendingUp,
+                },
+                { id: "blog", label: "Blog Management", icon: FileText },
+                { id: "leads", label: "Lead Management", icon: Mail },
+                { id: "bulk", label: "Bulk Import", icon: FileSpreadsheet },
               ].map((item) => (
                 <button
                   key={item.id}
                   onClick={() => {
-                    document.getElementById(item.id)?.scrollIntoView({ behavior: 'smooth' });
+                    document
+                      .getElementById(item.id)
+                      ?.scrollIntoView({ behavior: "smooth" });
                     setMobileMenuOpen(false);
                   }}
                   className="w-full flex items-center gap-3 px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition"
@@ -198,7 +204,8 @@ const AdminDashboard = () => {
                 <FileText className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
                 Blog Management
               </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 justify-items-centre">
+                {" "}
                 <DashboardCard
                   title="Add Blog"
                   icon={<PlusCircle className="w-6 h-6 sm:w-8 sm:h-8" />}
@@ -206,15 +213,9 @@ const AdminDashboard = () => {
                   link="/admin/blogs/create"
                 />
                 <DashboardCard
-                  title="Update Blogs"
+                  title="Edit and View Blogs"
                   icon={<Edit3 className="w-6 h-6 sm:w-8 sm:h-8" />}
                   color="green"
-                  link="/admin/blogs"
-                />
-                <DashboardCard
-                  title="View Blogs"
-                  icon={<Eye className="w-6 h-6 sm:w-8 sm:h-8" />}
-                  color="purple"
                   link="/admin/blogs"
                 />
               </div>
@@ -226,13 +227,15 @@ const AdminDashboard = () => {
                 <Mail className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
                 Lead Management
               </h2>
-              
+
               {/* Lead Cards */}
               <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-4 sm:mb-6">
                 <LeadsCard
                   title="Total Leads"
                   count={leadsStats.total}
-                  icon={<Users className="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8" />}
+                  icon={
+                    <Users className="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8" />
+                  }
                   color="blue"
                   link="/admin/leads"
                   subtitle="All time"
@@ -240,7 +243,9 @@ const AdminDashboard = () => {
                 <LeadsCard
                   title="New Leads"
                   count={leadsStats.new}
-                  icon={<Mail className="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8" />}
+                  icon={
+                    <Mail className="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8" />
+                  }
                   color="green"
                   link="/admin/leads?status=new"
                   subtitle="Awaiting"
@@ -256,7 +261,9 @@ const AdminDashboard = () => {
                 <LeadsCard
                   title="Today's"
                   count={leadsStats.today}
-                  icon={<TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8" />}
+                  icon={
+                    <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8" />
+                  }
                   color="purple"
                   link="/admin/leads?today=true"
                   subtitle="Received today"
@@ -298,7 +305,7 @@ const AdminDashboard = () => {
                 <FileSpreadsheet className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
                 Bulk Import
               </h2>
-              
+
               {/* Import Card - Mobile Optimized */}
               <button
                 onClick={() => setActiveTab("excel")}

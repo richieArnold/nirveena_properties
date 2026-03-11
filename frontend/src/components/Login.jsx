@@ -1,25 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import axiosInstance from "../utils/Instance";
 import { User, Lock, Loader2 } from "lucide-react";
 
 const Login = ({ onLogin }) => {
   const navigate = useNavigate();
   const location = useLocation();
+
   const [credentials, setCredentials] = useState({
     username: "",
     password: "",
   });
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [sessionMessage, setSessionMessage] = useState('');
+  const [error, setError] = useState("");
+  const [sessionMessage, setSessionMessage] = useState("");
 
   useEffect(() => {
-    // Check for session expired message from URL or state
     const params = new URLSearchParams(location.search);
-    if (params.get('session') === 'expired' || location.state?.message) {
-      setSessionMessage(location.state?.message || 'Your session has expired. Please login again.');
+    if (params.get("session") === "expired" || location.state?.message) {
+      setSessionMessage(
+        location.state?.message ||
+          "Your session has expired. Please login again."
+      );
     }
   }, [location]);
 
@@ -34,8 +37,8 @@ const Login = ({ onLogin }) => {
     e.preventDefault();
 
     setLoading(true);
-    setError('');
-    setSessionMessage('');
+    setError("");
+    setSessionMessage("");
 
     try {
       const response = await axiosInstance.post("/api/auth/login", credentials);
@@ -63,99 +66,95 @@ const Login = ({ onLogin }) => {
           "url('https://www.prestigesouthernstar.info/images/prestige/tiny-flats-hefty-rents-other-side-of-high-potential-bangalore-real-estate.webp')",
       }}
     >
-      {/* Overlay */}
+      {/* Dark overlay */}
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
 
-      {/* Login Container */}
-      <div className="w-full max-w-md relative z-10">
+      {/* Login Card */}
+      <div className="w-full max-w-md relative z-10 bg-white/95 backdrop-blur-md shadow-2xl rounded-2xl p-8">
 
-        {/* Brand */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white">
+        {/* Title */}
+        <div className="text-center mb-6">
+          <h1 className="text-3xl font-bold text-gray-900">
             Nirveena Admin
           </h1>
-          <p className="text-gray-200 mt-2">
+          <p className="text-gray-500 mt-2">
             Sign in to access dashboard
           </p>
         </div>
-        
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+
+        <form className="space-y-6" onSubmit={handleSubmit}>
           {sessionMessage && (
             <div className="bg-yellow-100 text-yellow-700 p-3 rounded-lg text-sm border-l-4 border-yellow-500">
               {sessionMessage}
             </div>
           )}
-          
+
           {error && (
             <div className="bg-red-100 text-red-700 p-3 rounded-lg text-sm">
               {error}
             </div>
           )}
-          
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Username
-              </label>
 
-              <div className="relative">
-                <User
-                  className="absolute left-3 top-3.5 text-gray-400"
-                  size={18}
-                />
+          {/* Username */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Username
+            </label>
 
-                <input
-                  type="text"
-                  name="username"
-                  value={credentials.username}
-                  onChange={handleChange}
-                  required
-                  placeholder="Enter username"
-                  className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                />
-              </div>
+            <div className="relative">
+              <User
+                className="absolute left-3 top-3.5 text-gray-400"
+                size={18}
+              />
+
+              <input
+                type="text"
+                name="username"
+                value={credentials.username}
+                onChange={handleChange}
+                required
+                placeholder="Enter username"
+                className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              />
             </div>
+          </div>
 
-            {/* Password */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Password
-              </label>
+          {/* Password */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Password
+            </label>
 
-              <div className="relative">
-                <Lock
-                  className="absolute left-3 top-3.5 text-gray-400"
-                  size={18}
-                />
+            <div className="relative">
+              <Lock
+                className="absolute left-3 top-3.5 text-gray-400"
+                size={18}
+              />
 
-                <input
-                  type="password"
-                  name="password"
-                  value={credentials.password}
-                  onChange={handleChange}
-                  required
-                  placeholder="Enter password"
-                  className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                />
-              </div>
+              <input
+                type="password"
+                name="password"
+                value={credentials.password}
+                onChange={handleChange}
+                required
+                placeholder="Enter password"
+                className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              />
             </div>
+          </div>
 
-            {/* Button */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-60"
-            >
-              {loading && <Loader2 className="animate-spin" size={18} />}
-              {loading ? "Signing in..." : "Sign In"}
-            </button>
-
-          </form>
-
-        </div>
+          {/* Button */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-60"
+          >
+            {loading && <Loader2 className="animate-spin" size={18} />}
+            {loading ? "Signing in..." : "Sign In"}
+          </button>
+        </form>
 
       </div>
-
     </div>
   );
 };

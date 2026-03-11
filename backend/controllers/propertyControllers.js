@@ -320,54 +320,6 @@ exports.getAllProjects = async (req, res) => {
 };
 
 
-// exports.getAllPropertiesUnfiltered = async (req, res) => {
-//   try {
-//     const result = await pool.query(`
-//       SELECT 
-//         p.id,
-//         p.slug,
-//         p.project_name,
-//         p.project_location,
-//         p.price,
-//         p.project_type,
-//         p.project_status,
-//         p.property_description,  
-//         img.image_url
-//       FROM projects p
-//       LEFT JOIN LATERAL (
-//         SELECT image_url
-//         FROM project_images pi
-//         WHERE pi.project_id = p.id
-//         ORDER BY pi.sort_order ASC
-//         LIMIT 1
-//       ) img ON true
-//       ORDER BY p.id DESC
-//     `);
-
-//     // Format prices and images
-//     const formattedData = result.rows
-//       .filter(
-//         (project) => !project.image_url || isValidImage(project.image_url),
-//       )
-//       .map((project) => ({
-//         ...project,
-//         price: formatPrice(project.price),
-//       }));
-
-//     res.json({
-//       success: true,
-//       count: formattedData.length,
-//       data: formattedData,
-//     });
-//   } catch (error) {
-//     res.status(500).json({
-//       success: false,
-//       message: "Failed to fetch projects",
-//       error: error.message,
-//     });
-//   }
-// };
-
 exports.getAllPropertiesUnfiltered = async (req, res) => {
   try {
     const { status } = req.query; // Get status from query params

@@ -172,7 +172,7 @@ function PropertyCard({ property }) {
                 bg-gradient-to-r from-blue-600 to-purple-600
                 hover:from-blue-700 hover:to-purple-700
                 shadow-sm hover:shadow-md
-                transition-all duration-300 flex items-center gap-1"
+                transition-all duration-300 flex items-center gap-1 cursor-pointer"
               >
                 View
                 <svg

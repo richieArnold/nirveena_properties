@@ -175,13 +175,13 @@ const Contact = () => {
                       icon: Phone,
                       title: "Call Us",
                       detail: "+91 98765 43210",
-                      sub: "Mon-Sat, 9AM-7PM",
+                      sub: "All Days, 9AM-9PM",
                       color: "from-blue-500/20 to-purple-500/20",
                     },
                     {
                       icon: Mail,
                       title: "Email Us",
-                      detail: "info@nirveenaproperty.com",
+                      detail: "info@nirveena.com",
                       sub: "Response within 1 hours",
                       color: "from-blue-500/20 to-purple-500/20",
                     },
@@ -228,7 +228,7 @@ const Contact = () => {
                 >
                   {[
                     { value: "24/7", label: "Support Available" },
-                    { value: "8 Hour", label: "Average Response" },
+                    { value: "1 Hour", label: "Average Response" },
                   ].map((stat, index) => (
                     <motion.div
                       key={index}
@@ -343,7 +343,8 @@ const Contact = () => {
                         </motion.div>
 
                         <motion.div variants={itemVariants}>
-                          <label className="block text-sm font-semibold text-gray-700 mb-2 items-center gap-2">
+                          <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                            {" "}
                             <Phone size={14} />
                             Phone Number *
                           </label>
@@ -359,7 +360,7 @@ const Contact = () => {
                               onFocus={() => setActiveField("phone")}
                               onBlur={() => setActiveField(null)}
                               required
-                              placeholder="+91 98765 43210"
+                              placeholder="+91 90000 00009"
                               className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-3 focus:ring-blue-500/30 focus:border-blue-500 outline-none transition-all text-gray-900 shadow-sm hover:shadow"
                             />
                           </motion.div>
@@ -492,7 +493,7 @@ const Contact = () => {
                             Processing...
                           </span>
                         ) : (
-                          <span className="relative flex items-center justify-center gap-3">
+                          <span className="relative flex items-center justify-center gap-3 ">
                             Send Message
                             <Send
                               size={18}

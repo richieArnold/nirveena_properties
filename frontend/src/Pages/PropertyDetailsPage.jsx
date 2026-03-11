@@ -31,7 +31,7 @@ function PropertyDetailsPage() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowPopup(true);
-    }, 10000); // 10 seconds
+    }, 5000); // 5 seconds
 
     return () => clearTimeout(timer);
   }, []);
@@ -342,35 +342,32 @@ function PropertyDetailsPage() {
             </div>
 
             {/* CONTACT FORM */}
-{/* ENQUIRY POPUP */}
-{showPopup && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+            {/* ENQUIRY POPUP */}
+            {showPopup && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+                <div className="relative bg-white w-[95%] max-w-md p-6 rounded-2xl shadow-2xl">
+                  {/* CLOSE BUTTON */}
+                  <button
+                    onClick={() => setShowPopup(false)}
+                    className="absolute top-4 right-4 text-slate-500 hover:text-black"
+                  >
+                    <X size={24} />
+                  </button>
 
-    <div className="relative bg-white w-[95%] max-w-md p-6 rounded-2xl shadow-2xl">
+                  <h3 className="text-xl font-bold mb-4 text-center">
+                    Schedule A Site Visit
+                  </h3>
 
-      {/* CLOSE BUTTON */}
-      <button
-        onClick={() => setShowPopup(false)}
-        className="absolute top-4 right-4 text-slate-500 hover:text-black"
-      >
-        <X size={24} />
-      </button>
-
-      <h3 className="text-xl font-bold mb-4 text-center">
-        Schedule A Site Visit
-      </h3>
-
-      <EnquiryForm
-        projectId={project.id}
-        onSuccess={() => {
-          setShowPopup(false);
-          handleEnquirySuccess();
-        }}
-      />
-
-    </div>
-  </div>
-)}
+                  <EnquiryForm
+                    projectId={project.id}
+                    onSuccess={() => {
+                      setShowPopup(false);
+                      handleEnquirySuccess();
+                    }}
+                  />
+                </div>
+              </div>
+            )}
           </div>
         </main>
 
