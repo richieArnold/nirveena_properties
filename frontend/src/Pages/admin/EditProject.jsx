@@ -359,9 +359,9 @@ const EditProject = () => {
                 className={inputClasses}
               >
                 <option value="">Select Status</option>
-                <option value="UC">Under Construction (UC)</option>
+                <option value="UC">On Going (UC/OG)</option>
                 <option value="RTM">Ready to Move (RTM)</option>
-                <option value="Completed">Completed</option>
+                <option value="EOI">Expression of Interest (EOI)</option>
               </select>
             </div>
 

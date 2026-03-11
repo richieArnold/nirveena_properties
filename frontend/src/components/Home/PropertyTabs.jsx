@@ -183,7 +183,7 @@ const PropertyTabs = () => {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, amount: 0.3 }}
-        className="flex flex-wrap justify-center gap-4 mb-14"
+        className="flex flex-wrap justify-center gap-4 mb-14 "
       >
         {tabs.map((tab) => (
           <motion.button
@@ -192,7 +192,7 @@ const PropertyTabs = () => {
             variants={tabVariants}
             whileHover="hover"
             whileTap="tap"
-            className={`px-6 py-3 rounded-full font-medium text-sm md:text-base transition-all duration-300 ${
+            className={`px-6 py-3 rounded-full font-medium text-sm md:text-base transition-all duration-300 cursor-pointer ${
               activeTab === tab.id
                 ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg"
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -237,7 +237,7 @@ const PropertyTabs = () => {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth="2"
-                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z "
                 />
               </svg>
             </div>
@@ -261,7 +261,7 @@ const PropertyTabs = () => {
           >
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg
-                className="w-8 h-8 text-gray-400"
+                className="w-8 h-8 text-gray-400 "
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -364,7 +364,7 @@ const PropertyTabs = () => {
             const currentTab = tabs.find((tab) => tab.id === activeTab);
             navigate(`/property?type=${currentTab.category}`);
           }}
-          className="bg-blue-600 text-white px-8 py-3.5 rounded-lg hover:bg-blue-700 transition duration-300 font-semibold shadow-md hover:shadow-lg inline-flex items-center gap-3"
+          className="bg-blue-600 text-white px-8 py-3.5 rounded-lg hover:bg-blue-700 transition duration-300 cursor-pointer font-semibold shadow-md hover:shadow-lg inline-flex items-center gap-3"
         >
           View All {activeTab}
           <motion.span

@@ -431,7 +431,7 @@ const About = () => {
                 lifestyle and secure your future.
               </p>
               <Link to="/property">
-                <button className="bg-white text-gray-900 px-8 py-3.5 rounded-lg font-bold hover:bg-blue-50 transition-all shadow-xl">
+                <button className="bg-white text-gray-900 px-8 py-3.5 rounded-lg font-bold hover:bg-blue-50 transition-all shadow-xl cursor-pointer">
                   View Properties
                 </button>
               </Link>

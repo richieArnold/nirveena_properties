@@ -1,8 +1,19 @@
-import { Users, ChevronDown, X, ArrowRight, Sparkles, Shield, Star } from "lucide-react";
+import {
+  Users,
+  ChevronDown,
+  X,
+  ArrowRight,
+  Sparkles,
+  Shield,
+  Star,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import bgImage from "../../assets/Hero-final.jpeg";
 import { useNavigate } from "react-router-dom";
+import { FaWhatsapp, FaPhoneAlt } from "react-icons/fa";
 
 /* Professional font setup */
 // @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
@@ -31,11 +42,11 @@ const fadeUp = {
 
 // Form slide animation
 const formVariants = {
-  hidden: { 
+  hidden: {
     x: 50,
     opacity: 0,
   },
-  visible: { 
+  visible: {
     x: 0,
     opacity: 1,
     transition: {
@@ -45,7 +56,7 @@ const formVariants = {
       delay: 0.2,
     },
   },
-  exit: { 
+  exit: {
     x: 50,
     opacity: 0,
     transition: {
@@ -58,10 +69,10 @@ const Hero = () => {
   const [showScrollHint, setShowScrollHint] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    phone: '',
-    email: ''
+    firstName: "",
+    lastName: "",
+    phone: "",
+    email: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
@@ -72,9 +83,9 @@ const Hero = () => {
     const handleScroll = () => {
       setShowScrollHint(window.scrollY < 50);
     };
-    
+
     window.addEventListener("scroll", handleScroll);
-    
+
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
@@ -90,29 +101,29 @@ const Hero = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     // Simulate API call
     setTimeout(() => {
       setIsSubmitting(false);
       setSubmitSuccess(true);
-      
+
       setTimeout(() => {
         setSubmitSuccess(false);
         setShowForm(false);
         setFormData({
-          firstName: '',
-          lastName: '',
-          phone: '',
-          email: ''
+          firstName: "",
+          lastName: "",
+          phone: "",
+          email: "",
         });
       }, 3000);
     }, 1500);
@@ -122,20 +133,30 @@ const Hero = () => {
     setShowForm(false);
   };
 
+  const [isContactOpen, setIsContactOpen] = useState(true);
+
+  const whatsappNumber = "919731658272"; // change to admin number
+
+  const message = encodeURIComponent(
+    "Hello, I am interested in your properties.",
+  );
+
+  const whatsappLink = `https://wa.me/${whatsappNumber}?text=${message}`;
+
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gray-950">
       {/* Subtle Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-purple-600/5 to-pink-600/5" />
-      
+
       {/* Very Subtle Animated Gradient */}
-      <motion.div 
+      <motion.div
         className="absolute inset-0 opacity-30"
         animate={{
           background: [
-            'radial-gradient(circle at 30% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 50%)',
-            'radial-gradient(circle at 70% 50%, rgba(168, 85, 247, 0.08) 0%, transparent 50%)',
-            'radial-gradient(circle at 30% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 50%)',
-          ]
+            "radial-gradient(circle at 30% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 50%)",
+            "radial-gradient(circle at 70% 50%, rgba(168, 85, 247, 0.08) 0%, transparent 50%)",
+            "radial-gradient(circle at 30% 50%, rgba(99, 102, 241, 0.08) 0%, transparent 50%)",
+          ],
         }}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
       />
@@ -161,14 +182,13 @@ const Hero = () => {
             animate="show"
             className="space-y-6 sm:space-y-8"
           >
-
             {/* Main Heading - Mobile Optimized */}
             <motion.h1
               variants={fadeUp}
               className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light tracking-tight text-white px-2"
               style={{ fontFamily: "'Playfair Display', serif" }}
             >
-              Step Into a World of{' '}
+              Step Into a World of{" "}
               <span className="block mt-1 sm:mt-2 font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
                 Premium Real Estate
               </span>
@@ -180,8 +200,9 @@ const Hero = () => {
               className="text-sm sm:text-base md:text-lg lg:text-xl text-white/70 max-w-2xl mx-auto leading-relaxed px-4 sm:px-0"
               style={{ fontFamily: "'Inter', sans-serif" }}
             >
-              Discover an exclusive collection of luxury residences, meticulously curated 
-              for discerning individuals who appreciate the finest in architectural excellence.
+              Discover an exclusive collection of luxury residences,
+              meticulously curated for discerning individuals who appreciate the
+              finest in architectural excellence.
             </motion.p>
 
             {/* Stats - Mobile Optimized */}
@@ -190,18 +211,30 @@ const Hero = () => {
               className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 md:gap-8 pt-2 sm:pt-4"
             >
               <div className="text-center">
-                <div className="text-xl sm:text-2xl md:text-3xl font-bold text-white">15k+</div>
-                <div className="text-[10px] sm:text-xs md:text-sm text-white/60 mt-0.5 sm:mt-1">Happy Clients</div>
+                <div className="text-xl sm:text-2xl md:text-3xl font-bold text-white">
+                  15k+
+                </div>
+                <div className="text-[10px] sm:text-xs md:text-sm text-white/60 mt-0.5 sm:mt-1">
+                  Happy Clients
+                </div>
               </div>
               <div className="w-px h-6 sm:h-8 bg-white/20" />
               <div className="text-center">
-                <div className="text-xl sm:text-2xl md:text-3xl font-bold text-white">500+</div>
-                <div className="text-[10px] sm:text-xs md:text-sm text-white/60 mt-0.5 sm:mt-1">Luxury Properties</div>
+                <div className="text-xl sm:text-2xl md:text-3xl font-bold text-white">
+                  500+
+                </div>
+                <div className="text-[10px] sm:text-xs md:text-sm text-white/60 mt-0.5 sm:mt-1">
+                  Luxury Properties
+                </div>
               </div>
               <div className="w-px h-6 sm:h-8 bg-white/20" />
               <div className="text-center">
-                <div className="text-xl sm:text-2xl md:text-3xl font-bold text-white">15+</div>
-                <div className="text-[10px] sm:text-xs md:text-sm text-white/60 mt-0.5 sm:mt-1">Years Experience</div>
+                <div className="text-xl sm:text-2xl md:text-3xl font-bold text-white">
+                  15+
+                </div>
+                <div className="text-[10px] sm:text-xs md:text-sm text-white/60 mt-0.5 sm:mt-1">
+                  Years Experience
+                </div>
               </div>
             </motion.div>
 
@@ -214,17 +247,17 @@ const Hero = () => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => navigate("/property")}
-                className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm sm:text-base font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
+                className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm sm:text-base font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
               >
                 Explore Properties
                 <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform" />
               </motion.button>
-              
+
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => navigate("/contact")}
-                className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-white/5 backdrop-blur-sm border border-white/20 text-white text-sm sm:text-base font-medium rounded-xl hover:bg-white/10 transition-all duration-300"
+                className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-white/5 backdrop-blur-sm border border-white/20 text-white text-sm sm:text-base font-medium rounded-xl hover:bg-white/10 transition-all duration-300 cursor-pointer"
               >
                 Schedule Consultation
               </motion.button>
@@ -260,7 +293,7 @@ const Hero = () => {
               onClick={handleClose}
               className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 hidden lg:block"
             />
-            
+
             <motion.div
               variants={formVariants}
               initial="hidden"
@@ -270,7 +303,10 @@ const Hero = () => {
             >
               <div className="bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-100">
                 <div className="px-6 py-5 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
-                  <h3 className="text-lg font-semibold text-gray-900" style={{ fontFamily: "'Playfair Display', serif" }}>
+                  <h3
+                    className="text-lg font-semibold text-gray-900"
+                    style={{ fontFamily: "'Playfair Display', serif" }}
+                  >
                     Get in Touch
                   </h3>
                   <p className="text-sm text-gray-500 mt-1">
@@ -286,12 +322,26 @@ const Hero = () => {
                       className="text-center py-6"
                     >
                       <div className="w-16 h-16 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-3">
-                        <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        <svg
+                          className="w-8 h-8 text-green-600"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                          />
                         </svg>
                       </div>
-                      <h4 className="text-lg font-semibold text-gray-900 mb-1">Thank You!</h4>
-                      <p className="text-sm text-gray-500">We'll contact you within 24 hours</p>
+                      <h4 className="text-lg font-semibold text-gray-900 mb-1">
+                        Thank You!
+                      </h4>
+                      <p className="text-sm text-gray-500">
+                        We'll contact you within 24 hours
+                      </p>
                     </motion.div>
                   ) : (
                     <form onSubmit={handleSubmit} className="space-y-4">
@@ -349,7 +399,7 @@ const Hero = () => {
                             Sending...
                           </span>
                         ) : (
-                          'Request Consultation'
+                          "Request Consultation"
                         )}
                       </motion.button>
 
@@ -384,26 +434,42 @@ const Hero = () => {
           >
             <div className="bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-100">
               <div className="px-4 py-3 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100 flex justify-between items-center">
-                <h3 className="text-base font-semibold text-gray-900">Get in Touch</h3>
-                <button 
-                  onClick={handleClose} 
+                <h3 className="text-base font-semibold text-gray-900">
+                  Get in Touch
+                </h3>
+                <button
+                  onClick={handleClose}
                   className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
                   aria-label="Close"
                 >
                   <X size={18} className="text-gray-500" />
                 </button>
               </div>
-              
+
               <div className="p-4">
                 {submitSuccess ? (
                   <div className="text-center py-4">
                     <div className="w-12 h-12 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-2">
-                      <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      <svg
+                        className="w-6 h-6 text-green-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 13l4 4L19 7"
+                        />
                       </svg>
                     </div>
-                    <p className="text-sm text-green-600 font-medium">Thank you!</p>
-                    <p className="text-xs text-gray-500 mt-1">We'll contact you soon.</p>
+                    <p className="text-sm text-green-600 font-medium">
+                      Thank you!
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      We'll contact you soon.
+                    </p>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -446,7 +512,7 @@ const Hero = () => {
                       disabled={isSubmitting}
                       className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg text-sm font-medium shadow-md active:scale-[0.98] transition-transform disabled:opacity-50"
                     >
-                      {isSubmitting ? 'Sending...' : 'Submit'}
+                      {isSubmitting ? "Sending..." : "Submit"}
                     </button>
                   </div>
                 )}
@@ -466,10 +532,16 @@ const Hero = () => {
             className="absolute bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 z-30"
           >
             <div className="flex flex-col items-center gap-1 sm:gap-2 text-white/30">
-              <span className="text-[8px] sm:text-xs tracking-widest uppercase">Scroll</span>
+              <span className="text-[8px] sm:text-xs tracking-widest uppercase">
+                Scroll
+              </span>
               <motion.div
                 animate={{ y: [0, 4, 0] }}
-                transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                transition={{
+                  repeat: Infinity,
+                  duration: 2,
+                  ease: "easeInOut",
+                }}
               >
                 <ChevronDown size={12} className="sm:w-4 sm:h-4" />
               </motion.div>
@@ -477,6 +549,52 @@ const Hero = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Floating Contact Widget */}
+      <motion.div
+        initial={{ x: -60 }}
+        animate={{ x: 0 }}
+        transition={{ duration: 0.4 }}
+        className="fixed left-0 top-1/2 -translate-y-1/2 z-50 flex flex-col"
+      >
+        {/* Phone */}
+        <a
+          href="tel:+919731658272"
+          className="group flex items-center bg-gray-900 hover:bg-indigo-600
+    text-white overflow-hidden transition-all duration-300"
+        >
+          <div className="flex items-center justify-center w-12 h-12">
+            <FaPhoneAlt size={18} />
+          </div>
+
+          <span
+            className="max-w-0 group-hover:max-w-[140px] opacity-0 group-hover:opacity-100
+      whitespace-nowrap transition-all duration-300 pr-4 font-medium"
+          >
+            Call Us
+          </span>
+        </a>
+
+        {/* WhatsApp */}
+        <a
+          href={whatsappLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group flex items-center bg-gray-900 hover:bg-green-500
+    text-white overflow-hidden transition-all duration-300"
+        >
+          <div className="flex items-center justify-center w-12 h-12">
+            <FaWhatsapp size={20} />
+          </div>
+
+          <span
+            className="max-w-0 group-hover:max-w-[140px] opacity-0 group-hover:opacity-100
+      whitespace-nowrap transition-all duration-300 pr-4 font-medium"
+          >
+            WhatsApp
+          </span>
+        </a>
+      </motion.div>
     </div>
   );
 };

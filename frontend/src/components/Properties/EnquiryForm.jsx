@@ -40,53 +40,61 @@ function EnquiryForm({ projectId, onSuccess }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
-        <input
-          type="text"
-          name="first_name"
-          placeholder="First Name"
-          required
-          onChange={handleChange}
-          className="w-full px-3 py-2.5 text-sm bg-gray-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition"
-        />
+<form onSubmit={handleSubmit} className="space-y-4">
 
-        <input
-          type="text"
-          name="last_name"
-          placeholder="Last Name"
-          required
-          onChange={handleChange}
-          className="w-full px-3 py-2.5 text-sm bg-gray-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition"
-        />
-      </div>
+  {/* Full Name */}
+  <div>
+    <label className="text-sm font-medium text-gray-700 mb-1 block">
+      Full Name <span className="text-red-500">*</span>
+    </label>
+    <input
+      type="text"
+      name="first_name"
+      required
+      onChange={handleChange}
+      placeholder="Enter your name"
+      className="w-full px-3 py-2.5 text-sm bg-gray-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition"
+    />
+  </div>
 
-      <input
-        type="tel"
-        name="contact"
-        placeholder="Contact Number"
-        required
-        onChange={handleChange}
-        className="w-full px-3 py-2.5 text-sm bg-gray-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition"
-      />
+  {/* Contact Number */}
+  <div>
+    <label className="text-sm font-medium text-gray-700 mb-1 block">
+      Contact Number <span className="text-red-500">*</span>
+    </label>
+    <input
+      type="tel"
+      name="contact"
+      required
+      onChange={handleChange}
+      placeholder="Enter contact number"
+      className="w-full px-3 py-2.5 text-sm bg-gray-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition"
+    />
+  </div>
 
-      <input
-        type="email"
-        name="email"
-        placeholder="Email Address"
-        required
-        onChange={handleChange}
-        className="w-full px-3 py-2.5 text-sm bg-gray-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition"
-      />
+  {/* Email */}
+  <div>
+    <label className="text-sm font-medium text-gray-700 mb-1 block">
+      Email Address <span className="text-red-500">*</span>
+    </label>
+    <input
+      type="email"
+      name="email"
+      onChange={handleChange}
+      placeholder="Enter email address"
+      className="w-full px-3 py-2.5 text-sm bg-gray-50 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/30 transition"
+    />
+  </div>
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full h-11 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-semibold hover:scale-105 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50"
-      >
-        {loading ? "Submitting..." : "Submit & Get Brochure"}
-      </button>
-    </form>
+  <button
+    type="submit"
+    disabled={loading}
+    className="w-full h-11 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-semibold hover:scale-105 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50"
+  >
+    {loading ? "Submitting..." : "Submit"}
+  </button>
+
+</form>
   );
 }
 

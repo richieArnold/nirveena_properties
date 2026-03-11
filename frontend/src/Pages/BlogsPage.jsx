@@ -45,6 +45,8 @@ const BlogsPage = () => {
     blog.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const featuredBlog = filteredBlogs[0];
+
   return (
     <div className="min-h-screen bg-[#fafafa]" style={BODY_STYLE}>
       {/* HERO */}
@@ -88,37 +90,39 @@ const BlogsPage = () => {
             <Loader2 className="animate-spin mb-4" size={40} />
             <p>Loading blogs...</p>
           </div>
-        ) : filteredBlogs.length > 0 ? (
+        ) : featuredBlog ? (
           <>
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+
               {/* FEATURED BLOG */}
               <div className="lg:col-span-6 xl:col-span-7">
                 <article className="flex flex-col h-full bg-white rounded-2xl overflow-hidden shadow border">
                   <div className="aspect-[1.4/1] overflow-hidden">
                     <img
                       src={
-                        filteredBlogs[0].images?.[0]?.image_url ||
+                        featuredBlog.images?.[0]?.image_url ||
                         "https://via.placeholder.com/800x600"
                       }
                       className="w-full h-full object-cover"
-                      alt={filteredBlogs[0].title}
+                      alt={featuredBlog.title}
                     />
                   </div>
 
                   <div className="p-8 flex flex-col flex-grow">
                     <div className="text-xs text-gray-400 uppercase mb-3">
-                      By {filteredBlogs[0].author}
+                      By {featuredBlog.author} •{" "}
+                      {new Date(featuredBlog.created_at).toLocaleDateString()}
                     </div>
 
                     <h2
                       className="text-3xl font-extrabold text-gray-900 mb-6"
                       style={HEADING_STYLE}
                     >
-                      {filteredBlogs[0].title}
+                      {featuredBlog.title}
                     </h2>
 
                     <Link
-                      to={`/blogs/${filteredBlogs[0].slug}`}
+                      to={`/blogs/${featuredBlog.slug}`}
                       className="text-blue-600 font-bold text-sm"
                     >
                       Read Now →
@@ -147,7 +151,8 @@ const BlogsPage = () => {
 
                     <div className="p-5">
                       <p className="text-xs text-gray-400 uppercase mb-1">
-                        By {blog.author}
+                        By {blog.author} •{" "}
+                        {new Date(blog.created_at).toLocaleDateString()}
                       </p>
 
                       <h3

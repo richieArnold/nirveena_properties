@@ -188,8 +188,7 @@ const Header = () => {
                   </div>
                   <div className="text-sm text-gray-600">
                     <p className="font-medium mb-1">Business Hours</p>
-                    <p>Mon-Fri: 9am-6pm</p>
-                    <p>Sat: 10am-4pm</p>
+                    <p>All Days: 9am-9pm</p>
                   </div>
                 </div>
               </div>

@@ -27,6 +27,14 @@ function PropertyDetailsPage() {
   const [activeImage, setActiveImage] = useState(0);
   const [viewerOpen, setViewerOpen] = useState(false);
 
+  const [showPopup, setShowPopup] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowPopup(true);
+    }, 5000); // 5 seconds
+
+    return () => clearTimeout(timer);
+  }, []);
   useEffect(() => {
     async function fetchProject() {
       try {
@@ -157,51 +165,71 @@ function PropertyDetailsPage() {
 
           {/* IMAGE GALLERY */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-10">
+            {/* LARGE IMAGE */}
             <div
-              onClick={() => setViewerOpen(true)}
+              onClick={() => {
+                setActiveImage(0);
+                setViewerOpen(true);
+              }}
               className="lg:col-span-2 relative h-[300px] md:h-[500px] rounded-2xl overflow-hidden shadow-lg cursor-pointer"
             >
               <img
                 src={
-                  project.images?.[activeImage]?.image_url ||
+                  project.images?.[0]?.image_url ||
                   project.image_url ||
                   "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1600&auto=format&fit=crop"
                 }
-                alt="property"
                 className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.target.src =
-                    "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1600&auto=format&fit=crop";
-                }}
               />
 
-              <div className="absolute bottom-4 right-4 bg-black/60 text-white px-4 py-2 rounded-lg text-sm">
-                {activeImage + 1} / {project.images?.length}
+              <div className="absolute bottom-4 right-4 bg-black/60 text-white px-3 py-1 rounded-md text-sm">
+                1 / {project.images?.length}
               </div>
             </div>
 
-            {/* THUMBNAILS */}
-            <div className="grid grid-cols-4 lg:grid-cols-1 gap-3">
-              {project.images?.map((img, i) => (
-                <button
-                  key={i}
-                  onClick={() => setActiveImage(i)}
-                  className={`relative rounded-xl overflow-hidden border-2 transition-all duration-200 
-      ${
-        activeImage === i
-          ? "border-blue-600 scale-95 shadow-md"
-          : "border-transparent opacity-80 hover:opacity-100"
-      }`}
+            {/* RIGHT SIDE IMAGES */}
+            <div className="flex flex-col gap-4">
+              {/* IMAGE 2 */}
+              {project.images?.[1] && (
+                <div
+                  onClick={() => {
+                    setActiveImage(1);
+                    setViewerOpen(true);
+                  }}
+                  className="h-[145px] md:h-[240px] rounded-2xl overflow-hidden cursor-pointer"
                 >
-                  <div className="w-full aspect-[4/3]">
-                    <img
-                      src={img.image_url}
-                      alt=""
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                </button>
-              ))}
+                  <img
+                    src={project.images[1].image_url}
+                    className="w-full h-full object-cover hover:scale-105 transition"
+                  />
+                </div>
+              )}
+
+              {/* IMAGE 3 */}
+              {project.images?.[2] && (
+                <div
+                  onClick={() => {
+                    setActiveImage(2);
+                    setViewerOpen(true);
+                  }}
+                  className="relative h-[145px] md:h-[240px] rounded-2xl overflow-hidden cursor-pointer"
+                >
+                  <img
+                    src={project.images[2].image_url}
+                    className="w-full h-full object-cover hover:scale-105 transition"
+                  />
+
+                  {/* MORE IMAGES OVERLAY */}
+                  {project.images.length > 3 && (
+                    <div
+                      onClick={() => setViewerOpen(true)}
+                      className="absolute inset-0 bg-black/60 flex items-center justify-center text-white text-lg font-semibold"
+                    >
+                      +{project.images.length - 3} more
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
@@ -314,18 +342,32 @@ function PropertyDetailsPage() {
             </div>
 
             {/* CONTACT FORM */}
-            <div className="lg:col-span-1">
-              <div className="sticky top-24 bg-white p-6 rounded-2xl shadow-xl border">
-                <h4 className="text-xl font-bold mb-6">
-                  Schedule A Sure Visit
-                </h4>
+            {/* ENQUIRY POPUP */}
+            {showPopup && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+                <div className="relative bg-white w-[95%] max-w-md p-6 rounded-2xl shadow-2xl">
+                  {/* CLOSE BUTTON */}
+                  <button
+                    onClick={() => setShowPopup(false)}
+                    className="absolute top-4 right-4 text-slate-500 hover:text-black"
+                  >
+                    <X size={24} />
+                  </button>
 
-                <EnquiryForm
-                  projectId={project.id}
-                  onSuccess={handleEnquirySuccess}
-                />
+                  <h3 className="text-xl font-bold mb-4 text-center">
+                    Schedule A Site Visit
+                  </h3>
+
+                  <EnquiryForm
+                    projectId={project.id}
+                    onSuccess={() => {
+                      setShowPopup(false);
+                      handleEnquirySuccess();
+                    }}
+                  />
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </main>
 

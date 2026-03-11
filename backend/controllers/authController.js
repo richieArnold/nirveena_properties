@@ -5,6 +5,7 @@ const pool = require('../rds_setup/db/index');
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this';
 
 // Existing login function
+// Existing login function - MODIFIED to use 3min token
 exports.login = async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -43,14 +44,14 @@ exports.login = async (req, res) => {
       });
     }
 
-    // Generate JWT token
+    // Generate JWT token with 3 minutes expiry
     const token = jwt.sign(
       { 
         id: admin.id, 
         username: admin.username 
       },
       JWT_SECRET,
-      { expiresIn: '24h' }
+      { expiresIn: '3m' } // Changed from '24h' to '3m'
     );
 
     res.json({
@@ -89,9 +90,17 @@ exports.verifyToken = (req, res, next) => {
     req.user = decoded;
     next();
   } catch (error) {
+    // Check if error is due to token expiration
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({
+        success: false,
+        message: 'Session expired. Please login again.',
+        expired: true
+      });
+    }
     return res.status(403).json({
       success: false,
-      message: 'Invalid or expired token'
+      message: 'Invalid token'
     });
   }
 };

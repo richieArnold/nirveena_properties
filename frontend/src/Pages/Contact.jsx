@@ -206,7 +206,7 @@ const ContactPage = () => {
               Send Us a Message
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              Fill out the form and our team will contact you within 24 hours
+              Fill out the form and our team will contact you within 1 hour
             </p>
           </motion.div>
 
@@ -384,7 +384,7 @@ const ContactPage = () => {
                           Sending Message...
                         </span>
                       ) : (
-                        <span className="flex items-center justify-center gap-3">
+                        <span className="flex cursor-pointer items-center justify-center gap-3">
                           Send Message
                           <Send size={18} />
                         </span>
@@ -448,8 +448,8 @@ const ContactPage = () => {
                 </div>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center pb-3 border-b border-white/20">
-                    <span>Monday - Sunday</span>
-                    <span className="font-semibold">9:00 AM - 7:00 PM</span>
+                    <span>All Days</span>
+                    <span className="font-semibold">9:00 AM - 9:00 PM</span>
                   </div>
                 </div>
                 <div className="mt-6 p-4 bg-white/10 rounded-xl">

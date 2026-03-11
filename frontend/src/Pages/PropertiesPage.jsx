@@ -38,12 +38,32 @@ function PropertiesPage() {
     fetchProperties();
   }, []);
 
+  // Read both type and status from URL parameters
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const typeFromURL = params.get("type");
+    const statusFromURL = params.get("status");
 
     if (typeFromURL) {
       setSelectedType(typeFromURL.toLowerCase());
+    }
+
+    if (statusFromURL) {
+      // Map URL status codes to display values for the filter
+      const statusMap = {
+        'rtm': 'Ready to Move',
+        'uc': 'On Going',
+        'eoi': 'Expression of Interest'
+      };
+      
+      const displayStatus = statusMap[statusFromURL.toLowerCase()];
+      if (displayStatus) {
+        setSelectedStatus(displayStatus);
+      } else {
+        setSelectedStatus("all");
+      }
+    } else {
+      setSelectedStatus("all");
     }
   }, [location.search]);
 
@@ -54,7 +74,7 @@ function PropertiesPage() {
 
   const filteredProperties = properties.filter((property) => {
     const type = property.project_type?.toLowerCase();
-    const status = property.project_status?.toLowerCase();
+    const status = property.project_status; // This is now the display value (e.g., "On Going")
     const search = searchQuery.toLowerCase();
 
     const matchesSearch =
