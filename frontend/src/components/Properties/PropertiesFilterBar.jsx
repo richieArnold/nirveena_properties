@@ -13,7 +13,6 @@ function PropertiesFilterBar({
     <div className="bg-white border-b border-gray-200 shadow-sm">
       <div className="w-full px-4 sm:px-6 py-5 flex flex-col lg:flex-row lg:items-center gap-4">
         <div className="relative w-full lg:w-80">
-          {" "}
           <input
             type="text"
             placeholder="Search project..."
@@ -31,7 +30,7 @@ function PropertiesFilterBar({
               <button
                 key={type}
                 onClick={() => setSelectedType(type)}
-                className={`px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border
+                className={`px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all border whitespace-nowrap
                 ${
                   isActive
                     ? "bg-blue-600 text-white border-blue-600 shadow-md"
@@ -48,16 +47,17 @@ function PropertiesFilterBar({
 
         <div className="hidden lg:block flex-1" />
 
-        <div className="w-full lg:w-auto">
+        {/* Status Dropdown - Visible only on mobile (below lg) */}
+        <div className="w-full lg:hidden">
           <select
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
-            className="px-4 py-3 rounded-xl border border-gray-200 bg-gray-100 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-100 text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="all">All Status</option>
-            <option value="rtm">RTM</option>
-            <option value="uc">UC</option>
-            <option value="eoi">EOI</option>
+            <option value="Ready to Move">Ready to Move</option>
+            <option value="On Going">On Going</option>
+            <option value="Expression of Interest">Expression of Interest</option>
           </select>
         </div>
       </div>

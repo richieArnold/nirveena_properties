@@ -1,18 +1,27 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axiosInstance from "../utils/Instance";
 import { User, Lock, Loader2 } from "lucide-react";
 
 const Login = ({ onLogin }) => {
   const navigate = useNavigate();
-
+  const location = useLocation();
   const [credentials, setCredentials] = useState({
     username: "",
     password: "",
   });
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
+  const [sessionMessage, setSessionMessage] = useState('');
+
+  useEffect(() => {
+    // Check for session expired message from URL or state
+    const params = new URLSearchParams(location.search);
+    if (params.get('session') === 'expired' || location.state?.message) {
+      setSessionMessage(location.state?.message || 'Your session has expired. Please login again.');
+    }
+  }, [location]);
 
   const handleChange = (e) => {
     setCredentials({
@@ -25,7 +34,8 @@ const Login = ({ onLogin }) => {
     e.preventDefault();
 
     setLoading(true);
-    setError("");
+    setError('');
+    setSessionMessage('');
 
     try {
       const response = await axiosInstance.post("/api/auth/login", credentials);
@@ -68,19 +78,21 @@ const Login = ({ onLogin }) => {
             Sign in to access dashboard
           </p>
         </div>
-
-        {/* Card */}
-        <div className="bg-white rounded-2xl shadow-2xl p-8 border">
-
-          <form className="space-y-6" onSubmit={handleSubmit}>
-
-            {error && (
-              <div className="bg-red-100 text-red-700 px-4 py-3 rounded-lg text-sm">
-                {error}
-              </div>
-            )}
-
-            {/* Username */}
+        
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          {sessionMessage && (
+            <div className="bg-yellow-100 text-yellow-700 p-3 rounded-lg text-sm border-l-4 border-yellow-500">
+              {sessionMessage}
+            </div>
+          )}
+          
+          {error && (
+            <div className="bg-red-100 text-red-700 p-3 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
+          
+          <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Username
