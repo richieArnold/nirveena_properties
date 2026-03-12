@@ -34,6 +34,12 @@ import CustomerDetails from "../Pages/admin/CustomerDetails";
 
 import BlogsPage from "../Pages/BlogsPage";
 import BlogDetails from "../Pages/BlogDetails";
+import PrivacyPolicy from "../Pages/PrivacyPolicy";
+import Terms from "../Pages/Terms";
+import Cookies from "../Pages/Cookies";
+import Consent from "../Pages/Consent";
+import ReraDisclosure from "../Pages/ReraDisclosure";
+
 
 import ChangePassword from "../components/admin/ChangePassword";
 
@@ -59,6 +65,11 @@ const PageRoutes = () => {
         <Route path="/properties/:slug" element={<PropertyDetailsPage />} />
         <Route path="/blogs" element={<BlogsPage />} />
         <Route path="/blogs/:slug" element={<BlogDetails />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/cookies" element={<Cookies/>}/>
+        <Route path="/consent" element={<Consent/>}/>
+        <Route path="/rera" element={<ReraDisclosure/>}/>
       </Route>
 
       {/* Admin Routes - NO Layout */}

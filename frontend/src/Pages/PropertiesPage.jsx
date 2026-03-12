@@ -1,11 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axiosInstance from "../utils/Instance";
-import {
-  Building2,
-  Home,
-  TreePine,
-  Briefcase,
-} from "lucide-react";
+import { Building2, Home, TreePine, Briefcase } from "lucide-react";
 import { useLocation } from "react-router-dom";
 
 import PropertiesHero from "../components/Properties/PropertiesHero";
@@ -24,7 +19,7 @@ function PropertiesPage() {
   async function fetchProperties() {
     try {
       const res = await axiosInstance.get(
-        "/api/projects/getAllPropertiesUnfiltered"
+        "/api/projects/getAllPropertiesUnfiltered",
       );
       setProperties(res.data.data);
     } catch (err) {
@@ -51,11 +46,11 @@ function PropertiesPage() {
     if (statusFromURL) {
       // Map URL status codes to display values for the filter
       const statusMap = {
-        'rtm': 'Ready to Move',
-        'uc': 'On Going',
-        'eoi': 'Expression of Interest'
+        rtm: "Ready to Move",
+        uc: "On Going",
+        eoi: "Expression of Interest",
       };
-      
+
       const displayStatus = statusMap[statusFromURL.toLowerCase()];
       if (displayStatus) {
         setSelectedStatus(displayStatus);
@@ -67,10 +62,15 @@ function PropertiesPage() {
     }
   }, [location.search]);
 
-  const projectTypes = [
-    "all",
-    ...new Set(properties.map((p) => p.project_type?.toLowerCase())),
-  ];
+const typesFromDB = [
+  ...new Set(properties.map((p) => p.project_type?.toLowerCase())),
+].filter(Boolean);
+
+const projectTypes = [
+  "all",
+  ...typesFromDB.filter((t) => t !== "commercial"),
+  ...typesFromDB.filter((t) => t === "commercial"),
+];
 
   const filteredProperties = properties.filter((property) => {
     const type = property.project_type?.toLowerCase();
@@ -86,8 +86,7 @@ function PropertiesPage() {
       type === selectedType ||
       (selectedType === "villa" && type === "villas");
 
-    const matchesStatus =
-      selectedStatus === "all" || status === selectedStatus;
+    const matchesStatus = selectedStatus === "all" || status === selectedStatus;
 
     return matchesSearch && matchesType && matchesStatus;
   });
@@ -103,7 +102,7 @@ function PropertiesPage() {
   const handleViewDetails = async (slug) => {
     try {
       const res = await axiosInstance.get(
-        `/api/projects/getSingleProject/${slug}`
+        `/api/projects/getSingleProject/${slug}`,
       );
       console.log(res);
     } catch (err) {

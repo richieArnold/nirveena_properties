@@ -8,6 +8,18 @@ function PropertiesGrid({
   getIcon,
   handleViewDetails,
 }) {
+
+  // Ensure commercial properties appear last
+  const sortedProperties = [...filteredProperties].sort((a, b) => {
+    const aType = (a.project_type || "").toLowerCase().trim();
+    const bType = (b.project_type || "").toLowerCase().trim();
+
+    if (aType === "commercial" && bType !== "commercial") return 1;
+    if (aType !== "commercial" && bType === "commercial") return -1;
+
+    return 0;
+  });
+
   return (
     <div className="w-full px-4 sm:px-6 lg:px-12 py-10 lg:py-16">
       <motion.div
@@ -36,7 +48,7 @@ function PropertiesGrid({
                 </div>
               </div>
             ))
-          : filteredProperties.map((property) => (
+          : sortedProperties.map((property) => (
               <PropertyCard
                 key={property.slug}
                 property={property}

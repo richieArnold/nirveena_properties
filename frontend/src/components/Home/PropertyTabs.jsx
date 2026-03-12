@@ -8,8 +8,8 @@ import { useNavigate } from "react-router-dom";
 const tabs = [
   { id: "Apartments", label: "Apartments", category: "apartment" },
   { id: "Villas", label: "Villas", category: "villa" },
-  { id: "Commercials", label: "Commercials", category: "commercial" },
   { id: "Villa Plots", label: "Villa Plots", category: "villa plots" },
+  { id: "Commercials", label: "Commercials", category: "commercial" },
 ];
 
 const PropertyTabs = () => {
@@ -86,36 +86,38 @@ const PropertyTabs = () => {
 
   // Update max scroll for progress line
   useEffect(() => {
-    const container = document.getElementById('properties-scroll-container');
+    const container = document.getElementById("properties-scroll-container");
     if (container) {
       setMaxScroll(container.scrollWidth - container.clientWidth);
-      
+
       const handleScroll = () => {
         setScrollPosition(container.scrollLeft);
       };
-      
-      container.addEventListener('scroll', handleScroll);
-      return () => container.removeEventListener('scroll', handleScroll);
+
+      container.addEventListener("scroll", handleScroll);
+      return () => container.removeEventListener("scroll", handleScroll);
     }
   }, [properties]);
 
   const handleScroll = (direction) => {
-    const container = document.getElementById('properties-scroll-container');
+    const container = document.getElementById("properties-scroll-container");
     if (container) {
       const scrollAmount = 400;
-      const newPosition = direction === 'left' 
-        ? container.scrollLeft - scrollAmount 
-        : container.scrollLeft + scrollAmount;
-      
+      const newPosition =
+        direction === "left"
+          ? container.scrollLeft - scrollAmount
+          : container.scrollLeft + scrollAmount;
+
       container.scrollTo({
         left: newPosition,
-        behavior: 'smooth'
+        behavior: "smooth",
       });
     }
   };
 
   // Calculate progress percentage
-  const progressPercentage = maxScroll > 0 ? (scrollPosition / maxScroll) * 100 : 0;
+  const progressPercentage =
+    maxScroll > 0 ? (scrollPosition / maxScroll) * 100 : 0;
 
   // Animation variants
   const headerVariants = {
@@ -285,19 +287,19 @@ const PropertyTabs = () => {
               <motion.button
                 whileHover={{ scale: 1.1, x: -2 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => handleScroll('left')}
+                onClick={() => handleScroll("left")}
                 className="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-600 hover:text-blue-600 transition-colors border border-gray-100"
                 disabled={scrollPosition <= 0}
               >
                 <ChevronLeft size={20} />
               </motion.button>
             </div>
-            
+
             <div className="absolute -right-4 top-1/2 -translate-y-1/2 z-10 hidden lg:block">
               <motion.button
                 whileHover={{ scale: 1.1, x: 2 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => handleScroll('right')}
+                onClick={() => handleScroll("right")}
                 className="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center text-gray-600 hover:text-blue-600 transition-colors border border-gray-100"
                 disabled={scrollPosition >= maxScroll}
               >
@@ -339,7 +341,7 @@ const PropertyTabs = () => {
                   transition={{ duration: 0.1, ease: "linear" }}
                 />
               </div>
-              
+
               {/* Minimal percentage indicator */}
               <div className="text-xs font-mono text-gray-400 font-medium tabular-nums">
                 {Math.round(progressPercentage)}%
