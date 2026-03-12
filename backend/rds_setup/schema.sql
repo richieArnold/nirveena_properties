@@ -22,6 +22,65 @@ CREATE TABLE IF NOT EXISTS projects (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+
+CREATE TABLE IF NOT EXISTS project_features (
+  id SERIAL PRIMARY KEY,
+
+  project_id INTEGER REFERENCES projects(project_id) ON DELETE CASCADE,
+
+  feature_name VARCHAR(150) NOT NULL, -- Amenities / Facilities
+
+  sort_order INTEGER DEFAULT 0,
+
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS project_feature_items (
+  id SERIAL PRIMARY KEY,
+
+  feature_id INTEGER REFERENCES project_features(id) ON DELETE CASCADE,
+
+  label VARCHAR(150) NOT NULL,
+
+  icon_url TEXT,
+  image_url TEXT,
+
+  sort_order INTEGER DEFAULT 0,
+
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS project_configurations (
+  id SERIAL PRIMARY KEY,
+
+  project_id INTEGER REFERENCES projects(project_id) ON DELETE CASCADE,
+
+  configuration VARCHAR(100) NOT NULL, -- 2BHK
+  size_range VARCHAR(100),             -- 1340-1350 sq.ft
+  price VARCHAR(100),                  -- ₹1.51 Cr onwards
+
+  sort_order INTEGER DEFAULT 0,
+
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS project_floor_plans (
+  id SERIAL PRIMARY KEY,
+
+  project_id INTEGER REFERENCES projects(project_id) ON DELETE CASCADE,
+  configuration_id INTEGER REFERENCES project_configurations(id) ON DELETE CASCADE,
+
+  title VARCHAR(150),   -- Example: 2 BHK
+  area VARCHAR(100),    -- Example: 1340 sq.ft
+
+  image_url TEXT NOT NULL,
+
+  sort_order INTEGER DEFAULT 0,
+
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+
 CREATE TABLE IF NOT EXISTS project_images (
   id SERIAL PRIMARY KEY,
   project_id INTEGER REFERENCES projects(project_id) ON DELETE CASCADE,
