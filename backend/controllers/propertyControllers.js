@@ -319,7 +319,6 @@ exports.getAllProjects = async (req, res) => {
   }
 };
 
-
 exports.getAllPropertiesUnfiltered = async (req, res) => {
   try {
     const { status } = req.query; // Get status from query params
@@ -333,6 +332,7 @@ exports.getAllPropertiesUnfiltered = async (req, res) => {
         p.price,
         p.project_type,
         p.project_status,
+        p.display_order,
         p.property_description,  
         img.image_url
       FROM projects p
@@ -353,7 +353,15 @@ exports.getAllPropertiesUnfiltered = async (req, res) => {
       queryParams.push(status);
     }
     
-    query += ` ORDER BY p.display_order ASC, p.id DESC`;
+    // Modified ORDER BY: Projects with display_order > 0 come first, ordered by display_order,
+    // then projects with display_order = 0 or NULL come last, ordered by id DESC
+    query += ` ORDER BY 
+        CASE 
+          WHEN p.display_order > 0 THEN 0 
+          ELSE 1 
+        END,
+        p.display_order ASC,
+        p.id DESC`;
     
     const result = await pool.query(query, queryParams);
 
@@ -368,7 +376,7 @@ exports.getAllPropertiesUnfiltered = async (req, res) => {
         
         if (project.project_status) {
           const statusLower = project.project_status.toLowerCase();
-          if (statusLower === 'uc' | 'og') {
+          if (statusLower === 'uc') {
             displayStatus = 'On Going';
           } else if (statusLower === 'rtm') {
             displayStatus = 'Ready to Move';
@@ -380,8 +388,8 @@ exports.getAllPropertiesUnfiltered = async (req, res) => {
         return {
           ...project,
           price: formatPrice(project.price),
-          project_status: displayStatus, // Replace with transformed status
-          original_status: project.project_status // Optional: keep original if needed
+          project_status: displayStatus,
+          original_status: project.project_status
         };
       });
 
@@ -449,117 +457,6 @@ exports.getProjectBySlug = async (req, res) => {
     });
   }
 };
-
-//  Add Create Project
-// exports.addProject = async (req, res) => {
-//   const client = await pool.connect();
-
-//   try {
-//     const {
-//       project_id,
-//       project_name,
-//       project_type,
-//       project_status,
-//       project_location,
-//       total_acres,
-//       no_of_units,
-//       club_house_size,
-//       structure,
-//       typology,
-//       sba,
-//       price,
-//       rera_completion,
-//       property_description,
-//       images = [],
-//     } = req.body;
-
-//     // Basic validation
-//     if (!project_id || !project_name) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "project_id and project_name are required",
-//       });
-//     }
-
-//     const slug = generateSlug(project_name);
-
-//     await client.query("BEGIN");
-
-//     // Insert project
-//     await client.query(
-//       `
-//       INSERT INTO projects (
-//         project_id,
-//         project_name,
-//         slug,
-//         project_type,
-//         project_status,
-//         project_location,
-//         total_acres,
-//         no_of_units,
-//         club_house_size,
-//         structure,
-//         typology,
-//         sba,
-//         price,
-//         rera_completion,
-//         property_description
-//       )
-//       VALUES (
-//         $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15
-//       )
-//       `,
-//       [
-//         Number(project_id),
-//         project_name.trim(),
-//         slug,
-//         project_type || null,
-//         project_status || null,
-//         project_location || null,
-//         total_acres || null,
-//         no_of_units || null,
-//         club_house_size || null,
-//         structure || null,
-//         typology || null,
-//         sba || null,
-//         price || null,
-//         rera_completion || null,
-//         property_description || null,
-//       ],
-//     );
-
-//     // Insert images if provided
-//     for (let i = 0; i < images.length; i++) {
-//       await client.query(
-//         `
-//         INSERT INTO project_images (project_id, image_url, sort_order)
-//         VALUES ($1, $2, $3)
-//         `,
-//         [Number(project_id), images[i], i],
-//       );
-//     }
-
-//     await client.query("COMMIT");
-
-//     res.status(201).json({
-//       success: true,
-//       message: "Project created successfully",
-//     });
-//   } catch (error) {
-//     await client.query("ROLLBACK");
-
-//     console.error("Create project error:", error);
-
-//     res.status(500).json({
-//       success: false,
-//       message: "Project creation failed",
-//       error: error.message,
-//     });
-//   } finally {
-//     client.release();
-//   }
-// };
-
 
 
 // Update addProject to include display_order
@@ -825,139 +722,6 @@ exports.getProjectById = async (req, res) => {
   }
 };
 
-// Update project
-// exports.updateProject = async (req, res) => {
-//   const client = await pool.connect();
-
-//   try {
-//     const { id } = req.params;
-//     const {
-//       project_id,
-//       project_name,
-//       project_type,
-//       project_status,
-//       project_location,
-//       total_acres,
-//       no_of_units,
-//       club_house_size,
-//       structure,
-//       typology,
-//       sba,
-//       price,
-//       rera_completion,
-//       property_description,
-//       existing_images = [],
-//       new_images = [],
-//     } = req.body;
-
-//     // Basic validation
-//     if (!project_id || !project_name) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "project_id and project_name are required",
-//       });
-//     }
-
-//     // Check if project exists
-//     const projectCheck = await client.query(
-//       "SELECT * FROM projects WHERE id = $1",
-//       [id],
-//     );
-
-//     if (projectCheck.rows.length === 0) {
-//       return res.status(404).json({
-//         success: false,
-//         message: "Project not found",
-//       });
-//     }
-
-//     const slug = generateSlug(project_name);
-
-//     await client.query("BEGIN");
-
-//     // Update project - ADD property_description to the query
-//     await client.query(
-//       `
-//       UPDATE projects SET
-//         project_id = $1,
-//         project_name = $2,
-//         slug = $3,
-//         project_type = $4,
-//         project_status = $5,
-//         project_location = $6,
-//         total_acres = $7,
-//         no_of_units = $8,
-//         club_house_size = $9,
-//         structure = $10,
-//         typology = $11,
-//         sba = $12,
-//         price = $13,
-//         rera_completion = $14,
-//         property_description = $15,  
-//         updated_at = NOW()
-//       WHERE id = $16  
-//       `,
-//       [
-//         Number(project_id),
-//         project_name.trim(),
-//         slug,
-//         project_type || null,
-//         project_status || null,
-//         project_location || null,
-//         total_acres || null,
-//         no_of_units || null,
-//         club_house_size || null,
-//         structure || null,
-//         typology || null,
-//         sba || null,
-//         price || null,
-//         rera_completion || null,
-//         property_description || null,
-//         id,
-//       ],
-//     );
-
-//     // Handle images if provided
-//     if (existing_images.length > 0 || new_images.length > 0) {
-//       // Delete images that are no longer needed
-//       await client.query(
-//         "DELETE FROM project_images WHERE project_id = $1 AND image_url NOT IN (SELECT unnest($2::text[]))",
-//         [Number(project_id), existing_images],
-//       );
-
-//       // Add new images
-//       let nextSortOrder = existing_images.length;
-//       for (let i = 0; i < new_images.length; i++) {
-//         await client.query(
-//           `
-//           INSERT INTO project_images (project_id, image_url, sort_order)
-//           VALUES ($1, $2, $3)
-//           ON CONFLICT DO NOTHING
-//           `,
-//           [Number(project_id), new_images[i], nextSortOrder + i],
-//         );
-//       }
-//     }
-
-//     await client.query("COMMIT");
-
-//     res.json({
-//       success: true,
-//       message: "Project updated successfully",
-//     });
-//   } catch (error) {
-//     await client.query("ROLLBACK");
-//     console.error("Update project error:", error);
-//     res.status(500).json({
-//       success: false,
-//       message: "Failed to update project",
-//       error: error.message,
-//     });
-//   } finally {
-//     client.release();
-//   }
-// };
-
 // Update updateProject to include display_order
 exports.updateProject = async (req, res) => {
   const client = await pool.connect();
@@ -1142,3 +906,34 @@ exports.updateDisplayOrder = async (req, res) => {
     });
   }
 };
+
+
+// Get all unique property types
+exports.getPropertyTypes = async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT DISTINCT project_type FROM projects WHERE project_type IS NOT NULL ORDER BY project_type"
+    );
+    const types = result.rows.map(row => row.project_type);
+    res.json({ success: true, types });
+  } catch (error) {
+    console.error("Error fetching property types:", error);
+    res.status(500).json({ success: false, message: "Failed to fetch property types" });
+  }
+};
+
+// Save new property type (optional)
+exports.savePropertyType = async (req, res) => {
+  // This is optional - you might not need to save types separately
+  // They'll be saved when you create a project with that type
+  res.json({ success: true });
+};
+
+
+
+
+
+
+
+
+

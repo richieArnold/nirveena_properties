@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { Save, Upload, ArrowLeft, CheckCircle, XCircle, X } from "lucide-react";
+import { Save, Upload, ArrowLeft, CheckCircle, XCircle, X, Plus, ChevronDown } from "lucide-react";
+import SimpleMDE from "react-simplemde-editor";
+import "easymde/dist/easymde.min.css";
 import AdminLayout from "../../components/admin/AdminLayout";
 import AlertMessage from "../../components/admin/AlertMessage";
 import axiosInstance from "../../utils/Instance";
@@ -18,6 +20,9 @@ const AddProject = () => {
     message: "",
   });
   const [images, setImages] = useState([]);
+  const [propertyTypes, setPropertyTypes] = useState([]);
+  const [showNewTypeInput, setShowNewTypeInput] = useState(false);
+  const [newPropertyType, setNewPropertyType] = useState("");
   const [formData, setFormData] = useState({
     project_id: "",
     project_name: "",
@@ -32,8 +37,25 @@ const AddProject = () => {
     sba: "",
     price: "",
     rera_completion: "",
-    property_description: "", // ADD THIS
+    property_description: "",
   });
+
+  // Fetch existing property types from backend
+  useEffect(() => {
+    fetchPropertyTypes();
+  }, []);
+
+  const fetchPropertyTypes = async () => {
+    try {
+      // You'll need to create this endpoint or use existing one
+      const response = await axiosInstance.get("/api/projects/property-types");
+      setPropertyTypes(response.data.types || []);
+    } catch (error) {
+      console.error("Error fetching property types:", error);
+      // Fallback to default types if endpoint doesn't exist
+      setPropertyTypes(["Apartment", "Villa", "Commercial", "Villa Plots", "Penthouse", "Studio"]);
+    }
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("adminToken");
@@ -47,6 +69,13 @@ const AddProject = () => {
     }
   }, [navigate]);
 
+  const handleDescriptionChange = (value) => {
+    setFormData({
+      ...formData,
+      property_description: value,
+    });
+  };
+
   const handleInputChange = (e) => {
     setFormData({
       ...formData,
@@ -56,6 +85,33 @@ const AddProject = () => {
 
   const handleImageChange = (e) => {
     setImages([...e.target.files]);
+  };
+
+  const handleAddNewType = () => {
+    if (newPropertyType.trim()) {
+      // Add to property types list
+      setPropertyTypes([...propertyTypes, newPropertyType.trim()]);
+      // Select the new type
+      setFormData({
+        ...formData,
+        project_type: newPropertyType.trim(),
+      });
+      // Reset new type input
+      setNewPropertyType("");
+      setShowNewTypeInput(false);
+      
+      // Optional: Save new type to backend
+      saveNewPropertyType(newPropertyType.trim());
+    }
+  };
+
+  const saveNewPropertyType = async (type) => {
+    try {
+      // You can create an endpoint to save new property types
+      await axiosInstance.post("/api/projects/property-types", { type });
+    } catch (error) {
+      console.error("Error saving new property type:", error);
+    }
   };
 
   const showSuccessNotification = (projectName, imageCount) => {
@@ -130,14 +186,15 @@ const AddProject = () => {
   return (
     <AdminLayout user={user}>
       <div className="mb-4">
-                <button
-                  onClick={() => navigate('/admin')}
-                  className="inline-flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  Back to Dashboard
-                </button>
-              </div>
+        <button
+          onClick={() => navigate('/admin')}
+          className="inline-flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Dashboard
+        </button>
+      </div>
+
       {/* Custom Notification */}
       {showNotification && (
         <div
@@ -242,17 +299,68 @@ const AddProject = () => {
             />
           </div>
 
-          {/* Project Type */}
-          <div>
+          {/* Project Type with Dropdown and Add New */}
+          <div className="md:col-span-2">
             <label className={labelClasses}>Project Type</label>
-            <input
-              type="text"
-              name="project_type"
-              value={formData.project_type}
-              onChange={handleInputChange}
-              className={inputClasses}
-              placeholder="e.g., Villa, Apartment"
-            />
+            <div className="flex gap-2">
+              {!showNewTypeInput ? (
+                <>
+                  <select
+                    name="project_type"
+                    value={formData.project_type}
+                    onChange={handleInputChange}
+                    className={`${inputClasses} flex-1`}
+                  >
+                    <option value="">Select Project Type</option>
+                    {propertyTypes.map((type) => (
+                      <option key={type} value={type}>
+                        {type}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    onClick={() => setShowNewTypeInput(true)}
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center gap-2 whitespace-nowrap"
+                    title="Add new property type"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span className="hidden sm:inline">New Type</span>
+                  </button>
+                </>
+              ) : (
+                <>
+                  <input
+                    type="text"
+                    value={newPropertyType}
+                    onChange={(e) => setNewPropertyType(e.target.value)}
+                    placeholder="Enter new property type"
+                    className={`${inputClasses} flex-1`}
+                    autoFocus
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddNewType}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                  >
+                    Add
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowNewTypeInput(false);
+                      setNewPropertyType("");
+                    }}
+                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
+                  >
+                    Cancel
+                  </button>
+                </>
+              )}
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              Select from existing types or add a new one
+            </p>
           </div>
 
           {/* Status */}
@@ -268,6 +376,7 @@ const AddProject = () => {
               <option value="UC">Under Construction (UC)</option>
               <option value="RTM">Ready to Move (RTM)</option>
               <option value="Completed">Completed</option>
+              <option value="EOI">Expression of Interest (EOI)</option>
             </select>
           </div>
 
@@ -388,20 +497,27 @@ const AddProject = () => {
             />
           </div>
 
-          {/* Property Description - NEW FIELD */}
+          {/* Property Description - Rich Text Editor */}
           <div className="md:col-span-2">
             <label className={labelClasses}>Property Description</label>
-            <textarea
-              name="property_description"
+            <SimpleMDE
               value={formData.property_description}
-              onChange={handleInputChange}
-              rows="5"
-              className={`${inputClasses} resize-y`}
-              placeholder="Enter detailed description of the property, its features, location benefits, amenities, etc."
+              onChange={handleDescriptionChange}
+              options={{
+                spellChecker: false,
+                autofocus: false,
+                placeholder: "Enter detailed description...",
+                toolbar: [
+                  "bold", "italic", "heading", "|",
+                  "quote", "unordered-list", "ordered-list", "|",
+                  "link", "|",
+                  "preview", "side-by-side", "fullscreen", "|",
+                  "guide"
+                ],
+              }}
             />
             <p className="text-xs text-gray-500 mt-1">
-              Describe the property in detail - this will be displayed on the
-              property page
+              Use formatting tools to create beautiful, structured descriptions
             </p>
           </div>
 

@@ -14,6 +14,7 @@ import { useEffect, useState } from "react";
 import bgImage from "../../assets/Hero-final.jpeg";
 import { useNavigate } from "react-router-dom";
 import { FaWhatsapp, FaPhoneAlt } from "react-icons/fa";
+import axiosInstance from "../../utils/Instance"; 
 
 /* Professional font setup */
 // @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
@@ -111,22 +112,37 @@ const Hero = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setSubmitSuccess(true);
+    try {
+      // Send data to backend - create customer without project_id
+      const response = await axiosInstance.post("/api/customers/create", {
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        contact: formData.phone,
+        email: formData.email,
+        // No project_id - will be NULL in database
+      });
 
-      setTimeout(() => {
-        setSubmitSuccess(false);
-        setShowForm(false);
-        setFormData({
-          firstName: "",
-          lastName: "",
-          phone: "",
-          email: "",
-        });
-      }, 3000);
-    }, 1500);
+      if (response.data.success) {
+        setSubmitSuccess(true);
+        
+        // Reset form after success
+        setTimeout(() => {
+          setSubmitSuccess(false);
+          setShowForm(false);
+          setFormData({
+            firstName: "",
+            lastName: "",
+            phone: "",
+            email: "",
+          });
+        }, 3000);
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      alert(error.response?.data?.message || "Failed to submit. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleClose = () => {
@@ -310,7 +326,7 @@ const Hero = () => {
                     Get in Touch
                   </h3>
                   <p className="text-sm text-gray-500 mt-1">
-                    Our team will respond within 24 hours
+                    Our team will respond within 8 hours
                   </p>
                 </div>
 
