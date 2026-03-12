@@ -8,7 +8,9 @@ const {
   getAllPropertiesUnfiltered,      // ADD THIS
   updateProject,       // ADD THIS
   deleteProject,
-  updateDisplayOrder  
+  updateDisplayOrder,
+  getPropertyTypes,
+  savePropertyType
 } = require("../controllers/propertyControllers");
 const { importProjectImages } = require("../controllers/imageControllers");
 const uploadController = require("../controllers/uploadController");
@@ -22,7 +24,9 @@ router.get("/getAllProjects", getAllProjects);
 router.get("/getAllPropertiesUnfiltered", getAllPropertiesUnfiltered);
 router.get("/getSingleProject/:slug", getProjectBySlug);
 router.get("/getProject/:id", getProjectById); 
-router.put("/:id/update-display-order", updateDisplayOrder);          // ADD THIS - Get project by ID for editing
+router.put("/:id/update-display-order", updateDisplayOrder); 
+router.get("/property-types", getPropertyTypes);
+router.post("/property-types", savePropertyType);         // ADD THIS - Get project by ID for editing
 
 // Admin routes
 router.post(

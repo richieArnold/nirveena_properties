@@ -2,6 +2,8 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axiosInstance from "../utils/Instance";
 import { Helmet } from "react-helmet-async";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 import {
   MapPin,
@@ -35,6 +37,7 @@ function PropertyDetailsPage() {
 
     return () => clearTimeout(timer);
   }, []);
+  
   useEffect(() => {
     async function fetchProject() {
       try {
@@ -58,7 +61,7 @@ function PropertyDetailsPage() {
         "@context": "https://schema.org",
         "@type": "Product",
         name: project.project_name,
-        description: project.property_description,
+        description: project.property_description?.replace(/[#*`]/g, ''), // Remove markdown for meta description
         image: project.image_url,
         brand: {
           "@type": "Brand",
@@ -112,13 +115,16 @@ function PropertyDetailsPage() {
         <Helmet>
           <title>{`${project.project_name} | Nirveena`}</title>
 
-          <meta name="description" content={project.property_description} />
+          <meta 
+            name="description" 
+            content={project.property_description?.replace(/[#*`]/g, '').substring(0, 160)} 
+          />
 
           <meta property="og:title" content={project.project_name} />
 
           <meta
             property="og:description"
-            content={project.property_description}
+            content={project.property_description?.replace(/[#*`]/g, '').substring(0, 160)}
           />
 
           <meta property="og:image" content={project.image_url} />
@@ -180,6 +186,7 @@ function PropertyDetailsPage() {
                   "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1600&auto=format&fit=crop"
                 }
                 className="w-full h-full object-cover"
+                alt={project.project_name}
               />
 
               <div className="absolute bottom-4 right-4 bg-black/60 text-white px-3 py-1 rounded-md text-sm">
@@ -201,6 +208,7 @@ function PropertyDetailsPage() {
                   <img
                     src={project.images[1].image_url}
                     className="w-full h-full object-cover hover:scale-105 transition"
+                    alt={`${project.project_name} view 2`}
                   />
                 </div>
               )}
@@ -217,6 +225,7 @@ function PropertyDetailsPage() {
                   <img
                     src={project.images[2].image_url}
                     className="w-full h-full object-cover hover:scale-105 transition"
+                    alt={`${project.project_name} view 3`}
                   />
 
                   {/* MORE IMAGES OVERLAY */}
@@ -296,16 +305,49 @@ function PropertyDetailsPage() {
                 </div>
               </div>
 
-              {/* DESCRIPTION */}
+              {/* DESCRIPTION - WITH MARKDOWN RENDERING */}
               <section>
                 <h3 className="text-2xl font-bold mb-4 flex items-center gap-2">
                   <Info className="text-blue-600" />
                   About Property
                 </h3>
 
-                <p className="text-slate-600 leading-relaxed">
-                  {project.property_description}
-                </p>
+                <div className="prose prose-lg max-w-none text-slate-600">
+                  <ReactMarkdown 
+                    remarkPlugins={[remarkGfm]}
+                    components={{
+                      h1: ({node, ...props}) => <h1 className="text-3xl font-bold mt-6 mb-4" {...props} />,
+                      h2: ({node, ...props}) => <h2 className="text-2xl font-bold mt-5 mb-3" {...props} />,
+                      h3: ({node, ...props}) => <h3 className="text-xl font-bold mt-4 mb-2" {...props} />,
+                      h4: ({node, ...props}) => <h4 className="text-lg font-bold mt-3 mb-2" {...props} />,
+                      p: ({node, ...props}) => <p className="mb-4 leading-relaxed" {...props} />,
+                      ul: ({node, ...props}) => <ul className="list-disc pl-6 mb-4 space-y-2" {...props} />,
+                      ol: ({node, ...props}) => <ol className="list-decimal pl-6 mb-4 space-y-2" {...props} />,
+                      li: ({node, ...props}) => <li className="mb-1" {...props} />,
+                      blockquote: ({node, ...props}) => (
+                        <blockquote className="border-l-4 border-blue-500 pl-4 italic my-4" {...props} />
+                      ),
+                      table: ({node, ...props}) => (
+                        <div className="overflow-x-auto my-4">
+                          <table className="min-w-full divide-y divide-gray-200 border" {...props} />
+                        </div>
+                      ),
+                      th: ({node, ...props}) => (
+                        <th className="px-4 py-2 bg-gray-50 font-semibold text-left" {...props} />
+                      ),
+                      td: ({node, ...props}) => (
+                        <td className="px-4 py-2 border-t" {...props} />
+                      ),
+                      strong: ({node, ...props}) => <strong className="font-bold text-gray-900" {...props} />,
+                      em: ({node, ...props}) => <em className="italic" {...props} />,
+                      code: ({node, ...props}) => (
+                        <code className="bg-gray-100 rounded px-1 py-0.5 text-sm" {...props} />
+                      ),
+                    }}
+                  >
+                    {project.property_description}
+                  </ReactMarkdown>
+                </div>
               </section>
 
               {/* PROJECT DETAILS */}
@@ -388,6 +430,7 @@ function PropertyDetailsPage() {
             <img
               src={project.images?.[activeImage]?.image_url}
               className="max-h-[90vh] max-w-[90vw] object-contain"
+              alt={`${project.project_name} view ${activeImage + 1}`}
             />
 
             <button onClick={nextImage} className="absolute right-6 text-white">
