@@ -17,7 +17,9 @@ import {
   CheckCircle2,
   Building2,
   Home,
+  IndianRupee,
 } from "lucide-react";
+import { Clock, LayoutGrid, Ruler } from "lucide-react";
 
 import EnquiryForm from "../components/Properties/EnquiryForm";
 
@@ -25,11 +27,14 @@ function PropertyDetailsPage() {
   const { slug } = useParams();
 
   const [project, setProject] = useState(null);
+  const [projectDetails, setProjectDetais] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(0);
   const [viewerOpen, setViewerOpen] = useState(false);
 
   const [showPopup, setShowPopup] = useState(false);
+  const [floorPlanViewer, setFloorPlanViewer] = useState(false);
+  const [activeFloorPlan, setActiveFloorPlan] = useState(null);
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowPopup(true);
@@ -37,7 +42,7 @@ function PropertyDetailsPage() {
 
     return () => clearTimeout(timer);
   }, []);
-  
+
   useEffect(() => {
     async function fetchProject() {
       try {
@@ -46,6 +51,7 @@ function PropertyDetailsPage() {
         );
         console.log(res);
         setProject(res.data.data);
+        setProjectDetais(res.data.data.project);
       } catch (err) {
         console.error(err);
       } finally {
@@ -61,7 +67,7 @@ function PropertyDetailsPage() {
         "@context": "https://schema.org",
         "@type": "Product",
         name: project.project_name,
-        description: project.property_description?.replace(/[#*`]/g, ''), // Remove markdown for meta description
+        description: project.property_description?.replace(/[#*`]/g, ""), // Remove markdown for meta description
         image: project.image_url,
         brand: {
           "@type": "Brand",
@@ -113,25 +119,29 @@ function PropertyDetailsPage() {
     <>
       {project && (
         <Helmet>
-          <title>{`${project.project_name} | Nirveena`}</title>
+          <title>{`${projectDetails.project_name} | Nirveena`}</title>
 
-          <meta 
-            name="description" 
-            content={project.property_description?.replace(/[#*`]/g, '').substring(0, 160)} 
+          <meta
+            name="description"
+            content={project.property_description
+              ?.replace(/[#*`]/g, "")
+              .substring(0, 160)}
           />
 
-          <meta property="og:title" content={project.project_name} />
+          <meta property="og:title" content={projectDetails.project_name} />
 
           <meta
             property="og:description"
-            content={project.property_description?.replace(/[#*`]/g, '').substring(0, 160)}
+            content={project.property_description
+              ?.replace(/[#*`]/g, "")
+              .substring(0, 160)}
           />
 
-          <meta property="og:image" content={project.image_url} />
+          <meta property="og:image" content={projectDetails.image_url} />
 
           <meta
             property="og:url"
-            content={`https://www.nirveena.com/property/${project.slug}`}
+            content={`https://www.nirveena.com/property/${projectDetails.slug}`}
           />
 
           {schemaData && (
@@ -156,16 +166,18 @@ function PropertyDetailsPage() {
               className="text-3xl md:text-4xl font-extrabold text-slate-900"
               style={{ textTransform: "capitalize" }}
             >
-              {project.project_name}
+              {projectDetails.project_name}
             </h1>
 
             <div className="flex items-center text-slate-500 mt-2">
               <MapPin className="w-4 h-4 mr-1 text-red-500" />
-              <p className="text-lg">{project.project_location}</p>
+              <p className="text-lg" style={{ textTransform: "capitalize" }}>
+                {projectDetails.project_location}
+              </p>
             </div>
 
             <p className="text-3xl font-black text-blue-600 mt-3">
-              {project.price}
+              {projectDetails.price}
             </p>
           </div>
 
@@ -186,7 +198,7 @@ function PropertyDetailsPage() {
                   "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1600&auto=format&fit=crop"
                 }
                 className="w-full h-full object-cover"
-                alt={project.project_name}
+                alt={projectDetails.project_name}
               />
 
               <div className="absolute bottom-4 right-4 bg-black/60 text-white px-3 py-1 rounded-md text-sm">
@@ -208,7 +220,7 @@ function PropertyDetailsPage() {
                   <img
                     src={project.images[1].image_url}
                     className="w-full h-full object-cover hover:scale-105 transition"
-                    alt={`${project.project_name} view 2`}
+                    alt={`${projectDetails.project_name} view 2`}
                   />
                 </div>
               )}
@@ -257,7 +269,7 @@ function PropertyDetailsPage() {
                       Total Acres
                     </p>
                     <p className="font-bold text-slate-800">
-                      {project.total_acres}
+                      {projectDetails.total_acres}
                     </p>
                   </div>
                 </div>
@@ -271,7 +283,7 @@ function PropertyDetailsPage() {
                       Units
                     </p>
                     <p className="font-bold text-slate-800">
-                      {project.no_of_units}
+                      {projectDetails.no_of_units}
                     </p>
                   </div>
                 </div>
@@ -285,7 +297,7 @@ function PropertyDetailsPage() {
                       Club House
                     </p>
                     <p className="font-bold text-slate-800">
-                      {project.club_house_size}
+                      {projectDetails.club_house_size}
                     </p>
                   </div>
                 </div>
@@ -299,7 +311,7 @@ function PropertyDetailsPage() {
                       Completion
                     </p>
                     <p className="font-bold text-slate-800">
-                      {project.rera_completion}
+                      {projectDetails.rera_completion}
                     </p>
                   </div>
                 </div>
@@ -313,35 +325,88 @@ function PropertyDetailsPage() {
                 </h3>
 
                 <div className="prose prose-lg max-w-none text-slate-600">
-                  <ReactMarkdown 
+                  <ReactMarkdown
                     remarkPlugins={[remarkGfm]}
                     components={{
-                      h1: ({node, ...props}) => <h1 className="text-3xl font-bold mt-6 mb-4" {...props} />,
-                      h2: ({node, ...props}) => <h2 className="text-2xl font-bold mt-5 mb-3" {...props} />,
-                      h3: ({node, ...props}) => <h3 className="text-xl font-bold mt-4 mb-2" {...props} />,
-                      h4: ({node, ...props}) => <h4 className="text-lg font-bold mt-3 mb-2" {...props} />,
-                      p: ({node, ...props}) => <p className="mb-4 leading-relaxed" {...props} />,
-                      ul: ({node, ...props}) => <ul className="list-disc pl-6 mb-4 space-y-2" {...props} />,
-                      ol: ({node, ...props}) => <ol className="list-decimal pl-6 mb-4 space-y-2" {...props} />,
-                      li: ({node, ...props}) => <li className="mb-1" {...props} />,
-                      blockquote: ({node, ...props}) => (
-                        <blockquote className="border-l-4 border-blue-500 pl-4 italic my-4" {...props} />
+                      h1: ({ node, ...props }) => (
+                        <h1
+                          className="text-3xl font-bold mt-6 mb-4"
+                          {...props}
+                        />
                       ),
-                      table: ({node, ...props}) => (
+                      h2: ({ node, ...props }) => (
+                        <h2
+                          className="text-2xl font-bold mt-5 mb-3"
+                          {...props}
+                        />
+                      ),
+                      h3: ({ node, ...props }) => (
+                        <h3
+                          className="text-xl font-bold mt-4 mb-2"
+                          {...props}
+                        />
+                      ),
+                      h4: ({ node, ...props }) => (
+                        <h4
+                          className="text-lg font-bold mt-3 mb-2"
+                          {...props}
+                        />
+                      ),
+                      p: ({ node, ...props }) => (
+                        <p className="mb-4 leading-relaxed" {...props} />
+                      ),
+                      ul: ({ node, ...props }) => (
+                        <ul
+                          className="list-disc pl-6 mb-4 space-y-2"
+                          {...props}
+                        />
+                      ),
+                      ol: ({ node, ...props }) => (
+                        <ol
+                          className="list-decimal pl-6 mb-4 space-y-2"
+                          {...props}
+                        />
+                      ),
+                      li: ({ node, ...props }) => (
+                        <li className="mb-1" {...props} />
+                      ),
+                      blockquote: ({ node, ...props }) => (
+                        <blockquote
+                          className="border-l-4 border-blue-500 pl-4 italic my-4"
+                          {...props}
+                        />
+                      ),
+                      table: ({ node, ...props }) => (
                         <div className="overflow-x-auto my-4">
-                          <table className="min-w-full divide-y divide-gray-200 border" {...props} />
+                          <table
+                            className="min-w-full divide-y divide-gray-200 border"
+                            {...props}
+                          />
                         </div>
                       ),
-                      th: ({node, ...props}) => (
-                        <th className="px-4 py-2 bg-gray-50 font-semibold text-left" {...props} />
+                      th: ({ node, ...props }) => (
+                        <th
+                          className="px-4 py-2 bg-gray-50 font-semibold text-left"
+                          {...props}
+                        />
                       ),
-                      td: ({node, ...props}) => (
+                      td: ({ node, ...props }) => (
                         <td className="px-4 py-2 border-t" {...props} />
                       ),
-                      strong: ({node, ...props}) => <strong className="font-bold text-gray-900" {...props} />,
-                      em: ({node, ...props}) => <em className="italic" {...props} />,
-                      code: ({node, ...props}) => (
-                        <code className="bg-gray-100 rounded px-1 py-0.5 text-sm" {...props} />
+                      strong: ({ node, ...props }) => (
+                        <strong
+                          className="font-bold text-gray-900"
+                          {...props}
+                        />
+                      ),
+                      em: ({ node, ...props }) => (
+                        <em className="italic" {...props} />
+                      ),
+                      code: ({ node, ...props }) => (
+                        <code
+                          className="bg-gray-100 rounded px-1 py-0.5 text-sm"
+                          {...props}
+                        />
                       ),
                     }}
                   >
@@ -356,28 +421,51 @@ function PropertyDetailsPage() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex items-center gap-3 p-3 rounded-xl bg-white border shadow-sm">
-                    <CheckCircle2 className="text-green-500 w-5 h-5" />
-                    Type: {project.project_type}
+                    <Home className="text-blue-600 w-5 h-5" />
+                    <span>
+                      <span className="font-medium text-slate-700">Type:</span>{" "}
+                      {projectDetails.project_type}
+                    </span>
                   </div>
 
                   <div className="flex items-center gap-3 p-3 rounded-xl bg-white border shadow-sm">
-                    <CheckCircle2 className="text-green-500 w-5 h-5" />
-                    Status: {project.project_status}
+                    <Clock className="text-blue-600 w-5 h-5" />
+                    <span>
+                      <span className="font-medium text-slate-700">
+                        Status:
+                      </span>{" "}
+                      {projectDetails.project_status}
+                    </span>
                   </div>
 
                   <div className="flex items-center gap-3 p-3 rounded-xl bg-white border shadow-sm">
-                    <CheckCircle2 className="text-green-500 w-5 h-5" />
-                    Structure: {project.structure}
+                    <Building2 className="text-blue-600 w-5 h-5" />
+                    <span>
+                      <span className="font-medium text-slate-700">
+                        Structure:
+                      </span>{" "}
+                      {projectDetails.structure}
+                    </span>
                   </div>
 
                   <div className="flex items-center gap-3 p-3 rounded-xl bg-white border shadow-sm">
-                    <CheckCircle2 className="text-green-500 w-5 h-5" />
-                    Typology: {project.typology}
+                    <LayoutGrid className="text-blue-600 w-5 h-5" />
+                    <span>
+                      <span className="font-medium text-slate-700">
+                        Typology:
+                      </span>{" "}
+                      {projectDetails.typology}
+                    </span>
                   </div>
 
                   <div className="flex items-center gap-3 p-3 rounded-xl bg-white border shadow-sm">
-                    <CheckCircle2 className="text-green-500 w-5 h-5" />
-                    Built Area: {project.sba}
+                    <Ruler className="text-blue-600 w-5 h-5" />
+                    <span>
+                      <span className="font-medium text-slate-700">
+                        Built Area:
+                      </span>{" "}
+                      {projectDetails.sba} Sqft
+                    </span>
                   </div>
                 </div>
               </section>
@@ -411,8 +499,138 @@ function PropertyDetailsPage() {
               </div>
             )}
           </div>
-        </main>
+          {/* features */}
+          {/* AMENITIES & FEATURES */}
+          {project.features?.length > 0 && (
+            <section className="mt-10">
+              <h3 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                <LayoutGrid className="text-blue-600" />
+                Amenities & Features
+              </h3>
 
+              <div className="space-y-8">
+                {project.features.map((feature) => (
+                  <div key={feature.id}>
+                    {/* Feature Title */}
+                    <h4 className="text-lg font-semibold text-slate-800 mb-4">
+                      {feature.feature_name}
+                    </h4>
+
+                    {/* Feature Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {feature.items?.map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex items-center gap-3 p-3 rounded-xl bg-white border shadow-sm hover:shadow-md transition"
+                        >
+                          {/* Icon */}
+                          {item.icon_url && (
+                            <div className="p-2 bg-blue-50 rounded-lg flex-shrink-0">
+                              <img
+                                src={item.icon_url}
+                                alt={item.label}
+                                className="w-5 h-5 object-contain"
+                              />
+                            </div>
+                          )}
+
+                          {/* Label */}
+                          <span className="text-sm font-medium text-slate-700">
+                            {item.label}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+          {/* configurations */}
+          {/* CONFIGURATIONS */}
+          {project.configurations?.length > 0 && (
+            <section className="mt-12">
+              <h3 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                <Home className="text-blue-600" />
+                Configurations
+              </h3>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                {project.configurations.map((config, index) => (
+                  <div
+                    key={index}
+                    className="bg-white border rounded-2xl shadow-sm hover:shadow-md transition p-6"
+                  >
+                    {/* Configuration Title */}
+                    <h4 className="text-xl font-semibold text-slate-800 mb-4">
+                      {config.configuration}
+                    </h4>
+
+                    {/* Size */}
+                    <div className="flex items-center gap-2 text-slate-600 mb-2">
+                      <Square className="w-4 h-4 text-blue-600" />
+                      <span>{config.size_range} Sqft</span>
+                    </div>
+
+                    {/* Price */}
+                    <div className="flex items-center gap-2 text-slate-700 font-semibold">
+                      <IndianRupee className="w-4 h-4 text-green-600" />
+                      {config.price}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* floorplans */}
+          {/* FLOOR PLANS */}
+          {project.floorplans?.length > 0 && (
+            <section className="mt-12">
+              <h3 className="text-2xl font-bold mb-6 flex items-center gap-2">
+                <LayoutGrid className="text-blue-600" />
+                Floor Plans
+              </h3>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {project.floorplans.map((plan, index) => (
+                  <div
+                    key={index}
+                    className="bg-white border rounded-2xl shadow-sm hover:shadow-md transition overflow-hidden"
+                  >
+                    {/* IMAGE */}
+                    <div
+                      className="cursor-pointer"
+                      onClick={() => {
+                        setActiveFloorPlan(plan.image_url);
+                        setFloorPlanViewer(true);
+                      }}
+                    >
+                      <img
+                        src={plan.image_url}
+                        alt={plan.configuration}
+                        className="w-full h-[220px] object-contain bg-slate-50"
+                      />
+                    </div>
+
+                    {/* DETAILS */}
+                    <div className="p-4">
+                      <h4 className="text-lg font-semibold text-slate-800">
+                        {plan.configuration}
+                      </h4>
+
+                      {plan.size && (
+                        <p className="text-slate-600 text-sm mt-1">
+                          {plan.size} Sqft
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+        </main>
         {/* FULLSCREEN IMAGE VIEWER */}
         {viewerOpen && (
           <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center">
@@ -436,6 +654,23 @@ function PropertyDetailsPage() {
             <button onClick={nextImage} className="absolute right-6 text-white">
               <ChevronRight size={40} />
             </button>
+          </div>
+        )}
+        {/* FLOOR PLAN VIEWER */}
+        {floorPlanViewer && (
+          <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center">
+            <button
+              onClick={() => setFloorPlanViewer(false)}
+              className="absolute top-6 right-6 text-white"
+            >
+              <X size={32} />
+            </button>
+
+            <img
+              src={activeFloorPlan}
+              className="max-h-[90vh] max-w-[90vw] object-contain"
+              alt="Floor Plan"
+            />
           </div>
         )}
       </div>

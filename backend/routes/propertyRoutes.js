@@ -19,14 +19,20 @@ const {
   getProjectFeatures,
   uploadIcon,
   uploadIconMiddleware,
+  updateProjectFeature,
+  deleteProjectFeature,
+  deleteFeatureItem,
 } = require("../controllers/featureController");
 const {
   addConfiguration,
   getProjectConfigurations,
   addFloorPlan,
   uploadFloorPlan,
-  getProjectFloorPlans
+  getProjectFloorPlans,
+  deleteConfiguration,
+  deleteFloorPlan,
 } = require("../controllers/floorConfigController");
+const { getIcons } = require("../controllers/iconController");
 
 // Imports
 router.post("/importProjects", importProjects);
@@ -43,17 +49,23 @@ router.post("/property-types", savePropertyType); // ADD THIS - Get project by I
 
 router.post("/:project_id/features", addProjectFeature);
 router.get("/:project_id/features", getProjectFeatures);
+router.put("/features/:feature_id", updateProjectFeature);
+router.delete("/features/:feature_id", deleteProjectFeature);
+router.delete("/feature-item/:item_id", deleteFeatureItem);
+
 router.post("/upload/icon", uploadIconMiddleware.single("icon"), uploadIcon);
+router.get("/icons", getIcons);
 router.post("/:project_id/addConfiguration", addConfiguration);
 router.get("/:project_id/getProjectConfigurations", getProjectConfigurations);
+router.delete("/configuration/:id", deleteConfiguration);
+
 router.post(
   "/:project_id/floorplans",
-  uploadFloorPlan.single("floorplan"),
-  addFloorPlan
+  uploadFloorPlan.single("image"),
+  addFloorPlan,
 );
-router.get(
-  "/:project_id/floorplans",getProjectFloorPlans);
-
+router.get("/:project_id/floorplans", getProjectFloorPlans);
+router.delete("/floorplan/:id", deleteFloorPlan);
 // Admin routes
 router.post(
   "/addProject",

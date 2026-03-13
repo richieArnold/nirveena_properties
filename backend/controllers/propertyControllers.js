@@ -87,7 +87,6 @@ exports.importProjects = async (req, res) => {
   }
 };
 
-//   try {
 //     const result = await pool.query(
 //       `
 //       SELECT
@@ -143,7 +142,7 @@ exports.importProjects = async (req, res) => {
 //     // Get paginated projects with images
 //     const result = await pool.query(
 //       `
-//       SELECT 
+//       SELECT
 //         p.id,
 //         p.project_id,
 //         p.slug,
@@ -209,23 +208,23 @@ exports.importProjects = async (req, res) => {
 //   }
 // };
 
-
-
 // Update getAllProjects to include display_order in SELECT and ORDER BY
 exports.getAllProjects = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
-    
+
     // Get sort parameters
-    const sortBy = req.query.sortBy || 'display_order';
-    const sortOrder = req.query.sortOrder || 'asc';
+    const sortBy = req.query.sortBy || "display_order";
+    const sortOrder = req.query.sortOrder || "asc";
 
     // Validate sortBy to prevent SQL injection
-    const validSortFields = ['display_order', 'project_id', 'project_name'];
-    const finalSortBy = validSortFields.includes(sortBy) ? sortBy : 'display_order';
-    const finalSortOrder = sortOrder === 'desc' ? 'DESC' : 'ASC';
+    const validSortFields = ["display_order", "project_id", "project_name"];
+    const finalSortBy = validSortFields.includes(sortBy)
+      ? sortBy
+      : "display_order";
+    const finalSortOrder = sortOrder === "desc" ? "DESC" : "ASC";
 
     // Get total count for pagination
     const countResult = await pool.query("SELECT COUNT(*) FROM projects");
@@ -279,23 +278,23 @@ exports.getAllProjects = async (req, res) => {
       .map((project) => {
         // Transform status to display format
         let displayStatus = project.project_status;
-        
+
         if (project.project_status) {
           const statusLower = project.project_status.toLowerCase();
-          if (statusLower === 'uc' || 'og') {
-            displayStatus = 'On Going';
-          } else if (statusLower === 'rtm') {
-            displayStatus = 'Ready to Move';
-          } else if (statusLower === 'eoi') {
-            displayStatus = 'Expression of Interest';
+          if (statusLower === "uc" || "og") {
+            displayStatus = "On Going";
+          } else if (statusLower === "rtm") {
+            displayStatus = "Ready to Move";
+          } else if (statusLower === "eoi") {
+            displayStatus = "Expression of Interest";
           }
         }
-        
+
         return {
           ...project,
           price: formatPrice(project.price),
           project_status: displayStatus, // Replace with transformed status
-          original_status: project.project_status // Optional: keep original if needed for filtering
+          original_status: project.project_status, // Optional: keep original if needed for filtering
         };
       });
 
@@ -322,7 +321,7 @@ exports.getAllProjects = async (req, res) => {
 exports.getAllPropertiesUnfiltered = async (req, res) => {
   try {
     const { status } = req.query; // Get status from query params
-    
+
     let query = `
       SELECT 
         p.id,
@@ -344,15 +343,15 @@ exports.getAllPropertiesUnfiltered = async (req, res) => {
         LIMIT 1
       ) img ON true
     `;
-    
+
     const queryParams = [];
-    
+
     // Add status filter if provided and not 'all'
-    if (status && status !== 'all') {
+    if (status && status !== "all") {
       query += ` WHERE LOWER(p.project_status) = LOWER($${queryParams.length + 1})`;
       queryParams.push(status);
     }
-    
+
     // Modified ORDER BY: Projects with display_order > 0 come first, ordered by display_order,
     // then projects with display_order = 0 or NULL come last, ordered by id DESC
     query += ` ORDER BY 
@@ -362,7 +361,7 @@ exports.getAllPropertiesUnfiltered = async (req, res) => {
         END,
         p.display_order ASC,
         p.id DESC`;
-    
+
     const result = await pool.query(query, queryParams);
 
     // Format prices, images, and transform status
@@ -373,23 +372,23 @@ exports.getAllPropertiesUnfiltered = async (req, res) => {
       .map((project) => {
         // Transform status to display format
         let displayStatus = project.project_status;
-        
+
         if (project.project_status) {
           const statusLower = project.project_status.toLowerCase();
-          if (statusLower === 'uc') {
-            displayStatus = 'On Going';
-          } else if (statusLower === 'rtm') {
-            displayStatus = 'Ready to Move';
-          } else if (statusLower === 'eoi') {
-            displayStatus = 'Expression of Interest';
+          if (statusLower === "uc") {
+            displayStatus = "On Going";
+          } else if (statusLower === "rtm") {
+            displayStatus = "Ready to Move";
+          } else if (statusLower === "eoi") {
+            displayStatus = "Expression of Interest";
           }
         }
-        
+
         return {
           ...project,
           price: formatPrice(project.price),
           project_status: displayStatus,
-          original_status: project.project_status
+          original_status: project.project_status,
         };
       });
 
@@ -408,6 +407,56 @@ exports.getAllPropertiesUnfiltered = async (req, res) => {
   }
 };
 
+// exports.getProjectBySlug = async (req, res) => {
+//   try {
+//     const { slug } = req.params;
+
+//     const projectResult = await pool.query(
+//       `SELECT * FROM projects WHERE slug = $1`,
+//       [slug],
+//     );
+
+//     if (projectResult.rows.length === 0) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Project not found",
+//       });
+//     }
+
+//     const project = projectResult.rows[0];
+
+//     const imagesResult = await pool.query(
+//       `
+//       SELECT image_url, sort_order
+//       FROM project_images
+//       WHERE project_id = $1
+//       ORDER BY sort_order ASC
+//       `,
+//       [project.project_id],
+//     );
+
+//     // Filter only valid images
+//     const validImages = imagesResult.rows.filter((img) =>
+//       isValidImage(img.image_url)
+//     );
+
+//     project.images = validImages;
+
+//     res.json({
+//       success: true,
+//       data: project,
+//     });
+
+//   } catch (error) {
+//     res.status(500).json({
+//       success: false,
+//       message: "Failed to fetch project",
+//       error: error.message,
+//     });
+//   }
+// };
+
+// Update addProject to include display_order
 
 exports.getProjectBySlug = async (req, res) => {
   try {
@@ -426,30 +475,90 @@ exports.getProjectBySlug = async (req, res) => {
     }
 
     const project = projectResult.rows[0];
+    const projectId = project.project_id;
 
-    const imagesResult = await pool.query(
-      `
-      SELECT image_url, sort_order
-      FROM project_images
-      WHERE project_id = $1
-      ORDER BY sort_order ASC
-      `,
-      [project.project_id],
-    );
+    // Format main price
+    project.price = formatPrice(project.price);
 
-    // Filter only valid images
+    const [
+      imagesResult,
+      featuresResult,
+      featureItemsResult,
+      configurationsResult,
+      floorPlansResult,
+    ] = await Promise.all([
+      pool.query(
+        `
+        SELECT image_url, sort_order
+        FROM project_images
+        WHERE project_id = $1
+        ORDER BY sort_order ASC
+        `,
+        [projectId],
+      ),
+
+      pool.query(
+        `
+        SELECT id, feature_name
+        FROM project_features
+        WHERE project_id = $1
+        ORDER BY sort_order
+        `,
+        [projectId],
+      ),
+
+      pool.query(`SELECT * FROM project_feature_items`),
+
+      pool.query(
+        `
+        SELECT *
+        FROM project_configurations
+        WHERE project_id = $1
+        ORDER BY id
+        `,
+        [projectId],
+      ),
+
+      pool.query(
+        `
+        SELECT *
+        FROM project_floor_plans
+        WHERE project_id = $1
+        ORDER BY sort_order
+        `,
+        [projectId],
+      ),
+    ]);
+
     const validImages = imagesResult.rows.filter((img) =>
-      isValidImage(img.image_url)
+      isValidImage(img.image_url),
     );
 
-    project.images = validImages;
+    const features = featuresResult.rows.map((feature) => ({
+      ...feature,
+      items: featureItemsResult.rows.filter(
+        (item) => item.feature_id === feature.id,
+      ),
+    }));
+
+    const configurations = configurationsResult.rows.map((config) => ({
+      ...config,
+      price: formatPrice(config.price),
+    }));
 
     res.json({
       success: true,
-      data: project,
+      data: {
+        project,
+        images: validImages,
+        features,
+        configurations,
+        floorplans: floorPlansResult.rows,
+      },
     });
-
   } catch (error) {
+    console.error("Fetch project error:", error);
+
     res.status(500).json({
       success: false,
       message: "Failed to fetch project",
@@ -458,8 +567,6 @@ exports.getProjectBySlug = async (req, res) => {
   }
 };
 
-
-// Update addProject to include display_order
 exports.addProject = async (req, res) => {
   const client = await pool.connect();
 
@@ -479,7 +586,7 @@ exports.addProject = async (req, res) => {
       price,
       rera_completion,
       property_description,
-      display_order = 0,  // ADD THIS with default 0
+      display_order = 0, // ADD THIS with default 0
       images = [],
     } = req.body;
 
@@ -536,7 +643,7 @@ exports.addProject = async (req, res) => {
         price || null,
         rera_completion || null,
         property_description || null,
-        display_order,  // ADD THIS
+        display_order, // ADD THIS
       ],
     );
 
@@ -571,9 +678,6 @@ exports.addProject = async (req, res) => {
     client.release();
   }
 };
-
-
-
 
 const { S3Client, DeleteObjectCommand } = require("@aws-sdk/client-s3");
 
@@ -743,7 +847,7 @@ exports.updateProject = async (req, res) => {
       price,
       rera_completion,
       property_description,
-      display_order,  // ADD THIS
+      display_order, // ADD THIS
       existing_images = [],
       new_images = [],
     } = req.body;
@@ -812,7 +916,7 @@ exports.updateProject = async (req, res) => {
         price || null,
         rera_completion || null,
         property_description || null,
-        display_order !== undefined ? display_order : 0,  // ADD THIS
+        display_order !== undefined ? display_order : 0, // ADD THIS
         id,
       ],
     );
@@ -858,9 +962,6 @@ exports.updateProject = async (req, res) => {
   }
 };
 
-
-
-
 // NEW FUNCTION: Update display order only (for quick updates from list)
 exports.updateDisplayOrder = async (req, res) => {
   try {
@@ -877,7 +978,7 @@ exports.updateDisplayOrder = async (req, res) => {
     // Check if project exists
     const projectCheck = await pool.query(
       "SELECT id FROM projects WHERE id = $1",
-      [id]
+      [id],
     );
 
     if (projectCheck.rows.length === 0) {
@@ -890,7 +991,7 @@ exports.updateDisplayOrder = async (req, res) => {
     // Update display order
     await pool.query(
       "UPDATE projects SET display_order = $1, updated_at = NOW() WHERE id = $2",
-      [parseInt(display_order), id]
+      [parseInt(display_order), id],
     );
 
     res.json({
@@ -907,18 +1008,19 @@ exports.updateDisplayOrder = async (req, res) => {
   }
 };
 
-
 // Get all unique property types
 exports.getPropertyTypes = async (req, res) => {
   try {
     const result = await pool.query(
-      "SELECT DISTINCT project_type FROM projects WHERE project_type IS NOT NULL ORDER BY project_type"
+      "SELECT DISTINCT project_type FROM projects WHERE project_type IS NOT NULL ORDER BY project_type",
     );
-    const types = result.rows.map(row => row.project_type);
+    const types = result.rows.map((row) => row.project_type);
     res.json({ success: true, types });
   } catch (error) {
     console.error("Error fetching property types:", error);
-    res.status(500).json({ success: false, message: "Failed to fetch property types" });
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to fetch property types" });
   }
 };
 
@@ -928,12 +1030,3 @@ exports.savePropertyType = async (req, res) => {
   // They'll be saved when you create a project with that type
   res.json({ success: true });
 };
-
-
-
-
-
-
-
-
-

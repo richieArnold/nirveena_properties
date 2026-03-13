@@ -1,5 +1,5 @@
 const pool = require('../rds_setup/db');
-
+const { DeleteObjectCommand } = require("@aws-sdk/client-s3");
 
 exports.addConfiguration = async (req, res) => {
   try {
@@ -65,6 +65,62 @@ exports.getProjectConfigurations = async (req, res) => {
   }
 };
 
+exports.deleteFloorPlan = async (req, res) => {
+
+  try {
+
+    const { id } = req.params;
+
+    const result = await pool.query(
+      `SELECT image_url FROM project_floor_plans WHERE id = $1`,
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Floor plan not found"
+      });
+    }
+
+    const imageUrl = result.rows[0].image_url;
+
+    // extract key from URL
+    const key = imageUrl.split(".amazonaws.com/")[1];
+
+    // delete from S3
+    await s3.send(
+      new DeleteObjectCommand({
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: key
+      })
+    );
+
+    // delete DB record
+    await pool.query(
+      `DELETE FROM project_floor_plans WHERE id = $1`,
+      [id]
+    );
+
+    res.json({
+      success: true,
+      message: "Floor plan deleted successfully"
+    });
+
+  } catch (error) {
+
+    console.error("Delete floorplan error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete floor plan",
+      error: error.message
+    });
+
+  }
+
+};
+
 const multer = require("multer");
 const multerS3 = require("multer-s3");
 const { S3Client } = require("@aws-sdk/client-s3");
@@ -89,7 +145,40 @@ exports.uploadFloorPlan = multer({
   }),
 });
 
+exports.deleteConfiguration = async (req, res) => {
+  try {
 
+    const { id } = req.params;
+
+    // delete linked floorplans first
+    await pool.query(
+      `DELETE FROM project_floor_plans WHERE configuration_id = $1`,
+      [id]
+    );
+
+    // delete configuration
+    await pool.query(
+      `DELETE FROM project_configurations WHERE id = $1`,
+      [id]
+    );
+
+    res.json({
+      success: true,
+      message: "Configuration deleted successfully"
+    });
+
+  } catch (error) {
+
+    console.error("Delete configuration error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete configuration",
+      error: error.message
+    });
+
+  }
+};
 
 exports.addFloorPlan = async (req, res) => {
   try {

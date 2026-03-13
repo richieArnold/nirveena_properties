@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate, useParams } from "react-router-dom";
-import { Save, Upload, ArrowLeft, Trash2, X, CheckCircle, XCircle } from 'lucide-react';
+import { Link, useNavigate, useParams } from "react-router-dom";
+import {
+  Save,
+  Upload,
+  ArrowLeft,
+  Trash2,
+  X,
+  CheckCircle,
+  XCircle,
+} from "lucide-react";
 import AdminLayout from "../../components/admin/AdminLayout";
 import AlertMessage from "../../components/admin/AlertMessage";
 import axiosInstance from "../../utils/Instance";
@@ -14,7 +22,12 @@ const EditProject = () => {
   const [fetchLoading, setFetchLoading] = useState(true);
   const [message, setMessage] = useState({ type: "", text: "" });
   const [showNotification, setShowNotification] = useState(false);
-  const [notification, setNotification] = useState({ type: "", title: "", message: "", details: {} });
+  const [notification, setNotification] = useState({
+    type: "",
+    title: "",
+    message: "",
+    details: {},
+  });
   const [newImages, setNewImages] = useState([]);
   const [existingImages, setExistingImages] = useState([]);
   const [imagesToKeep, setImagesToKeep] = useState([]);
@@ -32,27 +45,28 @@ const EditProject = () => {
     sba: "",
     price: "",
     rera_completion: "",
-    property_description: ""  // ADD THIS
+    property_description: "", // ADD THIS
   });
-
   useEffect(() => {
-    const token = localStorage.getItem('adminToken');
-    const userData = localStorage.getItem('adminUser');
-    
+    const token = localStorage.getItem("adminToken");
+    const userData = localStorage.getItem("adminUser");
+
     if (!token) {
-      navigate('/admin/login');
+      navigate("/admin/login");
     } else {
       setUser(JSON.parse(userData));
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       fetchProject();
     }
   }, [navigate, id]);
 
   const fetchProject = async () => {
     try {
-      const response = await axiosInstance.get(`/api/projects/getProject/${id}`);
+      const response = await axiosInstance.get(
+        `/api/projects/getProject/${id}`,
+      );
+      console.log(response);
       const project = response.data.data;
-      
       setFormData({
         project_id: project.project_id || "",
         project_name: project.project_name || "",
@@ -67,14 +81,14 @@ const EditProject = () => {
         sba: project.sba || "",
         price: project.price || "",
         rera_completion: project.rera_completion || "",
-        property_description: project.property_description || ""  // ADD THIS
+        property_description: project.property_description || "", // ADD THIS
       });
-      
+
       const images = project.images || [];
       setExistingImages(images);
-      setImagesToKeep(images.map(img => img.image_url));
+      setImagesToKeep(images.map((img) => img.image_url));
     } catch (error) {
-      console.log(error)
+      console.log(error);
       setMessage({ type: "error", text: "Failed to fetch project details" });
     } finally {
       setFetchLoading(false);
@@ -84,22 +98,23 @@ const EditProject = () => {
   const handleInputChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
-
   const handleImageChange = (e) => {
     setNewImages([...e.target.files]);
   };
 
   const handleRemoveExistingImage = (index) => {
     const removedImage = existingImages[index];
-    setExistingImages(prev => prev.filter((_, i) => i !== index));
-    setImagesToKeep(prev => prev.filter(url => url !== removedImage.image_url));
+    setExistingImages((prev) => prev.filter((_, i) => i !== index));
+    setImagesToKeep((prev) =>
+      prev.filter((url) => url !== removedImage.image_url),
+    );
   };
 
   const handleRemoveNewImage = (index) => {
-    setNewImages(prev => prev.filter((_, i) => i !== index));
+    setNewImages((prev) => prev.filter((_, i) => i !== index));
   };
 
   const showSuccessNotification = (projectName, stats) => {
@@ -110,15 +125,15 @@ const EditProject = () => {
     if (stats.images_deleted > 0) {
       message += ` Removed ${stats.images_deleted} old image(s).`;
     }
-    
+
     setNotification({
       type: "success",
       title: "Project Updated Successfully!",
       message: message,
-      details: stats
+      details: stats,
     });
     setShowNotification(true);
-    
+
     setTimeout(() => {
       setShowNotification(false);
     }, 5000);
@@ -128,10 +143,10 @@ const EditProject = () => {
     setNotification({
       type: "error",
       title: "Failed to Update Project",
-      message: errorMsg || "An error occurred while updating the project."
+      message: errorMsg || "An error occurred while updating the project.",
     });
     setShowNotification(true);
-    
+
     setTimeout(() => {
       setShowNotification(false);
     }, 5000);
@@ -142,33 +157,37 @@ const EditProject = () => {
     setLoading(true);
 
     const data = new FormData();
-    Object.keys(formData).forEach(key => {
+    Object.keys(formData).forEach((key) => {
       data.append(key, formData[key]);
     });
-    
-    data.append('existing_images', JSON.stringify(imagesToKeep));
-    
-    newImages.forEach(image => {
-      data.append('images', image);
+
+    data.append("existing_images", JSON.stringify(imagesToKeep));
+
+    newImages.forEach((image) => {
+      data.append("images", image);
     });
 
     try {
       const response = await axiosInstance.put(
         `/api/projects/updateProject/${id}`,
         data,
-        { headers: { "Content-Type": "multipart/form-data" } }
+        { headers: { "Content-Type": "multipart/form-data" } },
       );
 
       if (response.data.success) {
         setMessage({ type: "success", text: "Project updated successfully!" });
-        
-        showSuccessNotification(formData.project_name, response.data.data?.images_updated || {});
-        
-        setTimeout(() => navigate('/admin/list'), 2000);
+
+        showSuccessNotification(
+          formData.project_name,
+          response.data.data?.images_updated || {},
+        );
+
+        setTimeout(() => navigate("/admin/list"), 2000);
       }
     } catch (error) {
-      console.log(error)
-      const errorMsg = error.response?.data?.message || "Failed to update project";
+      console.log(error);
+      const errorMsg =
+        error.response?.data?.message || "Failed to update project";
       setMessage({ type: "error", text: errorMsg });
       showErrorNotification(errorMsg);
     } finally {
@@ -177,28 +196,39 @@ const EditProject = () => {
   };
 
   const handleDelete = async () => {
-    if (!window.confirm('Are you sure you want to delete this project? This action cannot be undone.')) return;
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this project? This action cannot be undone.",
+      )
+    )
+      return;
 
     try {
-      const response = await axiosInstance.delete(`/api/projects/deleteProject/${id}`);
+      const response = await axiosInstance.delete(
+        `/api/projects/deleteProject/${id}`,
+      );
       if (response.data.success) {
         setMessage({ type: "success", text: "Project deleted successfully!" });
-        
+
         setNotification({
           type: "success",
           title: "Project Deleted",
-          message: `"${formData.project_name}" has been permanently deleted.`
+          message: `"${formData.project_name}" has been permanently deleted.`,
         });
         setShowNotification(true);
-        
-        setTimeout(() => navigate('/admin/list'), 1500);
+
+        setTimeout(() => navigate("/admin/list"), 1500);
       }
     } catch (error) {
-      setMessage({ type: "error", text: error.response?.data?.message || "Failed to delete project" });
+      setMessage({
+        type: "error",
+        text: error.response?.data?.message || "Failed to delete project",
+      });
     }
   };
 
-  const inputClasses = "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition";
+  const inputClasses =
+    "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition";
   const labelClasses = "block text-sm font-medium text-gray-700 mb-1";
 
   if (fetchLoading) {
@@ -215,13 +245,17 @@ const EditProject = () => {
     <AdminLayout user={user}>
       {/* Custom Notification */}
       {showNotification && (
-        <div className={`fixed top-24 right-6 z-50 max-w-md w-full bg-white rounded-xl shadow-2xl border-l-4 ${
-          notification.type === 'success' ? 'border-green-500' : 'border-red-500'
-        } overflow-hidden animate-slide-in`}>
+        <div
+          className={`fixed top-24 right-6 z-50 max-w-md w-full bg-white rounded-xl shadow-2xl border-l-4 ${
+            notification.type === "success"
+              ? "border-green-500"
+              : "border-red-500"
+          } overflow-hidden animate-slide-in`}
+        >
           <div className="p-4">
             <div className="flex items-start">
               <div className="flex-shrink-0">
-                {notification.type === 'success' ? (
+                {notification.type === "success" ? (
                   <CheckCircle className="w-6 h-6 text-green-500" />
                 ) : (
                   <XCircle className="w-6 h-6 text-red-500" />
@@ -253,7 +287,7 @@ const EditProject = () => {
                 )}
                 <div className="mt-3 flex gap-2">
                   <button
-                    onClick={() => navigate('/admin/list')}
+                    onClick={() => navigate("/admin/list")}
                     className="text-sm bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700 transition"
                   >
                     View All Projects
@@ -274,7 +308,9 @@ const EditProject = () => {
               </button>
             </div>
           </div>
-          <div className={`h-1 ${notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'} animate-progress`} />
+          <div
+            className={`h-1 ${notification.type === "success" ? "bg-green-500" : "bg-red-500"} animate-progress`}
+          />
         </div>
       )}
 
@@ -283,7 +319,7 @@ const EditProject = () => {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
             <button
-              onClick={() => navigate('/admin/list')}
+              onClick={() => navigate("/admin/list")}
               className="p-2 hover:bg-gray-100 rounded-lg transition"
               title="Back to List"
             >
@@ -300,13 +336,16 @@ const EditProject = () => {
           </button>
         </div>
 
-        <AlertMessage 
-          message={message.text} 
-          type={message.type} 
-          onClose={() => setMessage({ type: "", text: "" })} 
+        <AlertMessage
+          message={message.text}
+          type={message.type}
+          onClose={() => setMessage({ type: "", text: "" })}
         />
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-lg p-6">
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white rounded-xl shadow-lg p-6"
+        >
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Project ID */}
             <div>
@@ -494,7 +533,8 @@ const EditProject = () => {
                 placeholder="Enter detailed description of the property, its features, location benefits, amenities, etc."
               />
               <p className="text-xs text-gray-500 mt-1">
-                Describe the property in detail - this will be displayed on the property page
+                Describe the property in detail - this will be displayed on the
+                property page
               </p>
             </div>
 
@@ -584,12 +624,21 @@ const EditProject = () => {
               </div>
             </div>
           </div>
-
+          {/* move to features and other page */}
+          <Link to={`/admin/features/${id}`}>
+            <button
+              type="button"
+              onClick={() => navigate("/admin/list")}
+              className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
+            >
+              Update Features and floor details
+            </button>
+          </Link>
           {/* Submit Button */}
           <div className="mt-8 flex justify-end gap-4">
             <button
               type="button"
-              onClick={() => navigate('/admin/list')}
+              onClick={() => navigate("/admin/list")}
               className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
             >
               Cancel
@@ -600,7 +649,7 @@ const EditProject = () => {
               className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:bg-blue-300 flex items-center gap-2"
             >
               <Save className="w-4 h-4" />
-              {loading ? 'Updating...' : 'Update Project'}
+              {loading ? "Updating..." : "Update Project"}
             </button>
           </div>
         </form>
@@ -617,16 +666,20 @@ const EditProject = () => {
             opacity: 1;
           }
         }
-        
+
         @keyframes progress {
-          from { width: 100%; }
-          to { width: 0%; }
+          from {
+            width: 100%;
+          }
+          to {
+            width: 0%;
+          }
         }
-        
+
         .animate-slide-in {
           animation: slideIn 0.3s ease-out;
         }
-        
+
         .animate-progress {
           animation: progress 5s linear;
         }

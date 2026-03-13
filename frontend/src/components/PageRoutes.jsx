@@ -42,6 +42,7 @@ import ReraDisclosure from "../Pages/ReraDisclosure";
 
 
 import ChangePassword from "../components/admin/ChangePassword";
+import UpdateFeatures from "../Pages/admin/UpdateFeatures";
 
 const PageRoutes = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -130,7 +131,16 @@ const PageRoutes = () => {
           </ProtectedRoute>
         }
       />
-
+<Route
+        path="/admin/features/:project_id"
+        element={
+          <ProtectedRoute>
+            <SessionTracker>
+              <UpdateFeatures />
+            </SessionTracker>
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/admin/view/:id"
         element={
