@@ -783,9 +783,55 @@ exports.deleteProject = async (req, res) => {
 /////////////////////////////   BELOW IS THE UPDATE PROPERTIES CONTROLLER ////////////////////////////////////////////////
 
 // Get single project by ID for editing
+// exports.getProjectById = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+
+//     const projectResult = await pool.query(
+//       `SELECT * FROM projects WHERE id = $1`,
+//       [id],
+//     );
+
+//     if (projectResult.rows.length === 0) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Project not found",
+//       });
+//     }
+
+//     const project = projectResult.rows[0];
+
+//     // Get project images
+//     const imagesResult = await pool.query(
+//       `SELECT id, image_url, sort_order
+//        FROM project_images
+//        WHERE project_id = $1
+//        ORDER BY sort_order ASC`,
+//       [project.project_id],
+//     );
+
+//     project.images = imagesResult.rows;
+
+//     res.json({
+//       success: true,
+//       data: project,
+//     });
+//   } catch (error) {
+//     console.error("Get project by ID error:", error);
+//     res.status(500).json({
+//       success: false,
+//       message: "Failed to fetch project",
+//       error: error.message,
+//     });
+//   }
+// };
+
+// Get single project by ID for editing / viewing
 exports.getProjectById = async (req, res) => {
   try {
     const { id } = req.params;
+
+    /* ---------------- PROJECT ---------------- */
 
     const projectResult = await pool.query(
       `SELECT * FROM projects WHERE id = $1`,
@@ -800,17 +846,68 @@ exports.getProjectById = async (req, res) => {
     }
 
     const project = projectResult.rows[0];
+    const projectId = project.project_id;
 
-    // Get project images
+    /* ---------------- IMAGES ---------------- */
+
     const imagesResult = await pool.query(
-      `SELECT id, image_url, sort_order 
-       FROM project_images 
-       WHERE project_id = $1 
+      `SELECT id, image_url, sort_order
+       FROM project_images
+       WHERE project_id = $1
        ORDER BY sort_order ASC`,
-      [project.project_id],
+      [projectId],
     );
 
+    /* ---------------- FEATURES ---------------- */
+
+    const featuresResult = await pool.query(
+      `SELECT id, feature_name
+       FROM project_features
+       WHERE project_id = $1
+       ORDER BY sort_order`,
+      [projectId],
+    );
+
+    const featureItemsResult = await pool.query(
+      `SELECT *
+       FROM project_feature_items`,
+    );
+
+    const features = featuresResult.rows.map((feature) => ({
+      ...feature,
+      items: featureItemsResult.rows.filter(
+        (item) => item.feature_id === feature.id,
+      ),
+    }));
+
+    /* ---------------- CONFIGURATIONS ---------------- */
+
+    const configurationsResult = await pool.query(
+      `SELECT *
+       FROM project_configurations
+       WHERE project_id = $1
+       ORDER BY sort_order`,
+      [projectId],
+    );
+
+    /* ---------------- FLOORPLANS ---------------- */
+
+    const floorPlansResult = await pool.query(
+      `SELECT *
+       FROM project_floor_plans
+       WHERE project_id = $1
+       ORDER BY sort_order`,
+      [projectId],
+    );
+
+    /* ---------------- ATTACH DATA ---------------- */
+
     project.images = imagesResult.rows;
+    project.features = features;
+    project.configurations = configurationsResult.rows;
+    project.floorplans = floorPlansResult.rows;
+
+    /* ---------------- RESPONSE ---------------- */
 
     res.json({
       success: true,
@@ -818,6 +915,7 @@ exports.getProjectById = async (req, res) => {
     });
   } catch (error) {
     console.error("Get project by ID error:", error);
+
     res.status(500).json({
       success: false,
       message: "Failed to fetch project",
