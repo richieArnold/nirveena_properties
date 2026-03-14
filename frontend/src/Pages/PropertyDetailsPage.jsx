@@ -20,6 +20,7 @@ import {
   IndianRupee,
 } from "lucide-react";
 import { Clock, LayoutGrid, Ruler } from "lucide-react";
+import { useUserRegistration } from "../context/UserRegistrationContext";
 
 import EnquiryForm from "../components/Properties/EnquiryForm";
 
@@ -41,6 +42,8 @@ function PropertyDetailsPage() {
 
   const [floorPlanViewer, setFloorPlanViewer] = useState(false);
   const [activeFloorPlan, setActiveFloorPlan] = useState(null);
+
+  const { isRegistered } = useUserRegistration();
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -177,7 +180,13 @@ function PropertyDetailsPage() {
       <div className="min-h-screen bg-slate-50 pt-20 pb-20">
         {/* NAVBAR */}
         <button
-          onClick={() => setShowBackPopup(true)}
+          onClick={() => {
+            if (isRegistered) {
+              navigate("/property"); // or navigate(-1)
+            } else {
+              setShowBackPopup(true);
+            }
+          }}
           className="flex items-center gap-2 px-3 py-2 hover:bg-slate-100 rounded-lg transition"
         >
           <ChevronLeft className="w-5 h-5 text-slate-700" />
@@ -415,22 +424,24 @@ function PropertyDetailsPage() {
             </div>
 
             {/* RIGHT SIDE FORM */}
-            <div className="hidden lg:block">
-              <div className="sticky top-28 bg-white border rounded-2xl shadow-xl p-6">
-                <h3 className="text-xl font-bold mb-4 text-center">
-                  Schedule A Site Visit
-                </h3>
+            {!isRegistered && (
+              <div className="hidden lg:block">
+                <div className="sticky top-28 bg-white border rounded-2xl shadow-xl p-6">
+                  <h3 className="text-xl font-bold mb-4 text-center">
+                    Schedule A Site Visit
+                  </h3>
 
-                <EnquiryForm
-                  projectId={project.id}
-                  onSuccess={handleEnquirySuccess}
-                />
+                  <EnquiryForm
+                    projectId={project.project_id}
+                    onSuccess={handleEnquirySuccess}
+                  />
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* ENTRY POPUP */}
-          {showPopup && (
+          {!isRegistered && showPopup && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
               <div className="relative bg-white w-[95%] max-w-md p-6 rounded-2xl shadow-2xl">
                 <button
@@ -445,7 +456,7 @@ function PropertyDetailsPage() {
                 </h3>
 
                 <EnquiryForm
-                  projectId={project.id}
+                  projectId={project.project_id}
                   onSuccess={() => {
                     setShowPopup(false);
                     handleEnquirySuccess();
@@ -454,9 +465,8 @@ function PropertyDetailsPage() {
               </div>
             </div>
           )}
-
           {/* EXIT POPUP */}
-          {showExitPopup && (
+          {!isRegistered && showExitPopup && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
               <div className="relative bg-white w-[95%] max-w-md p-6 rounded-2xl shadow-2xl">
                 <button
@@ -474,7 +484,7 @@ function PropertyDetailsPage() {
                 </h3>
 
                 <EnquiryForm
-                  projectId={project.id}
+                  projectId={project.project_id}
                   onSuccess={() => {
                     setShowExitPopup(false);
                     handleEnquirySuccess();
@@ -483,7 +493,7 @@ function PropertyDetailsPage() {
               </div>
             </div>
           )}
-          {showBackPopup && (
+          {!isRegistered && showBackPopup && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
               <div className="relative bg-white w-[95%] max-w-md p-6 rounded-2xl shadow-2xl">
                 {/* Close */}
@@ -520,6 +530,7 @@ function PropertyDetailsPage() {
               </div>
             </div>
           )}
+
           {/* features */}
           {/* AMENITIES & FEATURES */}
           {project.features?.length > 0 && (
@@ -594,10 +605,19 @@ function PropertyDetailsPage() {
                     </div>
 
                     {/* Price */}
-                    <div className="flex items-center gap-2 text-slate-700 font-semibold">
-                      <IndianRupee className="w-4 h-4 text-green-600" />
-                      {config.price}
-                    </div>
+                    {isRegistered ? (
+                      <div className="flex items-center gap-2 text-slate-700 font-semibold">
+                        <IndianRupee className="w-4 h-4 text-green-600" />
+                        {config.price}
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setShowPopup(true)}
+                        className="mt-2 w-full bg-blue-600 text-white text-sm font-semibold py-2 rounded-lg hover:bg-blue-700 transition"
+                      >
+                        View Prices
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>
@@ -621,17 +641,31 @@ function PropertyDetailsPage() {
                   >
                     {/* IMAGE */}
                     <div
-                      className="cursor-pointer"
+                      className="cursor-pointer relative"
                       onClick={() => {
-                        setActiveFloorPlan(plan.image_url);
-                        setFloorPlanViewer(true);
+                        if (!isRegistered) {
+                          setShowPopup(true);
+                        } else {
+                          setActiveFloorPlan(plan.image_url);
+                          setFloorPlanViewer(true);
+                        }
                       }}
                     >
                       <img
                         src={plan.image_url}
                         alt={plan.configuration}
-                        className="w-full h-[220px] object-contain bg-slate-50"
+                        className={`w-full h-[220px] object-contain bg-slate-50 transition ${
+                          !isRegistered ? "blur-md brightness-75" : ""
+                        }`}
                       />
+
+                      {!isRegistered && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="bg-white/90 text-slate-800 text-sm font-semibold px-4 py-2 rounded-lg shadow">
+                            View Floor Plan
+                          </span>
+                        </div>
+                      )}
                     </div>
 
                     {/* DETAILS */}

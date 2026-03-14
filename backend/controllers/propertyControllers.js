@@ -829,13 +829,13 @@ exports.deleteProject = async (req, res) => {
 // Get single project by ID for editing / viewing
 exports.getProjectById = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { project_id } = req.params;
 
     /* ---------------- PROJECT ---------------- */
 
     const projectResult = await pool.query(
-      `SELECT * FROM projects WHERE id = $1`,
-      [id],
+      `SELECT * FROM projects WHERE project_id = $1`,
+      [project_id],
     );
 
     if (projectResult.rows.length === 0) {

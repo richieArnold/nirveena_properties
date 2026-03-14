@@ -42,7 +42,7 @@ router.post("/import-images", importProjectImages);
 router.get("/getAllProjects", getAllProjects);
 router.get("/getAllPropertiesUnfiltered", getAllPropertiesUnfiltered);
 router.get("/getSingleProject/:slug", getProjectBySlug);
-router.get("/getProject/:id", getProjectById);
+router.get("/getProject/:project_id", getProjectById);
 router.put("/:id/update-display-order", updateDisplayOrder);
 router.get("/property-types", getPropertyTypes);
 router.post("/property-types", savePropertyType); // ADD THIS - Get project by ID for editing

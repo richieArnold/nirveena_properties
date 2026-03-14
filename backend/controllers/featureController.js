@@ -40,11 +40,13 @@ exports.addProjectFeature = async (req, res) => {
     });
 
   } catch (error) {
+    console.log(error)
     res.status(500).json({
       success: false,
       message: "Failed to add feature",
       error: error.message,
     });
+
   }
 };
 

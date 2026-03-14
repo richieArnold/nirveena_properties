@@ -114,6 +114,11 @@ const UpdateFeatures = () => {
       const res = await axiosInstance.post(
         "/api/projects/upload/icon",
         formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
       );
 
       const updated = [...features];
@@ -240,6 +245,11 @@ const UpdateFeatures = () => {
       await axiosInstance.post(
         `/api/projects/${project_id}/floorplans`,
         formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
       );
 
       alert("Floor plan uploaded");
@@ -361,33 +371,31 @@ const UpdateFeatures = () => {
                       Choose Icon
                     </button>
                     {showIconPicker === `${groupIndex}-${itemIndex}` && (
-  <div className="grid grid-cols-8 gap-2 mt-3 p-3 border rounded-lg bg-gray-50">
+                      <div className="grid grid-cols-8 gap-2 mt-3 p-3 border rounded-lg bg-gray-50">
+                        {availableIcons.map((icon, i) => (
+                          <button
+                            key={i}
+                            type="button"
+                            onClick={() => {
+                              const updated = [...features];
 
-    {availableIcons.map((icon, i) => (
-      <button
-        key={i}
-        type="button"
-        onClick={() => {
+                              updated[groupIndex].items[itemIndex].icon_url =
+                                icon.url;
 
-          const updated = [...features];
+                              setFeatures(updated);
 
-          updated[groupIndex].items[itemIndex].icon_url = icon.url;
-
-          setFeatures(updated);
-
-          setShowIconPicker(null); // close picker
-        }}
-        className="border rounded p-2 hover:bg-gray-100"
-      >
-        <img
-          src={icon.url}
-          className="w-6 h-6 object-contain"
-        />
-      </button>
-    ))}
-
-  </div>
-)}
+                              setShowIconPicker(null); // close picker
+                            }}
+                            className="border rounded p-2 hover:bg-gray-100"
+                          >
+                            <img
+                              src={icon.url}
+                              className="w-6 h-6 object-contain"
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    )}
                     {item.id ? (
                       <button
                         onClick={() => deleteFeatureItem(item.id)}
