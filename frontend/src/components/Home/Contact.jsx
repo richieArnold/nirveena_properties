@@ -98,7 +98,7 @@ const Contact = () => {
   };
 
   return (
-    <section className="py-24 bg-linear-to-b from-gray-50 to-white">
+    <section className="min-h-screen flex items-center justify-center p-4 bg-linear-to-b from-gray-50 to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial="hidden"

@@ -75,7 +75,7 @@ function EnquiryForm({ projectId, onSuccess }) {
   {/* Email */}
   <div>
     <label className="text-sm font-medium text-gray-700 mb-1 block">
-      Email Address <span className="text-red-500">*</span>
+      Email Address <span className="text-red-500"></span>
     </label>
     <input
       type="email"

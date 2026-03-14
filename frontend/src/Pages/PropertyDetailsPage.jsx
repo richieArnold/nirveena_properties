@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axiosInstance from "../utils/Instance";
 import { Helmet } from "react-helmet-async";
@@ -25,6 +25,7 @@ import EnquiryForm from "../components/Properties/EnquiryForm";
 
 function PropertyDetailsPage() {
   const { slug } = useParams();
+  const navigate = useNavigate();
 
   const [project, setProject] = useState(null);
   const [projectDetails, setProjectDetais] = useState(null);
@@ -33,8 +34,14 @@ function PropertyDetailsPage() {
   const [viewerOpen, setViewerOpen] = useState(false);
 
   const [showPopup, setShowPopup] = useState(false);
+
+  const [showExitPopup, setShowExitPopup] = useState(false);
+  const [popupClosed, setPopupClosed] = useState(false);
+  const [showBackPopup, setShowBackPopup] = useState(false);
+
   const [floorPlanViewer, setFloorPlanViewer] = useState(false);
   const [activeFloorPlan, setActiveFloorPlan] = useState(null);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowPopup(true);
@@ -42,6 +49,22 @@ function PropertyDetailsPage() {
 
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    const handleExitIntent = (e) => {
+      if (popupClosed) return;
+
+      if (e.clientY <= 10) {
+        setShowExitPopup(true);
+      }
+    };
+
+    document.addEventListener("mouseleave", handleExitIntent);
+
+    return () => {
+      document.removeEventListener("mouseleave", handleExitIntent);
+    };
+  }, [popupClosed]);
 
   useEffect(() => {
     async function fetchProject() {
@@ -151,13 +174,17 @@ function PropertyDetailsPage() {
           )}
         </Helmet>
       )}
-      <div className="min-h-screen bg-slate-50 pb-20">
+      <div className="min-h-screen bg-slate-50 pt-20 pb-20">
         {/* NAVBAR */}
-        <nav className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-slate-200 px-4 py-3 flex items-center justify-between">
-          <button className="p-2 hover:bg-slate-100 rounded-full">
-            <ChevronLeft className="w-6 h-6 text-slate-700" />
-          </button>
-        </nav>
+        <button
+          onClick={() => setShowBackPopup(true)}
+          className="flex items-center gap-2 px-3 py-2 hover:bg-slate-100 rounded-lg transition"
+        >
+          <ChevronLeft className="w-5 h-5 text-slate-700" />
+          <span className="text-sm font-medium text-slate-700">
+            Back to Properties
+          </span>
+        </button>
 
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
           {/* HEADER */}
@@ -317,7 +344,7 @@ function PropertyDetailsPage() {
                 </div>
               </div>
 
-              {/* DESCRIPTION - WITH MARKDOWN RENDERING */}
+              {/* ABOUT PROPERTY */}
               <section>
                 <h3 className="text-2xl font-bold mb-4 flex items-center gap-2">
                   <Info className="text-blue-600" />
@@ -325,91 +352,7 @@ function PropertyDetailsPage() {
                 </h3>
 
                 <div className="prose prose-lg max-w-none text-slate-600">
-                  <ReactMarkdown
-                    remarkPlugins={[remarkGfm]}
-                    components={{
-                      h1: ({ node, ...props }) => (
-                        <h1
-                          className="text-3xl font-bold mt-6 mb-4"
-                          {...props}
-                        />
-                      ),
-                      h2: ({ node, ...props }) => (
-                        <h2
-                          className="text-2xl font-bold mt-5 mb-3"
-                          {...props}
-                        />
-                      ),
-                      h3: ({ node, ...props }) => (
-                        <h3
-                          className="text-xl font-bold mt-4 mb-2"
-                          {...props}
-                        />
-                      ),
-                      h4: ({ node, ...props }) => (
-                        <h4
-                          className="text-lg font-bold mt-3 mb-2"
-                          {...props}
-                        />
-                      ),
-                      p: ({ node, ...props }) => (
-                        <p className="mb-4 leading-relaxed" {...props} />
-                      ),
-                      ul: ({ node, ...props }) => (
-                        <ul
-                          className="list-disc pl-6 mb-4 space-y-2"
-                          {...props}
-                        />
-                      ),
-                      ol: ({ node, ...props }) => (
-                        <ol
-                          className="list-decimal pl-6 mb-4 space-y-2"
-                          {...props}
-                        />
-                      ),
-                      li: ({ node, ...props }) => (
-                        <li className="mb-1" {...props} />
-                      ),
-                      blockquote: ({ node, ...props }) => (
-                        <blockquote
-                          className="border-l-4 border-blue-500 pl-4 italic my-4"
-                          {...props}
-                        />
-                      ),
-                      table: ({ node, ...props }) => (
-                        <div className="overflow-x-auto my-4">
-                          <table
-                            className="min-w-full divide-y divide-gray-200 border"
-                            {...props}
-                          />
-                        </div>
-                      ),
-                      th: ({ node, ...props }) => (
-                        <th
-                          className="px-4 py-2 bg-gray-50 font-semibold text-left"
-                          {...props}
-                        />
-                      ),
-                      td: ({ node, ...props }) => (
-                        <td className="px-4 py-2 border-t" {...props} />
-                      ),
-                      strong: ({ node, ...props }) => (
-                        <strong
-                          className="font-bold text-gray-900"
-                          {...props}
-                        />
-                      ),
-                      em: ({ node, ...props }) => (
-                        <em className="italic" {...props} />
-                      ),
-                      code: ({ node, ...props }) => (
-                        <code
-                          className="bg-gray-100 rounded px-1 py-0.5 text-sm"
-                          {...props}
-                        />
-                      ),
-                    }}
-                  >
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {project.property_description}
                   </ReactMarkdown>
                 </div>
@@ -471,34 +414,112 @@ function PropertyDetailsPage() {
               </section>
             </div>
 
-            {/* CONTACT FORM */}
-            {/* ENQUIRY POPUP */}
-            {showPopup && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-                <div className="relative bg-white w-[95%] max-w-md p-6 rounded-2xl shadow-2xl">
-                  {/* CLOSE BUTTON */}
-                  <button
-                    onClick={() => setShowPopup(false)}
-                    className="absolute top-4 right-4 text-slate-500 hover:text-black"
-                  >
-                    <X size={24} />
-                  </button>
+            {/* RIGHT SIDE FORM */}
+            <div className="hidden lg:block">
+              <div className="sticky top-28 bg-white border rounded-2xl shadow-xl p-6">
+                <h3 className="text-xl font-bold mb-4 text-center">
+                  Schedule A Site Visit
+                </h3>
 
-                  <h3 className="text-xl font-bold mb-4 text-center">
-                    Schedule A Site Visit
-                  </h3>
-
-                  <EnquiryForm
-                    projectId={project.id}
-                    onSuccess={() => {
-                      setShowPopup(false);
-                      handleEnquirySuccess();
-                    }}
-                  />
-                </div>
+                <EnquiryForm
+                  projectId={project.id}
+                  onSuccess={handleEnquirySuccess}
+                />
               </div>
-            )}
+            </div>
           </div>
+
+          {/* ENTRY POPUP */}
+          {showPopup && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+              <div className="relative bg-white w-[95%] max-w-md p-6 rounded-2xl shadow-2xl">
+                <button
+                  onClick={() => setShowPopup(false)}
+                  className="absolute top-4 right-4 text-slate-500 hover:text-black"
+                >
+                  <X size={24} />
+                </button>
+
+                <h3 className="text-xl font-bold mb-4 text-center">
+                  Schedule A Site Visit
+                </h3>
+
+                <EnquiryForm
+                  projectId={project.id}
+                  onSuccess={() => {
+                    setShowPopup(false);
+                    handleEnquirySuccess();
+                  }}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* EXIT POPUP */}
+          {showExitPopup && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+              <div className="relative bg-white w-[95%] max-w-md p-6 rounded-2xl shadow-2xl">
+                <button
+                  onClick={() => {
+                    setShowExitPopup(false);
+                    setPopupClosed(true);
+                  }}
+                  className="absolute top-4 right-4"
+                >
+                  <X size={24} />
+                </button>
+
+                <h3 className="text-xl font-bold mb-4 text-center">
+                  Wait! Get Exclusive Property Deals
+                </h3>
+
+                <EnquiryForm
+                  projectId={project.id}
+                  onSuccess={() => {
+                    setShowExitPopup(false);
+                    handleEnquirySuccess();
+                  }}
+                />
+              </div>
+            </div>
+          )}
+          {showBackPopup && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+              <div className="relative bg-white w-[95%] max-w-md p-6 rounded-2xl shadow-2xl">
+                {/* Close */}
+                <button
+                  onClick={() => navigate("/property")}
+                  className="absolute top-4 right-4"
+                >
+                  <X size={24} />
+                </button>
+
+                <h3 className="text-xl font-bold mb-2 text-center">
+                  Wait! Get Exclusive Property Deals
+                </h3>
+
+                <p className="text-sm text-slate-500 text-center mb-4">
+                  Submit your details and our team will contact you with the
+                  best offers.
+                </p>
+
+                <EnquiryForm
+                  projectId={project.id}
+                  onSuccess={() => {
+                    setShowBackPopup(false);
+                    handleEnquirySuccess();
+                  }}
+                />
+
+                <button
+                  onClick={() => navigate("/property")}
+                  className="w-full mt-3 text-sm text-slate-500 hover:text-black"
+                >
+                  No Thanks, Go Back
+                </button>
+              </div>
+            </div>
+          )}
           {/* features */}
           {/* AMENITIES & FEATURES */}
           {project.features?.length > 0 && (

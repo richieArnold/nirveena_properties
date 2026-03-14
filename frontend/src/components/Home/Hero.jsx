@@ -14,7 +14,7 @@ import { useEffect, useState } from "react";
 import bgImage from "../../assets/Hero-final.jpeg";
 import { useNavigate } from "react-router-dom";
 import { FaWhatsapp, FaPhoneAlt } from "react-icons/fa";
-import axiosInstance from "../../utils/Instance"; 
+import axiosInstance from "../../utils/Instance";
 
 /* Professional font setup */
 // @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
@@ -92,12 +92,22 @@ const Hero = () => {
     };
   }, []);
 
-  // Show form after 5 seconds
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowForm(true);
-    }, 5000);
-    return () => clearTimeout(timer);
+    const handleScrollTrigger = () => {
+      const scrollPosition = window.scrollY;
+      const pageHeight = document.body.scrollHeight - window.innerHeight;
+
+      if (scrollPosition > pageHeight * 0.3) {
+        setShowForm(true);
+        window.removeEventListener("scroll", handleScrollTrigger);
+      }
+    };
+
+    window.addEventListener("scroll", handleScrollTrigger);
+
+    return () => {
+      window.removeEventListener("scroll", handleScrollTrigger);
+    };
   }, []);
 
   const handleInputChange = (e) => {
@@ -124,7 +134,7 @@ const Hero = () => {
 
       if (response.data.success) {
         setSubmitSuccess(true);
-        
+
         // Reset form after success
         setTimeout(() => {
           setSubmitSuccess(false);
@@ -139,7 +149,9 @@ const Hero = () => {
       }
     } catch (error) {
       console.error("Error submitting form:", error);
-      alert(error.response?.data?.message || "Failed to submit. Please try again.");
+      alert(
+        error.response?.data?.message || "Failed to submit. Please try again.",
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -326,7 +338,7 @@ const Hero = () => {
                     Get in Touch
                   </h3>
                   <p className="text-sm text-gray-500 mt-1">
-                    Our team will respond within 8 hours
+                    Our team will respond within 1 hour
                   </p>
                 </div>
 
@@ -361,47 +373,57 @@ const Hero = () => {
                     </motion.div>
                   ) : (
                     <form onSubmit={handleSubmit} className="space-y-4">
-                      <div className="grid grid-cols-2 gap-3">
+                      {/* Name */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Full Name <span className="text-red-500">*</span>
+                        </label>
+
                         <input
                           type="text"
                           name="firstName"
                           value={formData.firstName}
                           onChange={handleInputChange}
                           required
-                          placeholder="First name"
-                          className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition text-sm"
-                        />
-                        <input
-                          type="text"
-                          name="lastName"
-                          value={formData.lastName}
-                          onChange={handleInputChange}
-                          required
-                          placeholder="Last name"
+                          placeholder="Enter your name"
                           className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition text-sm"
                         />
                       </div>
 
-                      <input
-                        type="tel"
-                        name="phone"
-                        value={formData.phone}
-                        onChange={handleInputChange}
-                        required
-                        placeholder="Phone number"
-                        className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition text-sm"
-                      />
+                      {/* Phone */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Phone Number <span className="text-red-500">*</span>
+                        </label>
 
-                      <input
-                        type="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleInputChange}
-                        required
-                        placeholder="Email address"
-                        className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition text-sm"
-                      />
+                        <input
+                          type="tel"
+                          name="phone"
+                          value={formData.phone}
+                          onChange={handleInputChange}
+                          required
+                          placeholder="Enter phone number"
+                          className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition text-sm"
+                        />
+                      </div>
 
+                      {/* Email */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Email Address
+                        </label>
+
+                        <input
+                          type="email"
+                          name="email"
+                          value={formData.email}
+                          onChange={handleInputChange}
+                          placeholder="Enter email (optional)"
+                          className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition text-sm"
+                        />
+                      </div>
+
+                      {/* Submit */}
                       <motion.button
                         type="submit"
                         disabled={isSubmitting}
@@ -420,7 +442,8 @@ const Hero = () => {
                       </motion.button>
 
                       <p className="text-xs text-center text-gray-400">
-                        By submitting, you agree to our privacy policy
+                        Fields marked with{" "}
+                        <span className="text-red-500">*</span> are required
                       </p>
                     </form>
                   )}
@@ -446,9 +469,13 @@ const Hero = () => {
             initial="hidden"
             animate="visible"
             exit="exit"
-            className="lg:hidden fixed inset-x-4 bottom-4 z-50"
+            className="lg:hidden fixed inset-0 z-50 flex items-center justify-center px-4"
           >
-            <div className="bg-white rounded-xl shadow-2xl overflow-hidden border border-gray-100">
+            <div
+              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              onClick={handleClose}
+            />
+            <div className="relative bg-white rounded-xl shadow-2xl border border-gray-100 w-full max-w-md max-h-[90vh] overflow-y-auto">
               <div className="px-4 py-3 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100 flex justify-between items-center">
                 <h3 className="text-base font-semibold text-gray-900">
                   Get in Touch
@@ -488,49 +515,65 @@ const Hero = () => {
                     </p>
                   </div>
                 ) : (
-                  <div className="space-y-3">
-                    <div className="grid grid-cols-2 gap-2">
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    {/* Name */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Full Name <span className="text-red-500">*</span>
+                      </label>
+
                       <input
                         type="text"
                         name="firstName"
-                        placeholder="First name"
                         value={formData.firstName}
                         onChange={handleInputChange}
-                        className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                      />
-                      <input
-                        type="text"
-                        name="lastName"
-                        placeholder="Last name"
-                        value={formData.lastName}
-                        onChange={handleInputChange}
-                        className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        required
+                        placeholder="Enter your name"
+                        className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                       />
                     </div>
-                    <input
-                      type="tel"
-                      name="phone"
-                      placeholder="Phone number"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    />
-                    <input
-                      type="email"
-                      name="email"
-                      placeholder="Email address"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                    />
+
+                    {/* Phone */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Phone Number <span className="text-red-500">*</span>
+                      </label>
+
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleInputChange}
+                        required
+                        placeholder="Enter phone number"
+                        className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      />
+                    </div>
+
+                    {/* Email */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Email Address
+                      </label>
+
+                      <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        placeholder="Enter email (optional)"
+                        className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      />
+                    </div>
+
                     <button
-                      onClick={handleSubmit}
+                      type="submit"
                       disabled={isSubmitting}
-                      className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg text-sm font-medium shadow-md active:scale-[0.98] transition-transform disabled:opacity-50"
+                      className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium shadow-md"
                     >
-                      {isSubmitting ? "Sending..." : "Submit"}
+                      {isSubmitting ? "Sending..." : "Request Consultation"}
                     </button>
-                  </div>
+                  </form>
                 )}
               </div>
             </div>
@@ -567,50 +610,44 @@ const Hero = () => {
       </AnimatePresence>
 
       {/* Floating Contact Widget */}
-      <motion.div
-        initial={{ x: -60 }}
-        animate={{ x: 0 }}
-        transition={{ duration: 0.4 }}
-        className="fixed left-0 top-1/2 -translate-y-1/2 z-50 flex flex-col"
-      >
-        {/* Phone */}
-        <a
-          href="tel:+919731658272"
-          className="group flex items-center bg-gray-900 hover:bg-indigo-600
-    text-white overflow-hidden transition-all duration-300"
+      {!showForm && (
+        <motion.div
+          initial={{ x: -60 }}
+          animate={{ x: 0 }}
+          transition={{ duration: 0.4 }}
+          className="flex fixed left-0 top-1/2 -translate-y-1/2 z-40 flex-col"
         >
-          <div className="flex items-center justify-center w-12 h-12">
-            <FaPhoneAlt size={18} />
-          </div>
-
-          <span
-            className="max-w-0 group-hover:max-w-[140px] opacity-0 group-hover:opacity-100
-      whitespace-nowrap transition-all duration-300 pr-4 font-medium"
+          {/* Phone */}
+          <a
+            href="tel:+919731658272"
+            className="group flex items-center bg-gray-900 hover:bg-indigo-600 text-white w-12 hover:w-40 overflow-hidden transition-all duration-300 rounded-r-lg"
           >
-            Call Us
-          </span>
-        </a>
+            <div className="flex items-center justify-center w-12 h-12 shrink-0">
+              <FaPhoneAlt size={18} />
+            </div>
 
-        {/* WhatsApp */}
-        <a
-          href={whatsappLink}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="group flex items-center bg-gray-900 hover:bg-green-500
-    text-white overflow-hidden transition-all duration-300"
-        >
-          <div className="flex items-center justify-center w-12 h-12">
-            <FaWhatsapp size={20} />
-          </div>
+            <span className="ml-2 opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity duration-300 font-medium">
+              Call Us
+            </span>
+          </a>
 
-          <span
-            className="max-w-0 group-hover:max-w-[140px] opacity-0 group-hover:opacity-100
-      whitespace-nowrap transition-all duration-300 pr-4 font-medium"
+          {/* WhatsApp */}
+          <a
+            href={whatsappLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex items-center bg-gray-900 hover:bg-green-500 text-white w-12 hover:w-40 overflow-hidden transition-all duration-300 rounded-r-lg"
           >
-            WhatsApp
-          </span>
-        </a>
-      </motion.div>
+            <div className="flex items-center justify-center w-12 h-12 shrink-0">
+              <FaWhatsapp size={20} />
+            </div>
+
+            <span className="ml-2 opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity duration-300 font-medium">
+              WhatsApp
+            </span>
+          </a>
+        </motion.div>
+      )}
     </div>
   );
 };
