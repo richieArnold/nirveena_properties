@@ -19,6 +19,8 @@ import {
   Home,
   IndianRupee,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { FaWhatsapp, FaPhoneAlt } from "react-icons/fa";
 import { Clock, LayoutGrid, Ruler } from "lucide-react";
 import { useUserRegistration } from "../context/UserRegistrationContext";
 
@@ -140,7 +142,13 @@ function PropertyDetailsPage() {
   const handleEnquirySuccess = () => {
     alert("Thank you! Our team will contact you soon.");
   };
+  const whatsappNumber = "919731658272"; // change to admin number
 
+  const message = encodeURIComponent(
+    "Hello, I am interested in your properties.",
+  );
+
+  const whatsappLink = `https://wa.me/${whatsappNumber}?text=${message}`;
   return (
     <>
       {project && (
@@ -655,7 +663,7 @@ function PropertyDetailsPage() {
                         src={plan.image_url}
                         alt={plan.configuration}
                         className={`w-full h-[220px] object-contain bg-slate-50 transition ${
-                          !isRegistered ? "blur-md brightness-75" : ""
+                          !isRegistered ? "blur-[1px] brightness-75" : ""
                         }`}
                       />
 
@@ -729,6 +737,42 @@ function PropertyDetailsPage() {
           </div>
         )}
       </div>
+      <motion.div
+        initial={{ x: -60 }}
+        animate={{ x: 0 }}
+        transition={{ duration: 0.4 }}
+        className="flex fixed left-0 top-1/2 -translate-y-1/2 z-40 flex-col"
+      >
+        {/* Phone */}
+        <a
+          href="tel:+919731658272"
+          className="group flex items-center bg-gray-900 hover:bg-indigo-600 text-white w-12 hover:w-40 overflow-hidden transition-all duration-300 rounded-r-lg"
+        >
+          <div className="flex items-center justify-center w-12 h-12 shrink-0">
+            <FaPhoneAlt size={18} />
+          </div>
+
+          <span className="ml-2 opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity duration-300 font-medium">
+            Call Us
+          </span>
+        </a>
+
+        {/* WhatsApp */}
+        <a
+          href={whatsappLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group flex items-center bg-gray-900 hover:bg-green-500 text-white w-12 hover:w-40 overflow-hidden transition-all duration-300 rounded-r-lg"
+        >
+          <div className="flex items-center justify-center w-12 h-12 shrink-0">
+            <FaWhatsapp size={20} />
+          </div>
+
+          <span className="ml-2 opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity duration-300 font-medium">
+            WhatsApp
+          </span>
+        </a>
+      </motion.div>
     </>
   );
 }

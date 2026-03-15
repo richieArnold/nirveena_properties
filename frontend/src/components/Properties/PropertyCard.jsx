@@ -1,16 +1,8 @@
 import { motion } from "framer-motion";
-import {
-  MapPin,
-  Home,
-  BedDouble,
-  Square,
-  Maximize2,
-} from "lucide-react";
+import { MapPin, Home, BedDouble, Square, Maximize2 } from "lucide-react";
 import { Link } from "react-router-dom";
-
+import { useNavigate } from "react-router-dom";
 function PropertyCard({ property }) {
-
-
   // Debug log
   console.log("Rendering property:", property);
 
@@ -22,7 +14,7 @@ function PropertyCard({ property }) {
   };
 
   const bhkInfo = getBHKInfo();
-
+  const navigate = useNavigate();
   return (
     <motion.div
       layout
@@ -36,7 +28,8 @@ function PropertyCard({ property }) {
         className="bg-white rounded-xl border border-gray-200
         shadow-md hover:shadow-lg
         transition-all duration-300 group relative
-        flex flex-col h-full overflow-hidden"
+        flex flex-col h-full overflow-hidden cursor-pointer"
+        onClick={() => navigate(`/properties/${property.slug}`)}
       >
         {/* Image Container */}
         <div className="relative h-48 overflow-hidden bg-gray-100">
@@ -68,7 +61,6 @@ function PropertyCard({ property }) {
               {property.project_status || "Coming Soon"}
             </span>
           </div>
-
         </div>
 
         {/* Content Section */}

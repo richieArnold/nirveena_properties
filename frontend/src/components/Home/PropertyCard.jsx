@@ -13,13 +13,14 @@ const PropertyCard = ({ property, className = "" }) => {
     if (property.configuration && property.configuration.length > 0) {
       return property.configuration.join(", ");
     }
-    
+
     // Fallback based on BHK types in title or description
     const title = property.title || "";
-    if (title.includes("2 BHK") && title.includes("3 BHK")) return "2, 3 BHK Apartments";
+    if (title.includes("2 BHK") && title.includes("3 BHK"))
+      return "2, 3 BHK Apartments";
     if (title.includes("2, 3")) return "2, 3 BHK Apartments";
     if (title.includes("2, 2.5, 3")) return "2, 2.5, 3 BHK Apartments";
-    
+
     return "Apartments";
   };
 
@@ -28,7 +29,7 @@ const PropertyCard = ({ property, className = "" }) => {
     if (property.price?.display) {
       return property.price.display;
     }
-    
+
     if (property.price?.min) {
       const minInCr = (property.price.min / 10000000).toFixed(2);
       if (property.price.max) {
@@ -37,7 +38,7 @@ const PropertyCard = ({ property, className = "" }) => {
       }
       return `₹${minInCr} Cr`;
     }
-    
+
     return "Contact for Price";
   };
 
@@ -49,7 +50,10 @@ const PropertyCard = ({ property, className = "" }) => {
       className={`group relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 cursor-pointer ${className}`}
     >
       {/* Property Image Container */}
-      <div className="relative h-96 overflow-hidden">
+      <div
+        className="relative h-96 overflow-hidden"
+        onClick={() => navigate(`/properties/${property.slug}`)}
+      >
         {/* Skeleton Loader */}
         {!imageLoaded && (
           <div className="absolute inset-0 bg-gradient-to-br from-gray-100 to-gray-200 animate-pulse"></div>
@@ -57,7 +61,10 @@ const PropertyCard = ({ property, className = "" }) => {
 
         {/* Main Image */}
         <img
-          src={property.images?.[0] || "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00"}
+          src={
+            property.images?.[0] ||
+            "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00"
+          }
           alt={property.title}
           onLoad={() => setImageLoaded(true)}
           className={`w-full h-full object-cover transition-transform duration-700 ${
@@ -71,8 +78,10 @@ const PropertyCard = ({ property, className = "" }) => {
         {/* Property Info Overlay */}
         <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
           {/* Property Title */}
-          <h3 className="text-2xl font-bold mb-2 line-clamp-1">{property.title}</h3>
-          
+          <h3 className="text-2xl font-bold mb-2 line-clamp-1">
+            {property.title}
+          </h3>
+
           {/* Developer */}
           <div className="flex items-center gap-1.5 mb-3">
             <Building className="w-4 h-4 text-white/90" />
@@ -96,9 +105,7 @@ const PropertyCard = ({ property, className = "" }) => {
               <p className="text-sm font-medium text-white/90 capitalize">
                 {property.location?.area || property.location?.address}
               </p>
-              <p className="text-sm text-white/80">
-                {property.location?.city}
-              </p>
+              <p className="text-sm text-white/80">{property.location?.city}</p>
             </div>
           </div>
 
@@ -106,22 +113,24 @@ const PropertyCard = ({ property, className = "" }) => {
           <div className="mt-4 pt-4 border-t border-white/20">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs uppercase tracking-wider text-white/70 mb-1">Starting Price</p>
+                <p className="text-xs uppercase tracking-wider text-white/70 mb-1">
+                  Starting Price
+                </p>
                 <div className="text-xl font-bold text-white">
                   {getPriceDisplay()}
                 </div>
               </div>
-              
+
               {/* View Details Button */}
-<motion.button
-  whileHover={{ scale: 1.05 }}
-  whileTap={{ scale: 0.95 }}
-  onClick={() => navigate(`/properties/${property.slug}`)}
-  className="flex items-center gap-1 bg-white text-gray-900 px-4 py-2.5 rounded-lg font-semibold text-sm hover:bg-gray-100 transition-colors duration-200 shadow-lg"
->
-  View Details
-  <ChevronRight className="w-4 h-4" />
-</motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => navigate(`/properties/${property.slug}`)}
+                className="flex items-center gap-1 bg-white text-gray-900 px-4 py-2.5 rounded-lg font-semibold text-sm hover:bg-gray-100 transition-colors duration-200 shadow-lg cursor-pointer"
+              >
+                View Details
+                <ChevronRight className="w-4 h-4" />
+              </motion.button>
             </div>
           </div>
         </div>

@@ -8,7 +8,6 @@ function PropertiesGrid({
   getIcon,
   handleViewDetails,
 }) {
-
   // Ensure commercial properties appear last
   const sortedProperties = [...filteredProperties].sort((a, b) => {
     const aType = (a.project_type || "").toLowerCase().trim();

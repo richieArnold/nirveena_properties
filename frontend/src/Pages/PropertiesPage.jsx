@@ -6,7 +6,8 @@ import { useLocation } from "react-router-dom";
 import PropertiesHero from "../components/Properties/PropertiesHero";
 import PropertiesFilterBar from "../components/Properties/PropertiesFilterBar";
 import PropertiesGrid from "../components/Properties/PropertiesGrid";
-
+import { motion, AnimatePresence } from "framer-motion";
+import { FaWhatsapp, FaPhoneAlt } from "react-icons/fa";
 function PropertiesPage() {
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -62,15 +63,15 @@ function PropertiesPage() {
     }
   }, [location.search]);
 
-const typesFromDB = [
-  ...new Set(properties.map((p) => p.project_type?.toLowerCase())),
-].filter(Boolean);
+  const typesFromDB = [
+    ...new Set(properties.map((p) => p.project_type?.toLowerCase())),
+  ].filter(Boolean);
 
-const projectTypes = [
-  "all",
-  ...typesFromDB.filter((t) => t !== "commercial"),
-  ...typesFromDB.filter((t) => t === "commercial"),
-];
+  const projectTypes = [
+    "all",
+    ...typesFromDB.filter((t) => t !== "commercial"),
+    ...typesFromDB.filter((t) => t === "commercial"),
+  ];
 
   const filteredProperties = properties.filter((property) => {
     const type = property.project_type?.toLowerCase();
@@ -109,31 +110,75 @@ const projectTypes = [
       console.error("Failed to fetch project:", err);
     }
   };
+  const whatsappNumber = "919731658272"; // change to admin number
 
+  const message = encodeURIComponent(
+    "Hello, I am interested in your properties.",
+  );
+
+  const whatsappLink = `https://wa.me/${whatsappNumber}?text=${message}`;
   return (
-    <div
-      className="bg-[#f3f4f6] min-h-screen"
-      style={{ fontFamily: "'Inter', sans-serif" }}
-    >
-      <PropertiesHero />
+    <>
+      <motion.div
+        initial={{ x: -60 }}
+        animate={{ x: 0 }}
+        transition={{ duration: 0.4 }}
+        className="flex fixed left-0 top-1/2 -translate-y-1/2 z-40 flex-col"
+      >
+        {/* Phone */}
+        <a
+          href="tel:+919731658272"
+          className="group flex items-center bg-gray-900 hover:bg-indigo-600 text-white w-12 hover:w-40 overflow-hidden transition-all duration-300 rounded-r-lg"
+        >
+          <div className="flex items-center justify-center w-12 h-12 shrink-0">
+            <FaPhoneAlt size={18} />
+          </div>
 
-      <PropertiesFilterBar
-        searchQuery={searchQuery}
-        setSearchQuery={setSearchQuery}
-        projectTypes={projectTypes}
-        selectedType={selectedType}
-        setSelectedType={setSelectedType}
-        selectedStatus={selectedStatus}
-        setSelectedStatus={setSelectedStatus}
-      />
+          <span className="ml-2 opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity duration-300 font-medium">
+            Call Us
+          </span>
+        </a>
 
-      <PropertiesGrid
-        loading={loading}
-        filteredProperties={filteredProperties}
-        getIcon={getIcon}
-        handleViewDetails={handleViewDetails}
-      />
-    </div>
+        {/* WhatsApp */}
+        <a
+          href={whatsappLink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group flex items-center bg-gray-900 hover:bg-green-500 text-white w-12 hover:w-40 overflow-hidden transition-all duration-300 rounded-r-lg"
+        >
+          <div className="flex items-center justify-center w-12 h-12 shrink-0">
+            <FaWhatsapp size={20} />
+          </div>
+
+          <span className="ml-2 opacity-0 group-hover:opacity-100 whitespace-nowrap transition-opacity duration-300 font-medium">
+            WhatsApp
+          </span>
+        </a>
+      </motion.div>
+      <div
+        className="bg-[#f3f4f6] min-h-screen"
+        style={{ fontFamily: "'Inter', sans-serif" }}
+      >
+        <PropertiesHero />
+
+        <PropertiesFilterBar
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          projectTypes={projectTypes}
+          selectedType={selectedType}
+          setSelectedType={setSelectedType}
+          selectedStatus={selectedStatus}
+          setSelectedStatus={setSelectedStatus}
+        />
+
+        <PropertiesGrid
+          loading={loading}
+          filteredProperties={filteredProperties}
+          getIcon={getIcon}
+          handleViewDetails={handleViewDetails}
+        />
+      </div>
+    </>
   );
 }
 
