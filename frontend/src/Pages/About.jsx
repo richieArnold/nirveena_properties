@@ -459,7 +459,7 @@ const About = () => {
                   </h2>
                 </div>
 
-                <div className="space-y-6 text-lg text-gray-600 leading-relaxed" style={{ fontFamily: "'Inter', sans-serif" }}>
+                <div className="space-y-6 text-lg text-gray-600 leading-relaxed jus" style={{ fontFamily: "'Inter', sans-serif", textAlign: "justify" }}>
                   <p>
                     Nirveena Realty is a premier real estate firm specializing
                     in thoughtfully curated apartments, luxury villas, villa

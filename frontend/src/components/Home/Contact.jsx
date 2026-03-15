@@ -98,7 +98,7 @@ const Contact = () => {
   };
 
   return (
-    <section className="py-24 bg-linear-to-b from-gray-50 to-white">
+    <section className="min-h-screen flex items-center justify-center p-4 bg-linear-to-b from-gray-50 to-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           initial="hidden"
@@ -174,7 +174,7 @@ const Contact = () => {
                     {
                       icon: Phone,
                       title: "Call Us",
-                      detail: "+91 98765 43210",
+                      detail: "+91 97316 58272",
                       sub: "All Days, 9AM-9PM",
                       color: "from-blue-500/20 to-purple-500/20",
                     },
@@ -375,7 +375,7 @@ const Contact = () => {
                       >
                         <label className="block text-sm font-semibold text-gray-700 mb-2 items-center gap-2">
                           <Mail size={14} />
-                          Email Address *
+                          Email Address
                         </label>
                         <motion.div
                           variants={inputVariants}
@@ -388,7 +388,6 @@ const Contact = () => {
                             onChange={handleChange}
                             onFocus={() => setActiveField("email")}
                             onBlur={() => setActiveField(null)}
-                            required
                             placeholder="john@example.com"
                             className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-3 focus:ring-blue-500/30 focus:border-blue-500 outline-none transition-all text-gray-900 shadow-sm hover:shadow"
                           />

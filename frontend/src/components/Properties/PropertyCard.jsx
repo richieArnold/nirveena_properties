@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { motion } from "framer-motion";
 import {
   MapPin,
@@ -6,12 +5,11 @@ import {
   BedDouble,
   Square,
   Maximize2,
-  Heart,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 function PropertyCard({ property }) {
-  const [isLiked, setIsLiked] = useState(false);
+
 
   // Debug log
   console.log("Rendering property:", property);
@@ -71,21 +69,6 @@ function PropertyCard({ property }) {
             </span>
           </div>
 
-          {/* Like Button */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsLiked(!isLiked);
-            }}
-            className="absolute top-3 right-3 p-1.5 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white transition-all duration-300 shadow-sm"
-          >
-            <Heart
-              size={14}
-              className={`transition-colors duration-300 ${
-                isLiked ? "fill-red-500 text-red-500" : "text-gray-600"
-              }`}
-            />
-          </button>
         </div>
 
         {/* Content Section */}

@@ -184,14 +184,14 @@ const Amenities = () => {
           </div>
         </div>
 
-        <motion.div 
+        {/* <motion.div 
           className="mt-12 text-center text-gray-400 text-xs italic md:hidden"
           initial={{ opacity: 0 }}
           animate={isInView ? { opacity: 1 } : {}}
           transition={{ delay: 1.5 }}
         >
           Hover or tap on a card to learn more
-        </motion.div>
+        </motion.div> */}
       </div>
     </section>
   );

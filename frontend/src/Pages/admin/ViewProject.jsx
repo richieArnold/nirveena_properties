@@ -42,6 +42,7 @@ const ViewProject = () => {
       const response = await axiosInstance.get(
         `/api/projects/getProject/${id}`,
       );
+      console.log(response);
       setProject(response.data.data);
     } catch (error) {
       console.log(error);
@@ -269,7 +270,112 @@ const ViewProject = () => {
             </span>
           </div>
         </div>
+        <div>
+          {/* ================= AMENITIES ================= */}
+          {project.features?.length > 0 && (
+            <div className="bg-white rounded-xl shadow-lg p-6 mt-6">
+              <h2 className="text-xl font-semibold mb-6">
+                Amenities / Features
+              </h2>
 
+              <div className="space-y-6">
+                {project.features.map((feature) => (
+                  <div key={feature.id}>
+                    <h3 className="font-semibold text-gray-800 mb-3">
+                      {feature.feature_name}
+                    </h3>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                      {feature.items?.map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border"
+                        >
+                          {item.icon_url && (
+                            <img
+                              src={item.icon_url}
+                              className="w-6 h-6 object-contain"
+                            />
+                          )}
+
+                          <span className="text-sm font-medium text-gray-700">
+                            {item.label}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+        <div>
+          {/* ================= CONFIGURATIONS ================= */}
+          {project.configurations?.length > 0 && (
+            <div className="bg-white rounded-xl shadow-lg p-6 mt-6">
+              <h2 className="text-xl font-semibold mb-6">Configurations</h2>
+
+              <div className="overflow-x-auto">
+                <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
+                  <thead className="bg-gray-100">
+                    <tr>
+                      <th className="text-left p-3 text-sm font-semibold">
+                        Configuration
+                      </th>
+                      <th className="text-left p-3 text-sm font-semibold">
+                        Size Range
+                      </th>
+                      <th className="text-left p-3 text-sm font-semibold">
+                        Price
+                      </th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {project.configurations.map((config) => (
+                      <tr key={config.id} className="border-t">
+                        <td className="p-3">{config.configuration}</td>
+                        <td className="p-3">{config.size_range}</td>
+                        <td className="p-3 font-semibold text-green-700">
+                          {config.price}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+        <div>
+          {/* ================= FLOOR PLANS ================= */}
+
+          {project.floorplans?.length > 0 && (
+            <div className="bg-white rounded-xl shadow-lg p-6 mt-6">
+              <h2 className="text-xl font-semibold mb-6">Floor Plans</h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {project.floorplans.map((plan) => (
+                  <div
+                    key={plan.id}
+                    className="border rounded-lg overflow-hidden bg-gray-50"
+                  >
+                    <img
+                      src={plan.image_url}
+                      className="w-full h-56 object-contain bg-white"
+                    />
+
+                    <div className="p-4">
+                      <p className="font-semibold">{plan.title}</p>
+                      <p className="text-sm text-gray-600">{plan.area}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
         {/* Action Buttons */}
         <div className="mt-6 flex justify-end gap-4">
           <button

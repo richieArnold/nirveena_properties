@@ -42,6 +42,8 @@ const Footer = () => {
     { name: "Privacy Policy", path: "/privacy" },
     { name: "Terms of Service", path: "/terms" },
     { name: "Cookie Policy", path: "/cookies" },
+    { name: "Consent for Property Inquiry", path: "/consent" },
+    { name: "RERA Disclosure", path: "/rera" },
   ];
 
   return (
@@ -59,7 +61,7 @@ const Footer = () => {
                 className="h-14 mb-4 w-auto rounded-full"
               />
             </div>
-            <p className="text-gray-400 text-sm mb-6 max-w-md">
+            <p className="text-gray-400 text-sm mb-6 max-w-md text-left">
               Nirveena Realty helps you discover premium homes and smart
               property investments in Bangalore’s most sought-after locations.
             </p>
