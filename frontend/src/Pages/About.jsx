@@ -405,33 +405,45 @@ const About = () => {
 
       <main className="flex-grow">
         {/* Hero Section */}
-        <section className="relative h-[500px] md:h-[600px] bg-gray-900 flex items-center">
+        <section className="relative h-[420px] sm:h-[500px] md:h-[600px] bg-gray-900 flex items-center">
           <ImageWithFallback
             src="https://cdn.confident-group.com/wp-content/uploads/2024/12/27103036/types-of-real-estate-overview-scaled.jpg"
             alt="Modern Architecture"
             className="absolute inset-0 w-full h-full object-cover opacity-50"
           />
+
           <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent"></div>
-          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-left">
+
+          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
             <motion.div
               className="max-w-xl backdrop-blur-[2px]"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <h1 className="text-5xl md:text-6xl font-extrabold text-white mb-6 leading-tight drop-shadow-xl" style={{fontFamily: "'Playfair Display', serif" }}>
+              {/* Title */}
+              <h1
+                className="text-3xl sm:text-4xl md:text-6xl font-extrabold text-white mb-4 md:mb-6 leading-tight drop-shadow-xl"
+                style={{ fontFamily: "'Playfair Display', serif" }}
+              >
                 Nirveena Realty
               </h1>
 
-              <p className="text-lg text-gray-100 mb-8 leading-relaxed font-light" style={{ fontFamily: "'Inter', sans-serif" }}>
+              {/* Description */}
+              <p
+                className="text-sm sm:text-base md:text-lg text-gray-100 mb-6 md:mb-8 leading-relaxed font-light"
+                style={{ fontFamily: "'Inter', sans-serif" }}
+              >
                 At Nirveena Realty, we specialize in premium apartments, luxury
                 villas, villa plots, and high-value farmland investments. With
                 nearly two decades of expertise and RERA-certified
                 professionals, we guide you toward properties that elevate your
                 lifestyle and secure your future.
               </p>
+
+              {/* Button */}
               <Link to="/property">
-                <button className="bg-white text-gray-900 px-8 py-3.5 rounded-lg font-bold hover:bg-blue-50 transition-all shadow-xl cursor-pointer">
+                <button className="w-full sm:w-auto bg-white text-gray-900 px-6 py-3 md:px-8 md:py-3.5 rounded-lg font-bold hover:bg-blue-50 transition-all shadow-xl cursor-pointer">
                   View Properties
                 </button>
               </Link>
@@ -440,51 +452,52 @@ const About = () => {
         </section>
 
         {/* Company Story */}
-        <section className="py-24 bg-white">
+        <section className="py-16 md:py-24 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid md:grid-cols-2 gap-16 items-center">
+            <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-center">
+              {/* Text Section */}
               <motion.div
                 initial={{ opacity: 0, x: -30 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
-                className="text-left"
               >
-                <div className="mb-6">
-                  <span className="text-blue-600 font-bold uppercase tracking-widest text-sm">
-                    Our Heritage
-                  </span>
-                  <h2 className="text-4xl font-bold text-gray-900 mt-2 mb-6 text-left tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
-                    Crafting Elegant Living
-                  </h2>
-                </div>
+                <span className="text-blue-600 font-bold uppercase tracking-widest text-xs sm:text-sm">
+                  Our Heritage
+                </span>
 
-                <div className="space-y-6 text-lg text-gray-600 leading-relaxed jus" style={{ fontFamily: "'Inter', sans-serif", textAlign: "justify" }}>
+                <h2
+                  className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mt-2 mb-4 md:mb-6"
+                  style={{ fontFamily: "'Playfair Display', serif" }}
+                >
+                  Crafting Elegant Living
+                </h2>
+
+                <div
+                  className="space-y-4 md:space-y-6 text-sm sm:text-base md:text-lg text-gray-600 leading-relaxed"
+                  style={{
+                    fontFamily: "'Inter', sans-serif",
+                    textAlign: "justify",
+                  }}
+                >
                   <p>
                     Nirveena Realty is a premier real estate firm specializing
                     in thoughtfully curated apartments, luxury villas, villa
-                    plots, and premium farmland investments. Backed by nearly
-                    two decades of industry experience, our RERA-certified
-                    professionals are committed to delivering a seamless and
-                    transparent property experience for every client.
+                    plots, and premium farmland investments.
                   </p>
 
                   <p>
-                    We offer a comprehensive end-to-end solution that supports
-                    you at every stage of your property journey, from
-                    identifying the right opportunity to ensuring a secure and
-                    legally compliant transaction. Our approach combines deep
-                    market intelligence, thorough legal due diligence, and
-                    data-driven investment insights.
+                    Backed by nearly two decades of industry experience, our
+                    RERA-certified professionals are committed to delivering a
+                    seamless and transparent property experience.
                   </p>
 
                   <p>
-                    At Nirveena Realty, we believe a property should be more
-                    than just a purchase, it should be a long-term asset that
-                    enhances your lifestyle while building lasting value for the
-                    future.
+                    We believe a property should be more than just a purchase —
+                    it should be a long-term asset that enhances your lifestyle.
                   </p>
-                  <div className="flex items-center gap-3 bg-gray-50 p-4 rounded-lg w-fit">
+
+                  <div className="flex items-center gap-3 bg-gray-50 p-3 md:p-4 rounded-lg w-fit">
                     <CheckCircle className="text-blue-600" size={20} />
                     <span className="text-sm font-bold text-gray-900">
                       Verified Listings
@@ -492,13 +505,15 @@ const About = () => {
                   </div>
                 </div>
               </motion.div>
+
+              {/* Image Section */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.98 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
               >
-                <div className="relative h-[450px] rounded-xl overflow-hidden shadow-xl">
+                <div className="relative h-[300px] sm:h-[350px] md:h-[450px] rounded-xl overflow-hidden shadow-xl">
                   <ImageWithFallback
                     src="https://images.unsplash.com/photo-1581533961790-5ab6ecdf8254?q=80&w=1491&auto=format&fit=crop"
                     alt="Workspace"
@@ -510,10 +525,10 @@ const About = () => {
           </div>
         </section>
 
-        {/* Stats Section with Flowing Menu Effect */}
-        <section className="py-24 bg-gray-50 overflow-hidden">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        {/* Stats Section */}
+        <section className="py-16 md:py-24 bg-gray-50 overflow-hidden">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
               {stats.map((stat, index) => (
                 <FlowingCard key={index} data={stat} index={index} />
               ))}
@@ -521,18 +536,23 @@ const About = () => {
           </div>
         </section>
 
-        {/* Values Section with Flowing Menu (Background Images Removed) */}
-        <section className="py-24 bg-white text-center">
+        {/* Values Section */}
+        <section className="py-16 md:py-24 bg-white text-center">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="mb-16">
-              <span className="text-blue-600 font-bold uppercase tracking-widest text-sm">
+            <div className="mb-10 md:mb-16">
+              <span className="text-blue-600 font-bold uppercase tracking-widest text-xs sm:text-sm">
                 Why Choose Us
               </span>
-              <h2 className="text-4xl font-bold text-gray-900 mt-2 tracking-tight" style={{ fontFamily: "'Playfair Display', serif" }}>
+
+              <h2
+                className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mt-2"
+                style={{ fontFamily: "'Playfair Display', serif" }}
+              >
                 Our Core Values
               </h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
               {values.map((value, index) => (
                 <FlowingCard
                   key={index}
