@@ -13,14 +13,17 @@ import {
   Home,
   Map,
 } from "lucide-react";
+import axiosInstance from "../../utils/Instance";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
     email: "",
+    subject: "",
     message: "",
     propertyType: "",
+    budget: "",
   });
 
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -38,23 +41,34 @@ const Contact = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setIsSubmitted(true);
-      setFormData({
-        name: "",
-        phone: "",
-        email: "",
-        message: "",
-        propertyType: "",
+    try {
+      const response = await axiosInstance.post("/api/leads/submit", formData, {
+        headers: { "Content-Type": "application/json" },
       });
 
-      // Reset success message after 3 seconds
-      setTimeout(() => {
-        setIsSubmitted(false);
-      }, 3000);
-    }, 1500);
+      if (response.data.success) {
+        setIsSubmitted(true);
+
+        setFormData({
+          name: "",
+          phone: "",
+          email: "",
+          subject: "",
+          message: "",
+          propertyType: "",
+          budget: "",
+        });
+
+        setTimeout(() => {
+          setIsSubmitted(false);
+        }, 5000);
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      alert("Failed to submit form. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Animation variants
@@ -307,10 +321,9 @@ const Contact = () => {
                         transition={{ delay: 0.2 }}
                         className="text-gray-500 text-sm"
                       >
-                        Our team will contact you within 24 hours
+                        Our team will contact you within 1 hour
                       </motion.p>
                     </div>
-
                     <form onSubmit={handleSubmit} className="space-y-6">
                       {/* Name & Phone Row */}
                       <motion.div
@@ -319,11 +332,13 @@ const Contact = () => {
                         animate="visible"
                         className="grid md:grid-cols-2 gap-6"
                       >
+                        {/* Name */}
                         <motion.div variants={itemVariants}>
                           <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
                             <User size={14} />
                             Full Name *
                           </label>
+
                           <motion.div
                             variants={inputVariants}
                             animate={activeField === "name" ? "focus" : "blur"}
@@ -342,12 +357,13 @@ const Contact = () => {
                           </motion.div>
                         </motion.div>
 
+                        {/* Phone */}
                         <motion.div variants={itemVariants}>
                           <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                            {" "}
                             <Phone size={14} />
                             Phone Number *
                           </label>
+
                           <motion.div
                             variants={inputVariants}
                             animate={activeField === "phone" ? "focus" : "blur"}
@@ -368,15 +384,12 @@ const Contact = () => {
                       </motion.div>
 
                       {/* Email */}
-                      <motion.div
-                        variants={itemVariants}
-                        initial="hidden"
-                        animate="visible"
-                      >
-                        <label className="block text-sm font-semibold text-gray-700 mb-2 items-center gap-2">
+                      <motion.div variants={itemVariants}>
+                        <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
                           <Mail size={14} />
                           Email Address
                         </label>
+
                         <motion.div
                           variants={inputVariants}
                           animate={activeField === "email" ? "focus" : "blur"}
@@ -394,49 +407,88 @@ const Contact = () => {
                         </motion.div>
                       </motion.div>
 
-                      {/* Property Type */}
+                      {/* Property Type + Budget */}
                       <motion.div
-                        variants={itemVariants}
+                        variants={containerVariants}
                         initial="hidden"
                         animate="visible"
+                        className="grid md:grid-cols-2 gap-6"
                       >
-                        <label className="block text-sm font-semibold text-gray-700 mb-2 items-center gap-2">
-                          <Building size={14} />
-                          Property Type Interested In
-                        </label>
-                        <motion.div
-                          variants={inputVariants}
-                          animate={
-                            activeField === "propertyType" ? "focus" : "blur"
-                          }
-                        >
-                          <select
-                            name="propertyType"
-                            value={formData.propertyType}
-                            onChange={handleChange}
-                            onFocus={() => setActiveField("propertyType")}
-                            onBlur={() => setActiveField(null)}
-                            className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-3 focus:ring-blue-500/30 focus:border-blue-500 outline-none transition-all text-gray-900 shadow-sm hover:shadow appearance-none cursor-pointer"
+                        {/* Property Type */}
+                        <motion.div variants={itemVariants}>
+                          <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                            <Building size={14} />
+                            Property Type
+                          </label>
+
+                          <motion.div
+                            variants={inputVariants}
+                            animate={
+                              activeField === "propertyType" ? "focus" : "blur"
+                            }
                           >
-                            <option value="">Select Property Type</option>
-                            <option value="apartment">Apartments</option>
-                            <option value="villa">Villas</option>
-                            <option value="plot">Plots</option>
-                            <option value="commercial">Commercial</option>
+                            <select
+                              name="propertyType"
+                              value={formData.propertyType}
+                              onChange={handleChange}
+                              onFocus={() => setActiveField("propertyType")}
+                              onBlur={() => setActiveField(null)}
+                              className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-3 focus:ring-blue-500/30 focus:border-blue-500 outline-none transition-all text-gray-900 shadow-sm hover:shadow appearance-none cursor-pointer"
+                            >
+                              <option value="">Select Property Type</option>
+                              <option value="apartment">Apartments</option>
+                              <option value="villa">Villas</option>
+                              <option value="plot">Plots</option>
+                              <option value="commercial">Commercial</option>
+                            </select>
+                          </motion.div>
+                        </motion.div>
+
+                        {/* Budget */}
+                        <motion.div variants={itemVariants}>
+                          <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                            <Map size={14} />
+                            Budget Range
+                          </label>
+
+                          <select
+                            name="budget"
+                            value={formData.budget}
+                            onChange={handleChange}
+                            className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-3 focus:ring-blue-500/30 focus:border-blue-500 outline-none transition-all text-gray-900 shadow-sm hover:shadow"
+                          >
+                            <option value="">Select Budget</option>
+                            <option value="< 1 Cr">&lt; 1 Cr</option>
+                            <option value="1 - 1.5 Cr">1 - 1.5 Cr</option>
+                            <option value="1.5 - 2 Cr">1.5 - 2 Cr</option>
+                            <option value="2 Cr+">2 Cr+</option>
                           </select>
                         </motion.div>
                       </motion.div>
 
+                      {/* Subject */}
+                      <motion.div variants={itemVariants}>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Subject
+                        </label>
+
+                        <input
+                          type="text"
+                          name="subject"
+                          value={formData.subject}
+                          onChange={handleChange}
+                          placeholder="How can we help you?"
+                          className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-3 focus:ring-blue-500/30 focus:border-blue-500 outline-none transition-all text-gray-900 shadow-sm hover:shadow"
+                        />
+                      </motion.div>
+
                       {/* Message */}
-                      <motion.div
-                        variants={itemVariants}
-                        initial="hidden"
-                        animate="visible"
-                      >
-                        <label className="block text-sm font-semibold text-gray-700 mb-2 items-center gap-2">
+                      <motion.div variants={itemVariants}>
+                        <label className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
                           <MessageSquare size={14} />
                           Your Requirements
                         </label>
+
                         <motion.div
                           variants={inputVariants}
                           animate={activeField === "message" ? "focus" : "blur"}
@@ -463,14 +515,10 @@ const Contact = () => {
                           boxShadow: "0 10px 25px -5px rgba(59, 130, 246, 0.5)",
                         }}
                         whileTap={{ scale: 0.98 }}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3 }}
                         className={`w-full relative overflow-hidden bg-linear-to-r from-blue-600 via-blue-500 to-purple-600 text-white py-4 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all duration-300 ${
                           isSubmitting ? "opacity-90 cursor-not-allowed" : ""
                         }`}
                       >
-                        {/* Shine Effect */}
                         <motion.div
                           className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent"
                           initial={{ x: "-100%" }}
@@ -492,12 +540,9 @@ const Contact = () => {
                             Processing...
                           </span>
                         ) : (
-                          <span className="relative flex items-center justify-center gap-3 ">
+                          <span className="relative flex items-center justify-center gap-3">
                             Send Message
-                            <Send
-                              size={18}
-                              className="group-hover:translate-x-1 transition-transform"
-                            />
+                            <Send size={18} />
                           </span>
                         )}
                       </motion.button>

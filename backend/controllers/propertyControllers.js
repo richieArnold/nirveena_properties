@@ -944,12 +944,13 @@ exports.updateProject = async (req, res) => {
       sba,
       price,
       rera_completion,
+      youtube_video_url,
       property_description,
       display_order, // ADD THIS
       existing_images = [],
       new_images = [],
     } = req.body;
-
+    console.log(req.body);
     // Basic validation
     if (!project_id || !project_name) {
       return res.status(400).json({
@@ -993,10 +994,11 @@ exports.updateProject = async (req, res) => {
         sba = $12,
         price = $13,
         rera_completion = $14,
-        property_description = $15,
-        display_order = $16,
+        youtube_video_url = $15,
+        property_description = $16,
+        display_order = $17,
         updated_at = NOW()
-      WHERE id = $17
+      WHERE id = $18
       `,
       [
         Number(project_id),
@@ -1013,6 +1015,7 @@ exports.updateProject = async (req, res) => {
         sba || null,
         price || null,
         rera_completion || null,
+        youtube_video_url || null,
         property_description || null,
         display_order !== undefined ? display_order : 0, // ADD THIS
         id,

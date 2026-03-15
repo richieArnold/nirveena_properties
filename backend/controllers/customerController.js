@@ -1,14 +1,15 @@
 const pool = require("../rds_setup/db"); // adjust if needed
 
 // Existing function - keep as is
+
 exports.createCustomerEnquiry = async (req, res) => {
   const { first_name, last_name, contact, email, project_id } = req.body;
 
   try {
     // Check existing customer
     const existingCustomer = await pool.query(
-      "SELECT id FROM customers WHERE email = $1",
-      [email]
+      "SELECT id FROM customers WHERE contact = $1",
+      [contact]
     );
 
     let customerId;
@@ -26,21 +27,23 @@ exports.createCustomerEnquiry = async (req, res) => {
       customerId = newCustomer.rows[0].id;
     }
 
-    // Insert enquiry
+    // Insert enquiry (project optional)
     await pool.query(
       `INSERT INTO enquiries (customer_id, project_id)
        VALUES ($1, $2)`,
-      [customerId, project_id]
+      [customerId, project_id || null]
     );
 
-    res.json({ success: true, message: "Enquiry submitted successfully" });
+    res.json({
+      success: true,
+      message: "Enquiry submitted successfully",
+    });
 
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: "Server error" });
   }
 };
-
 // ============= NEW ADMIN FUNCTIONS =============
 
 // Get all customers with their latest enquiry

@@ -192,6 +192,7 @@ exports.updateProjectWithImages = async (req, res) => {
       sba,
       price,
       rera_completion,
+      youtube_video_url,
       property_description, 
       existing_images
     } = req.body;
@@ -299,9 +300,10 @@ exports.updateProjectWithImages = async (req, res) => {
         sba = $12,
         price = $13,
         rera_completion = $14,
-        property_description = $15, 
+        youtube_video_url = $15,
+        property_description = $16, 
         updated_at = NOW()
-      WHERE id = $16  
+      WHERE id = $17  
       `,
       [
         projectIdValue,
@@ -318,6 +320,7 @@ exports.updateProjectWithImages = async (req, res) => {
         sba || null,
         price || null,
         rera_completion || null,
+        youtube_video_url || null,
         property_description || null, 
         id
       ]

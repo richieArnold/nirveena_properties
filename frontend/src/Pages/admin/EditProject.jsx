@@ -740,6 +740,7 @@ const EditProject = () => {
     sba: "",
     price: "",
     rera_completion: "",
+    youtube_video_url:"",
     property_description: "",
   });
 
@@ -777,6 +778,7 @@ const EditProject = () => {
         sba: project.sba || "",
         price: project.price || "",
         rera_completion: project.rera_completion || "",
+        youtube_video_url: project.youtube_video_url || "",
         property_description: project.property_description || "",
       });
 
@@ -799,6 +801,8 @@ const EditProject = () => {
   };
 
   const handleInputChange = (e) => {
+    console.log(e.target.value)
+    console.log(e.target.name)
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -1225,6 +1229,21 @@ const EditProject = () => {
               />
             </div>
 
+            {/* youtube video url */}
+            <div className="mt-4">
+              <label className="block text-sm font-medium text-gray-700">
+                YouTube Property Video
+              </label>
+              <input
+                type="text"
+                name="youtube_video_url"
+                value={formData.youtube_video_url || ""}
+                onChange={handleInputChange}
+                placeholder="Paste YouTube video link"
+                className="mt-1 w-full border rounded-lg px-3 py-2"
+              />
+            </div>
+
             {/* Property Description - Rich Text Editor */}
             <div className="md:col-span-2">
               <label className={labelClasses}>Property Description</label>
@@ -1346,8 +1365,7 @@ const EditProject = () => {
               </div>
             </div>
           </div>
-          {/* move to features and other page */}
-          {" "}
+          {/* move to features and other page */}{" "}
           <Link to={`/admin/features/${id}`}>
             {" "}
             <button

@@ -149,6 +149,21 @@ function PropertyDetailsPage() {
   );
 
   const whatsappLink = `https://wa.me/${whatsappNumber}?text=${message}`;
+
+  //Youtube Helper
+
+  const getYoutubeEmbedUrl = (url) => {
+    if (!url) return null;
+
+    const regExp = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&]+)/;
+
+    const match = url.match(regExp);
+
+    return match ? `https://www.youtube.com/embed/${match[1]}` : null;
+  };
+
+  const embedUrl = getYoutubeEmbedUrl(projectDetails.youtube_video_url);
+
   return (
     <>
       {project && (
@@ -632,7 +647,8 @@ function PropertyDetailsPage() {
             </section>
           )}
 
-          {/* floorplans */}
+
+
           {/* FLOOR PLANS */}
           {project.floorplans?.length > 0 && (
             <section className="mt-12">
@@ -692,6 +708,20 @@ function PropertyDetailsPage() {
                 ))}
               </div>
             </section>
+          )}
+          {embedUrl && (
+            <div className="bg-white rounded-xl shadow-lg p-6 mt-6">
+              <h2 className="text-xl font-semibold mb-4">Property Video</h2>
+
+              <div className="relative w-full pb-[56.25%]">
+                <iframe
+                  src={embedUrl}
+                  title="Property Video"
+                  className="absolute top-0 left-0 w-full h-full rounded-lg"
+                  allowFullScreen
+                ></iframe>
+              </div>
+            </div>
           )}
         </main>
         {/* FULLSCREEN IMAGE VIEWER */}

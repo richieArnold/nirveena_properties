@@ -123,19 +123,21 @@ const Hero = () => {
     setIsSubmitting(true);
 
     try {
-      // Send data to backend - create customer without project_id
+      // Split full name into first and last
+      const nameParts = formData.firstName.trim().split(" ");
+      const first_name = nameParts[0];
+      const last_name = nameParts.slice(1).join(" ") || "";
+
       const response = await axiosInstance.post("/api/customers/create", {
-        first_name: formData.firstName,
-        last_name: formData.lastName,
+        first_name,
+        last_name,
         contact: formData.phone,
         email: formData.email,
-        // No project_id - will be NULL in database
       });
 
       if (response.data.success) {
         setSubmitSuccess(true);
 
-        // Reset form after success
         setTimeout(() => {
           setSubmitSuccess(false);
           setShowForm(false);
@@ -161,7 +163,7 @@ const Hero = () => {
     setShowForm(false);
   };
 
-  const [isContactOpen, setIsContactOpen] = useState(true);
+
 
   const whatsappNumber = "919731658272"; // change to admin number
 
@@ -368,7 +370,7 @@ const Hero = () => {
                         Thank You!
                       </h4>
                       <p className="text-sm text-gray-500">
-                        We'll contact you within 24 hours
+                        We'll contact you within 1 hour
                       </p>
                     </motion.div>
                   ) : (
