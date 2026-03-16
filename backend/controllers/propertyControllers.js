@@ -252,6 +252,7 @@ exports.getAllProjects = async (req, res) => {
         p.property_description,
         p.display_order,
         p.created_at,
+        p.youtube_video_url,
         p.updated_at,
         img.image_url
       FROM projects p

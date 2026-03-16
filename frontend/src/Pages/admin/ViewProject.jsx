@@ -211,6 +211,17 @@ const ViewProject = () => {
                   </p>
                 </div>
               </div>
+              <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                <span className="w-5 h-5 flex items-center justify-center text-pink-600 font-bold">
+                  🏢
+                </span>
+                <div>
+                  <p className="text-sm text-gray-500">Youtube Video URL</p>
+                  <p className="font-semibold">
+                    {project.youtube_video_url || "N/A"}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
 
