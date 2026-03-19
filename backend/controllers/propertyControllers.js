@@ -830,15 +830,15 @@ exports.deleteProject = async (req, res) => {
 // Get single project by ID for editing / viewing
 exports.getProjectById = async (req, res) => {
   try {
-    const { project_id } = req.params;
-
+    const { id } = req.params;
+    console.log(id)
     /* ---------------- PROJECT ---------------- */
 
     const projectResult = await pool.query(
-      `SELECT * FROM projects WHERE project_id = $1`,
-      [project_id],
+      `SELECT * FROM projects WHERE id = $1`,
+      [id],
     );
-
+    console.log(projectResult)
     if (projectResult.rows.length === 0) {
       return res.status(404).json({
         success: false,

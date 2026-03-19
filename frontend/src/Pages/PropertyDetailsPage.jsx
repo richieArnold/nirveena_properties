@@ -385,7 +385,7 @@ function PropertyDetailsPage() {
 
                 <div className="prose prose-lg max-w-none text-slate-600">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                    {project.property_description}
+                    {projectDetails.property_description}
                   </ReactMarkdown>
                 </div>
               </section>

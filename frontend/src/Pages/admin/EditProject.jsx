@@ -712,6 +712,7 @@ import axiosInstance from "../../utils/Instance";
 const EditProject = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  console.log(id)
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [fetchLoading, setFetchLoading] = useState(true);

@@ -132,7 +132,7 @@ const PageRoutes = () => {
         }
       />
 <Route
-        path="/admin/features/:project_id"
+        path="/admin/features/:id"
         element={
           <ProtectedRoute>
             <SessionTracker>

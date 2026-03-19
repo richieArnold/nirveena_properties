@@ -6,14 +6,14 @@ import { ArrowLeft, Trash2, Plus, Upload } from "lucide-react";
 
 const UpdateFeatures = () => {
   const navigate = useNavigate();
-  const { project_id } = useParams();
+  const { id } = useParams();
 
   const [features, setFeatures] = useState([]);
+  const [project, setProject] = useState(null);
   const [availableIcons, setAvailableIcons] = useState([]);
   const [showIconPicker, setShowIconPicker] = useState(null);
   const [configurations, setConfigurations] = useState([]);
   const [floorPlans, setFloorPlans] = useState([]);
-
   const [fetchLoading, setFetchLoading] = useState(true);
 
   const [newFloorPlan, setNewFloorPlan] = useState({
@@ -23,57 +23,68 @@ const UpdateFeatures = () => {
     image: null,
   });
 
+  /* ---------------- FETCH PROJECT ---------------- */
+
   useEffect(() => {
-    if (project_id) {
-      fetchFeatures();
-      fetchIcons();
-      fetchConfigurations();
-      fetchFloorPlans();
-    }
-  }, [project_id]);
+    if (id) fetchProject();
+  }, [id]);
 
-  /* ---------------- FETCH ---------------- */
-
-  const fetchFeatures = async () => {
+  const fetchProject = async () => {
     try {
-      const res = await axiosInstance.get(
-        `/api/projects/${project_id}/features`,
-      );
-      setFeatures(res.data.data || []);
+      const res = await axiosInstance.get(`/api/projects/getProject/${id}`);
+      setProject(res.data.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  /* ---------------- FETCH DEPENDENT DATA ---------------- */
+
+  useEffect(() => {
+    if (project?.project_id) {
+      fetchAllData();
+    }
+  }, [project]);
+
+  const fetchAllData = async () => {
+    try {
+      await Promise.all([
+        fetchFeatures(),
+        fetchIcons(),
+        fetchConfigurations(),
+        fetchFloorPlans(),
+      ]);
     } catch (err) {
       console.error(err);
     } finally {
       setFetchLoading(false);
     }
   };
-  const fetchIcons = async () => {
-    try {
-      const res = await axiosInstance.get("/api/projects/icons");
-      setAvailableIcons(res.data.data || []);
-    } catch (error) {
-      console.error(error);
-    }
+
+  const fetchFeatures = async () => {
+    const res = await axiosInstance.get(
+      `/api/projects/${project.project_id}/features`,
+    );
+    setFeatures(res.data.data || []);
   };
+
+  const fetchIcons = async () => {
+    const res = await axiosInstance.get(`/api/projects/icons`);
+    setAvailableIcons(res.data.data || []);
+  };
+
   const fetchConfigurations = async () => {
-    try {
-      const res = await axiosInstance.get(
-        `/api/projects/${project_id}/getProjectConfigurations`,
-      );
-      setConfigurations(res.data.data || []);
-    } catch (err) {
-      console.error(err);
-    }
+    const res = await axiosInstance.get(
+      `/api/projects/${project.project_id}/getProjectConfigurations`,
+    );
+    setConfigurations(res.data.data || []);
   };
 
   const fetchFloorPlans = async () => {
-    try {
-      const res = await axiosInstance.get(
-        `/api/projects/${project_id}/floorplans`,
-      );
-      setFloorPlans(res.data.data || []);
-    } catch (err) {
-      console.error(err);
-    }
+    const res = await axiosInstance.get(
+      `/api/projects/${project.project_id}/floorplans`,
+    );
+    setFloorPlans(res.data.data || []);
   };
 
   /* ---------------- FEATURES ---------------- */
@@ -114,11 +125,6 @@ const UpdateFeatures = () => {
       const res = await axiosInstance.post(
         "/api/projects/upload/icon",
         formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        },
       );
 
       const updated = [...features];
@@ -129,8 +135,6 @@ const UpdateFeatures = () => {
     }
   };
 
-  /* ---------- SAVE FEATURES (UPDATE OR CREATE) ---------- */
-
   const saveFeatures = async () => {
     try {
       for (const feature of features) {
@@ -140,43 +144,31 @@ const UpdateFeatures = () => {
             items: feature.items,
           });
         } else {
-          await axiosInstance.post(`/api/projects/${project_id}/features`, {
-            feature_name: feature.feature_name,
-            items: feature.items,
-          });
+          await axiosInstance.post(
+            `/api/projects/${project.project_id}/features`,
+            {
+              feature_name: feature.feature_name,
+              items: feature.items,
+            },
+          );
         }
       }
 
       alert("Features updated");
-
       fetchFeatures();
     } catch (err) {
       console.error(err);
     }
   };
-
-  /* ---------- DELETE FEATURE CATEGORY ---------- */
 
   const deleteFeature = async (featureId) => {
-    try {
-      await axiosInstance.delete(`/api/projects/features/${featureId}`);
-
-      fetchFeatures();
-    } catch (err) {
-      console.error(err);
-    }
+    await axiosInstance.delete(`/api/projects/features/${featureId}`);
+    fetchFeatures();
   };
 
-  /* ---------- DELETE FEATURE ITEM ---------- */
-
   const deleteFeatureItem = async (itemId) => {
-    try {
-      await axiosInstance.delete(`/api/projects/feature-item/${itemId}`);
-
-      fetchFeatures();
-    } catch (err) {
-      console.error(err);
-    }
+    await axiosInstance.delete(`/api/projects/feature-item/${itemId}`);
+    fetchFeatures();
   };
 
   /* ---------------- CONFIGURATIONS ---------------- */
@@ -184,11 +176,7 @@ const UpdateFeatures = () => {
   const addConfiguration = () => {
     setConfigurations([
       ...configurations,
-      {
-        configuration: "",
-        size_range: "",
-        price: "",
-      },
+      { configuration: "", size_range: "", price: "" },
     ]);
   };
 
@@ -203,14 +191,13 @@ const UpdateFeatures = () => {
       for (const config of configurations) {
         if (!config.id) {
           await axiosInstance.post(
-            `/api/projects/${project_id}/addConfiguration`,
+            `/api/projects/${project.project_id}/addConfiguration`,
             config,
           );
         }
       }
 
       alert("Configurations saved");
-
       fetchConfigurations();
     } catch (err) {
       console.error(err);
@@ -218,13 +205,8 @@ const UpdateFeatures = () => {
   };
 
   const deleteConfiguration = async (id) => {
-    try {
-      await axiosInstance.delete(`/api/projects/configuration/${id}`);
-
-      fetchConfigurations();
-    } catch (err) {
-      console.error(err);
-    }
+    await axiosInstance.delete(`/api/projects/configuration/${id}`);
+    fetchConfigurations();
   };
 
   /* ---------------- FLOOR PLAN ---------------- */
@@ -243,17 +225,11 @@ const UpdateFeatures = () => {
 
     try {
       await axiosInstance.post(
-        `/api/projects/${project_id}/floorplans`,
+        `/api/projects/${project.project_id}/floorplans`,
         formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        },
       );
 
       alert("Floor plan uploaded");
-
       fetchFloorPlans();
     } catch (err) {
       console.error(err);
@@ -261,13 +237,8 @@ const UpdateFeatures = () => {
   };
 
   const deleteFloorPlan = async (id) => {
-    try {
-      await axiosInstance.delete(`/api/projects/floorplan/${id}`);
-
-      fetchFloorPlans();
-    } catch (err) {
-      console.error(err);
-    }
+    await axiosInstance.delete(`/api/projects/floorplan/${id}`);
+    fetchFloorPlans();
   };
 
   /* ---------------- UI ---------------- */
@@ -284,7 +255,6 @@ const UpdateFeatures = () => {
     <AdminLayout>
       <div className="max-w-6xl mx-auto px-4 py-6">
         {/* HEADER */}
-
         <div className="flex items-center gap-4 mb-6">
           <button
             onClick={() => navigate(-1)}
@@ -297,7 +267,6 @@ const UpdateFeatures = () => {
         </div>
 
         {/* ================= FEATURES ================= */}
-
         <div className="mb-12">
           <h2 className="text-xl font-semibold mb-4">Amenities / Features</h2>
 
@@ -361,41 +330,36 @@ const UpdateFeatures = () => {
                         }
                       />
                     </label>
+
                     <button
                       type="button"
                       onClick={() =>
                         setShowIconPicker(`${groupIndex}-${itemIndex}`)
                       }
-                      className="bg-gray-100 px-3 py-2 rounded text-sm hover:bg-gray-200"
+                      className="bg-gray-100 px-3 py-2 rounded text-sm"
                     >
                       Choose Icon
                     </button>
+
                     {showIconPicker === `${groupIndex}-${itemIndex}` && (
                       <div className="grid grid-cols-8 gap-2 mt-3 p-3 border rounded-lg bg-gray-50">
                         {availableIcons.map((icon, i) => (
                           <button
                             key={i}
-                            type="button"
                             onClick={() => {
                               const updated = [...features];
-
                               updated[groupIndex].items[itemIndex].icon_url =
                                 icon.url;
-
                               setFeatures(updated);
-
-                              setShowIconPicker(null); // close picker
+                              setShowIconPicker(null);
                             }}
-                            className="border rounded p-2 hover:bg-gray-100"
                           >
-                            <img
-                              src={icon.url}
-                              className="w-6 h-6 object-contain"
-                            />
+                            <img src={icon.url} className="w-6 h-6" />
                           </button>
                         ))}
                       </div>
                     )}
+
                     {item.id ? (
                       <button
                         onClick={() => deleteFeatureItem(item.id)}
@@ -434,8 +398,7 @@ const UpdateFeatures = () => {
           </button>
         </div>
 
-        {/* ================= CONFIGURATIONS ================= */}
-
+        {/* ================= CONFIG ================= */}
         <div className="mb-12">
           <h2 className="text-xl font-semibold mb-4">Configurations</h2>
 
@@ -495,8 +458,7 @@ const UpdateFeatures = () => {
           </div>
         </div>
 
-        {/* ================= FLOOR PLANS ================= */}
-
+        {/* ================= FLOOR ================= */}
         <div>
           <h2 className="text-xl font-semibold mb-4">Floor Plans</h2>
 
@@ -530,7 +492,6 @@ const UpdateFeatures = () => {
               className="border px-3 py-2 rounded w-full"
             >
               <option value="">Select Configuration</option>
-
               {configurations.map((config) => (
                 <option key={config.id} value={config.id}>
                   {config.configuration}
@@ -540,7 +501,6 @@ const UpdateFeatures = () => {
 
             <input
               type="file"
-              accept="image/*"
               onChange={(e) => handleFloorPlanImage(e.target.files[0])}
             />
 
@@ -555,18 +515,12 @@ const UpdateFeatures = () => {
           <div className="grid grid-cols-3 gap-4">
             {floorPlans.map((plan) => (
               <div key={plan.id} className="border rounded p-3 bg-white">
-                <img
-                  src={plan.image_url}
-                  className="h-40 w-full object-contain mb-2"
-                />
-
-                <p className="font-medium">{plan.title}</p>
-
-                <p className="text-sm text-gray-500">{plan.area}</p>
-
+                <img src={plan.image_url} className="h-40 w-full mb-2" />
+                <p>{plan.title}</p>
+                <p>{plan.area}</p>
                 <button
                   onClick={() => deleteFloorPlan(plan.id)}
-                  className="text-red-500 mt-2"
+                  className="text-red-500"
                 >
                   Delete
                 </button>
