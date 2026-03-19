@@ -8,7 +8,7 @@ const SessionTracker = ({ children }) => {
   const warningTimeoutRef = useRef(null);
 
   // 3 minutes = 180000 milliseconds
-  const SESSION_TIMEOUT = 3 * 60 * 1000;
+  const SESSION_TIMEOUT = 10 * 60 * 1000;
   const WARNING_BEFORE = 30 * 1000; // Show warning 30 seconds before logout
 
   const resetTimer = () => {

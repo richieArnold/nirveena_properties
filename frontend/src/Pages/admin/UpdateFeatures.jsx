@@ -101,7 +101,11 @@ const UpdateFeatures = () => {
 
   const addFeatureItem = (groupIndex) => {
     const updated = [...features];
-    updated[groupIndex].items.push({ label: "", icon_url: "" });
+    updated[groupIndex].items.push({
+      label: "",
+      icon_url: "",
+      description: "",
+    });
     setFeatures(updated);
   };
 
@@ -125,6 +129,11 @@ const UpdateFeatures = () => {
       const res = await axiosInstance.post(
         "/api/projects/upload/icon",
         formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
       );
 
       const updated = [...features];
@@ -148,7 +157,11 @@ const UpdateFeatures = () => {
             `/api/projects/${project.project_id}/features`,
             {
               feature_name: feature.feature_name,
-              items: feature.items,
+              items: feature.items.map((item) => ({
+                label: item.label || "",
+                icon_url: item.icon_url || null,
+                description: item.description || "",
+              })),
             },
           );
         }
@@ -310,14 +323,32 @@ const UpdateFeatures = () => {
                       <div className="w-8 h-8 bg-gray-200 rounded" />
                     )}
 
-                    <input
-                      value={item.label}
-                      placeholder="Feature"
-                      onChange={(e) =>
-                        updateFeatureItem(groupIndex, itemIndex, e.target.value)
-                      }
-                      className="flex-1 border px-3 py-2 rounded"
-                    />
+                    <div className="flex flex-col flex-1 gap-1">
+                      <input
+                        value={item.label || ""}
+                        placeholder="Feature"
+                        onChange={(e) =>
+                          updateFeatureItem(
+                            groupIndex,
+                            itemIndex,
+                            e.target.value,
+                          )
+                        }
+                        className="border px-3 py-2 rounded"
+                      />
+
+                      <input
+                        value={item.description || ""}
+                        placeholder="Description"
+                        onChange={(e) => {
+                          const updated = [...features];
+                          updated[groupIndex].items[itemIndex].description =
+                            e.target.value;
+                          setFeatures(updated);
+                        }}
+                        className="border px-3 py-2 rounded text-sm"
+                      />
+                    </div>
 
                     <label className="cursor-pointer bg-blue-600 text-white px-3 py-2 rounded flex items-center gap-2">
                       <Upload size={14} />

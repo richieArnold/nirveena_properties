@@ -1,5 +1,6 @@
 const pool = require('../rds_setup/db');
 
+/* ================= ADD FEATURE ================= */
 
 exports.addProjectFeature = async (req, res) => {
   try {
@@ -21,14 +22,15 @@ exports.addProjectFeature = async (req, res) => {
       await pool.query(
         `
         INSERT INTO project_feature_items
-        (feature_id, label, icon_url, image_url, sort_order)
-        VALUES ($1,$2,$3,$4,$5)
+        (feature_id, label, icon_url, image_url, description, sort_order)
+        VALUES ($1,$2,$3,$4,$5,$6)
         `,
         [
           featureId,
           items[i].label,
           items[i].icon_url || null,
           items[i].image_url || null,
+          items[i].description || null,
           i
         ]
       );
@@ -40,15 +42,16 @@ exports.addProjectFeature = async (req, res) => {
     });
 
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500).json({
       success: false,
       message: "Failed to add feature",
       error: error.message,
     });
-
   }
 };
+
+/* ================= GET FEATURES ================= */
 
 exports.getProjectFeatures = async (req, res) => {
   try {
@@ -65,6 +68,7 @@ exports.getProjectFeatures = async (req, res) => {
               'label', pfi.label,
               'icon_url', pfi.icon_url,
               'image_url', pfi.image_url,
+              'description', pfi.description,
               'sort_order', pfi.sort_order
             )
             ORDER BY pfi.sort_order
@@ -95,7 +99,8 @@ exports.getProjectFeatures = async (req, res) => {
   }
 };
 
-// icon upload controller 
+/* ================= ICON UPLOAD ================= */
+
 const multer = require("multer");
 const multerS3 = require("multer-s3");
 const { S3Client } = require("@aws-sdk/client-s3");
@@ -147,9 +152,10 @@ exports.uploadIcon = async (req, res) => {
   }
 };
 
+/* ================= UPDATE FEATURE ================= */
+
 exports.updateProjectFeature = async (req, res) => {
   try {
-
     const { feature_id } = req.params;
     const { feature_name, items = [] } = req.body;
 
@@ -174,22 +180,21 @@ exports.updateProjectFeature = async (req, res) => {
 
     // insert new items
     for (let i = 0; i < items.length; i++) {
-
       await pool.query(
         `
         INSERT INTO project_feature_items
-        (feature_id, label, icon_url, image_url, sort_order)
-        VALUES ($1,$2,$3,$4,$5)
+        (feature_id, label, icon_url, image_url, description, sort_order)
+        VALUES ($1,$2,$3,$4,$5,$6)
         `,
         [
           feature_id,
           items[i].label,
           items[i].icon_url || null,
           items[i].image_url || null,
+          items[i].description || null,
           i
         ]
       );
-
     }
 
     res.json({
@@ -198,7 +203,6 @@ exports.updateProjectFeature = async (req, res) => {
     });
 
   } catch (error) {
-
     console.error("Update feature error:", error);
 
     res.status(500).json({
@@ -206,31 +210,22 @@ exports.updateProjectFeature = async (req, res) => {
       message: "Failed to update feature",
       error: error.message
     });
-
   }
 };
 
+/* ================= DELETE FEATURE ================= */
+
 exports.deleteProjectFeature = async (req, res) => {
-
   try {
-
     const { feature_id } = req.params;
 
-    // delete items first
     await pool.query(
-      `
-      DELETE FROM project_feature_items
-      WHERE feature_id = $1
-      `,
+      `DELETE FROM project_feature_items WHERE feature_id = $1`,
       [feature_id]
     );
 
-    // delete feature
     await pool.query(
-      `
-      DELETE FROM project_features
-      WHERE id = $1
-      `,
+      `DELETE FROM project_features WHERE id = $1`,
       [feature_id]
     );
 
@@ -240,7 +235,6 @@ exports.deleteProjectFeature = async (req, res) => {
     });
 
   } catch (error) {
-
     console.error("Delete feature error:", error);
 
     res.status(500).json({
@@ -248,22 +242,17 @@ exports.deleteProjectFeature = async (req, res) => {
       message: "Failed to delete feature",
       error: error.message
     });
-
   }
-
 };
 
+/* ================= DELETE FEATURE ITEM ================= */
+
 exports.deleteFeatureItem = async (req, res) => {
-
   try {
-
     const { item_id } = req.params;
 
     await pool.query(
-      `
-      DELETE FROM project_feature_items
-      WHERE id = $1
-      `,
+      `DELETE FROM project_feature_items WHERE id = $1`,
       [item_id]
     );
 
@@ -273,7 +262,6 @@ exports.deleteFeatureItem = async (req, res) => {
     });
 
   } catch (error) {
-
     console.error("Delete feature item error:", error);
 
     res.status(500).json({
@@ -281,7 +269,5 @@ exports.deleteFeatureItem = async (req, res) => {
       message: "Failed to delete feature item",
       error: error.message
     });
-
   }
-
 };
