@@ -1,12 +1,15 @@
 // src/components/Layout.jsx
 import Header from "./Header";
 import Footer from "./Footer";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 
 const Layout = () => {
+  const location = useLocation();
+
+  const isPropertyPage = location.pathname.startsWith("/properties/");
   return (
     <div className="flex flex-col min-h-screen">
-      <Header />
+      {!isPropertyPage && <Header />}
 
       <main className="flex-1">
         <Outlet />

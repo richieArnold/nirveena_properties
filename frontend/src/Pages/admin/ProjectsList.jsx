@@ -357,14 +357,14 @@ const ProjectsList = () => {
                         <td className="px-4 lg:px-6 py-4">
                           <div className="flex items-center gap-2">
                             <button
-                              onClick={() => navigate(`/admin/view/${project.project_id}`)}
+                              onClick={() => navigate(`/admin/view/${project.id}`)}
                               className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition"
                               title="View"
                             >
                               <Eye className="w-4 h-4" />
                             </button>
                             <button
-                              onClick={() => navigate(`/admin/edit/${project.project_id}`)}
+                              onClick={() => navigate(`/admin/edit/${project.id}`)}
                               className="p-1.5 text-green-600 hover:bg-green-50 rounded-lg transition"
                               title="Edit"
                             >
