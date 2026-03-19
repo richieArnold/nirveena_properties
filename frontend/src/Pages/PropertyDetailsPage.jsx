@@ -74,6 +74,18 @@ function PropertyDetailsPage() {
   }, []);
 
   useEffect(() => {
+    if (!project?.images?.length || viewerOpen) return;
+
+    const interval = setInterval(() => {
+      setActiveImage((prev) =>
+        prev === project.images.length - 1 ? 0 : prev + 1,
+      );
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [project, viewerOpen]);
+
+  useEffect(() => {
     const handleExitIntent = (e) => {
       if (popupClosed) return;
 
@@ -377,15 +389,17 @@ function PropertyDetailsPage() {
               <button
                 onClick={() => setShowPopup(true)}
                 className="
-      group flex items-center gap-2 
-      bg-black text-white 
-      w-full sm:w-auto px-6 py-3 rounded-full 
-      font-medium 
-      shadow-md hover:shadow-xl 
-      transition-all duration-300 
-      hover:bg-gray-900 hover:scale-105
-      whitespace-nowrap
-    "
+group flex items-center gap-2 
+bg-black text-white 
+w-full sm:w-auto px-6 py-3 rounded-full 
+font-medium 
+shadow-md 
+transition-all duration-300 
+hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600
+hover:scale-105 hover:shadow-lg
+active:scale-95
+whitespace-nowrap
+"
               >
                 <span className="flex items-center gap-2">Get Details →</span>
               </button>
@@ -512,7 +526,7 @@ function PropertyDetailsPage() {
                 </button>
 
                 <h3 className="text-xl font-bold mb-4 text-center">
-                  Schedule A Site Visit
+                  Enquire now
                 </h3>
 
                 <EnquiryForm
@@ -710,29 +724,30 @@ max-w-[240px] sm:max-w-[280px] md:max-w-[300px] flex-shrink-0 snap-start snap-al
   bg-[#f8f7f5]`}
                 >
                   {/* INNER */}
-                  <div className="p-8 flex flex-col justify-between h-full">
+                  <div className="p-6 sm:p-7 flex flex-col justify-between h-full space-y-2">
                     {/* TITLE */}
                     <div>
-                      <h3 className="text-xl font-semibold text-gray-900 tracking-wide">
+                      <h3 className="text-lg sm:text-xl font-semibold text-gray-900 tracking-tight">
                         {config.configuration}
                       </h3>
 
-                      <div className="w-10 h-[1px] bg-gray-300 my-4"></div>
+                      <div className="w-8 h-[1px] bg-gray-300 my-3"></div>
 
                       {/* SIZE */}
-                      <p className="text-sm text-gray-500 flex items-center gap-2">
+                      <p className="text-sm text-gray-500 flex items-center justify-center gap-2 text-center">
+                        {" "}
                         <Ruler size={14} className="text-gray-400" />
                         {config.size_range} Sq.Ft.
                       </p>
                     </div>
 
                     {/* PRICE */}
-                    <div className="mt-6">
-                      <p className="text-xs uppercase tracking-widest text-gray-400 mb-1">
+                    <div className="mt-6 text-center flex flex-col items-center">
+                      <p className="text-[11px] uppercase tracking-[0.2em] text-gray-400 mb-1">
                         Starting Price
                       </p>
 
-                      <p className="text-3xl font-semibold text-gray-900 flex items-center gap-1">
+                      <p className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-1 mt-1">
                         <IndianRupee size={18} />
                         {config.price}
                       </p>
@@ -741,8 +756,14 @@ max-w-[240px] sm:max-w-[280px] md:max-w-[300px] flex-shrink-0 snap-start snap-al
                     {/* CTA */}
                     <button
                       onClick={() => setShowPopup(true)}
-                      className="mt-8 w-full py-3 rounded-lg border border-gray-900 text-gray-900 
-      hover:bg-gray-900 hover:text-white transition-all duration-300"
+                      className="
+mt-8 w-full py-3 rounded-lg 
+bg-gray-900 text-white font-medium
+transition-all duration-300 
+hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600
+hover:scale-105 hover:shadow-lg
+active:scale-95
+"
                     >
                       Get Detailed Pricing
                     </button>
@@ -775,32 +796,53 @@ max-w-[240px] sm:max-w-[280px] md:max-w-[300px] flex-shrink-0 snap-start snap-al
               {project.floorplans.map((plan, index) => (
                 <div
                   key={index}
+                  onClick={() => {
+                    if (isRegistered) {
+                      setActiveFloorPlan(plan.image_url);
+                      setFloorPlanViewer(true);
+                    } else {
+                      setShowPopup(true);
+                    }
+                  }}
                   className="relative group overflow-hidden rounded-xl shadow-lg cursor-pointer"
                 >
                   {/* IMAGE */}
                   <img
                     src={plan.image_url}
-                    className="w-full h-[260px] object-cover 
-    blur-sm group-hover:blur-md scale-105 
-    transition duration-500"
+                    className={`w-full h-[260px] object-cover scale-105 transition-all duration-700
+      ${!isRegistered ? "blur-sm group-hover:blur-md" : "blur-0"}`}
                   />
 
-                  {/* DARK OVERLAY */}
-                  <div className="absolute inset-0 bg-black/40 group-hover:bg-black/60 transition duration-300" />
+                  {/* DARK OVERLAY (only when locked) */}
+                  {!isRegistered && (
+                    <div className="absolute inset-0 bg-black/40 group-hover:bg-black/60 transition duration-300" />
+                  )}
 
-                  {/* CENTER CTA */}
-                  <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
-                    <button
-                      onClick={() => setShowPopup(true)}
-                      className="backdrop-blur-md bg-white/20 border border-white/30 
-      px-6 py-2 rounded-full text-sm font-medium
-      hover:bg-white hover:text-black transition duration-300"
-                    >
-                      Enquire now
-                    </button>
-                  </div>
+                  {/* CTA (only when locked) */}
+                  {!isRegistered && (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation(); // prevent card click
+                          setShowPopup(true);
+                        }}
+                        className="
+          backdrop-blur-md 
+          bg-white/20 text-white border border-white/30
+          px-6 py-2 rounded-full text-sm font-medium
+          transition-all duration-300 
+          hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600
+          hover:text-white hover:border-transparent
+          hover:scale-105 hover:shadow-lg
+          active:scale-95
+          "
+                      >
+                        Enquire now
+                      </button>
+                    </div>
+                  )}
 
-                  {/* BOTTOM INFO BAR */}
+                  {/* BOTTOM INFO */}
                   <div className="absolute bottom-0 w-full bg-black/80 text-white py-2 text-sm text-center">
                     {plan.title}
                   </div>

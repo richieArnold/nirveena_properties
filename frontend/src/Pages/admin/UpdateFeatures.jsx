@@ -206,6 +206,11 @@ const UpdateFeatures = () => {
           await axiosInstance.post(
             `/api/projects/${project.project_id}/addConfiguration`,
             config,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            },
           );
         }
       }
@@ -240,6 +245,11 @@ const UpdateFeatures = () => {
       await axiosInstance.post(
         `/api/projects/${project.project_id}/floorplans`,
         formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        },
       );
 
       alert("Floor plan uploaded");
