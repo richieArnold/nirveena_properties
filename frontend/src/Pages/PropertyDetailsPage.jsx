@@ -73,17 +73,17 @@ function PropertyDetailsPage() {
     return () => clearTimeout(timer);
   }, []);
 
-  useEffect(() => {
-    if (!project?.images?.length || viewerOpen) return;
+  // useEffect(() => {
+  //   if (!project?.images?.length || viewerOpen) return;
 
-    const interval = setInterval(() => {
-      setActiveImage((prev) =>
-        prev === project.images.length - 1 ? 0 : prev + 1,
-      );
-    }, 4000);
+  //   const interval = setInterval(() => {
+  //     setActiveImage((prev) =>
+  //       prev === project.images.length - 1 ? 0 : prev + 1,
+  //     );
+  //   }, 4000);
 
-    return () => clearInterval(interval);
-  }, [project, viewerOpen]);
+  //   return () => clearInterval(interval);
+  // }, [project, viewerOpen]);
 
   useEffect(() => {
     const handleExitIntent = (e) => {
@@ -123,7 +123,7 @@ function PropertyDetailsPage() {
   const [connectivity, setConnectivity] = useState({});
 
   useEffect(() => {
-    console.log(projectDetails)
+    console.log(projectDetails);
     if (!projectDetails?.project_id) return;
 
     const fetchConnectivity = async () => {
@@ -145,11 +145,14 @@ function PropertyDetailsPage() {
     fetchConnectivity();
   }, [projectDetails]);
   const allImages = project ? project.images : [];
-  const heroImages = allImages.slice(0, 3);
+  const heroImages =
+    allImages.length >= 3
+      ? allImages.slice(0, 3)
+      : [...allImages, ...allImages, ...allImages].slice(0, 3);
   const galleryImages = allImages.slice(3);
 
   useEffect(() => {
-    if (!heroImages.length || viewerOpen) return;
+    if (!heroImages?.length || viewerOpen) return;
 
     const interval = setInterval(() => {
       setActiveImage((prev) => (prev === heroImages.length - 1 ? 0 : prev + 1));
@@ -192,11 +195,15 @@ function PropertyDetailsPage() {
     : null;
 
   const nextImage = () => {
-    setActiveImage((prev) => (prev === heroImages.length - 1 ? 0 : prev + 1));
+    const total = viewerOpen ? project.images.length : heroImages.length;
+
+    setActiveImage((prev) => (prev + 1) % total);
   };
 
   const prevImage = () => {
-    setActiveImage((prev) => (prev === 0 ? heroImages.length - 1 : prev - 1));
+    const total = viewerOpen ? project.images.length : heroImages.length;
+
+    setActiveImage((prev) => (prev - 1 + total) % total);
   };
 
   if (loading) {
@@ -294,7 +301,7 @@ function PropertyDetailsPage() {
         <div className="relative w-full h-[45vh] sm:h-[60vh] md:h-[75vh] lg:h-[85vh] overflow-hidden bg-black">
           {/* BLUR BACKGROUND */}
           <img
-            src={heroImages?.[activeImage]?.image_url}
+            src={heroImages[activeImage]?.image_url || heroImages[0]?.image_url}
             className="absolute w-full h-full object-cover blur-xl scale-110 opacity-25"
             alt=""
           />

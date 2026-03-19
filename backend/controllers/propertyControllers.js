@@ -87,126 +87,7 @@ exports.importProjects = async (req, res) => {
   }
 };
 
-//     const result = await pool.query(
-//       `
-//       SELECT
-//         p.id,
-//         p.slug,
-//         p.project_name,
-//         p.project_location,
-//         p.price,
-//         p.project_type,
-//         p.project_status,
-//         img.image_url
-//       FROM projects p
-//       LEFT JOIN LATERAL (
-//         SELECT image_url
-//         FROM project_images pi
-//         WHERE pi.project_id = p.project_id
-//         ORDER BY pi.sort_order ASC
-//         LIMIT 1
-//       ) img ON true
-//       ORDER BY p.id DESC
-//       `,
-//     );
 
-//     console.log("Query successful, rows:", result.rows.length);
-
-//     res.json({
-//       success: true,
-//       count: result.rows.length,
-//       data: result.rows,
-//     });
-//   } catch (error) {
-//     console.error("ERROR in getAllProjects:", error); // This will show in your terminal
-//     res.status(500).json({
-//       success: false,
-//       message: "Failed to fetch projects",
-//       error: error.message,
-//     });
-//   }
-// };
-
-// controllers/propertyControllers.js
-
-// exports.getAllProjects = async (req, res) => {
-//   try {
-//     const page = parseInt(req.query.page) || 1;
-//     const limit = parseInt(req.query.limit) || 10;
-//     const offset = (page - 1) * limit;
-
-//     // Get total count for pagination
-//     const countResult = await pool.query("SELECT COUNT(*) FROM projects");
-//     const totalCount = parseInt(countResult.rows[0].count);
-
-//     // Get paginated projects with images
-//     const result = await pool.query(
-//       `
-//       SELECT
-//         p.id,
-//         p.project_id,
-//         p.slug,
-//         p.project_name,
-//         p.project_location,
-//         p.price,
-//         p.project_type,
-//         p.project_status,
-//         p.total_acres,
-//         p.no_of_units,
-//         p.club_house_size,
-//         p.structure,
-//         p.typology,
-//         p.sba,
-//         p.rera_completion,
-//         p.property_description,
-//         p.created_at,
-//         p.updated_at,
-//         img.image_url
-//       FROM projects p
-//       LEFT JOIN LATERAL (
-//         SELECT image_url
-//         FROM project_images pi
-//         WHERE pi.project_id = p.project_id
-//         ORDER BY pi.sort_order ASC
-//         LIMIT 1
-//       ) img ON true
-//       ORDER BY p.id DESC
-//       LIMIT $1 OFFSET $2
-//       `,
-//       [limit, offset],
-//     );
-
-//     console.log("Query successful, rows:", result.rows.length);
-
-//     // Format prices and Formated images
-//     const formattedProjects = result.rows
-//       .filter(
-//         (project) => !project.image_url || isValidImage(project.image_url),
-//       )
-//       .map((project) => ({
-//         ...project,
-//         price: formatPrice(project.price),
-//       }));
-
-//     res.json({
-//       success: true,
-//       data: formattedProjects,
-//       pagination: {
-//         currentPage: page,
-//         totalPages: Math.ceil(totalCount / limit),
-//         totalCount: totalCount,
-//         limit: limit,
-//       },
-//     });
-//   } catch (error) {
-//     console.error("ERROR in getAllProjects:", error);
-//     res.status(500).json({
-//       success: false,
-//       message: "Failed to fetch projects",
-//       error: error.message,
-//     });
-//   }
-// };
 
 // Update getAllProjects to include display_order in SELECT and ORDER BY
 exports.getAllProjects = async (req, res) => {
@@ -325,7 +206,7 @@ exports.getAllPropertiesUnfiltered = async (req, res) => {
 
     let query = `
       SELECT 
-        p.id,
+        p.project_id,
         p.slug,
         p.project_name,
         p.project_location,
@@ -339,7 +220,7 @@ exports.getAllPropertiesUnfiltered = async (req, res) => {
       LEFT JOIN LATERAL (
         SELECT image_url
         FROM project_images pi
-        WHERE pi.project_id = p.id
+        WHERE pi.project_id = p.project_id
         ORDER BY pi.sort_order ASC
         LIMIT 1
       ) img ON true
