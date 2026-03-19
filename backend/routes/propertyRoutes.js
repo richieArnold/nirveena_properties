@@ -22,6 +22,7 @@ const {
   updateProjectFeature,
   deleteProjectFeature,
   deleteFeatureItem,
+  getConnectivity,
 } = require("../controllers/featureController");
 const {
   addConfiguration,
@@ -33,10 +34,17 @@ const {
   deleteFloorPlan,
 } = require("../controllers/floorConfigController");
 const { getIcons } = require("../controllers/iconController");
+const { uploadAndSaveProjectLogo, uploadProjectLogoMiddleware } = require("../controllers/logoController");
 
 // Imports
 router.post("/importProjects", importProjects);
 router.post("/import-images", importProjectImages);
+
+router.post(
+  "/logo/:project_id/logo",
+  uploadProjectLogoMiddleware.single("logo"),
+  uploadAndSaveProjectLogo
+);
 
 // Fetch routes
 router.get("/getAllProjects", getAllProjects);
@@ -52,6 +60,7 @@ router.get("/:project_id/features", getProjectFeatures);
 router.put("/features/:feature_id", updateProjectFeature);
 router.delete("/features/:feature_id", deleteProjectFeature);
 router.delete("/feature-item/:item_id", deleteFeatureItem);
+router.get("/connectivity/:project_id", getConnectivity);
 
 router.post("/upload/icon", uploadIconMiddleware.single("icon"), uploadIcon);
 router.get("/icons", getIcons);

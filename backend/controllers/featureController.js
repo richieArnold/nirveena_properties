@@ -1,4 +1,4 @@
-const pool = require('../rds_setup/db');
+const pool = require("../rds_setup/db");
 
 /* ================= ADD FEATURE ================= */
 
@@ -9,11 +9,11 @@ exports.addProjectFeature = async (req, res) => {
 
     const feature = await pool.query(
       `
-      INSERT INTO project_features (project_id, feature_name)
-      VALUES ($1,$2)
+      INSERT INTO project_features (project_id, feature_name, description)
+      VALUES ($1,$2,$3)
       RETURNING id
       `,
-      [project_id, feature_name]
+      [project_id, feature_name, description],
     );
 
     const featureId = feature.rows[0].id;
@@ -31,8 +31,8 @@ exports.addProjectFeature = async (req, res) => {
           items[i].icon_url || null,
           items[i].image_url || null,
           items[i].description || null,
-          i
-        ]
+          i,
+        ],
       );
     }
 
@@ -40,7 +40,6 @@ exports.addProjectFeature = async (req, res) => {
       success: true,
       message: "Feature added successfully",
     });
-
   } catch (error) {
     console.log(error);
     res.status(500).json({
@@ -80,14 +79,13 @@ exports.getProjectFeatures = async (req, res) => {
       WHERE pf.project_id = $1
       ORDER BY pf.sort_order
       `,
-      [project_id]
+      [project_id],
     );
 
     res.json({
       success: true,
       data: result.rows,
     });
-
   } catch (error) {
     console.error("Get project features error:", error);
 
@@ -140,7 +138,6 @@ exports.uploadIcon = async (req, res) => {
       success: true,
       icon_url: req.file.location,
     });
-
   } catch (error) {
     console.error("Icon upload error:", error);
 
@@ -166,7 +163,7 @@ exports.updateProjectFeature = async (req, res) => {
       SET feature_name = $1
       WHERE id = $2
       `,
-      [feature_name, feature_id]
+      [feature_name, feature_id],
     );
 
     // delete old items
@@ -175,7 +172,7 @@ exports.updateProjectFeature = async (req, res) => {
       DELETE FROM project_feature_items
       WHERE feature_id = $1
       `,
-      [feature_id]
+      [feature_id],
     );
 
     // insert new items
@@ -192,23 +189,22 @@ exports.updateProjectFeature = async (req, res) => {
           items[i].icon_url || null,
           items[i].image_url || null,
           items[i].description || null,
-          i
-        ]
+          i,
+        ],
       );
     }
 
     res.json({
       success: true,
-      message: "Feature updated successfully"
+      message: "Feature updated successfully",
     });
-
   } catch (error) {
     console.error("Update feature error:", error);
 
     res.status(500).json({
       success: false,
       message: "Failed to update feature",
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -221,26 +217,24 @@ exports.deleteProjectFeature = async (req, res) => {
 
     await pool.query(
       `DELETE FROM project_feature_items WHERE feature_id = $1`,
-      [feature_id]
+      [feature_id],
     );
 
-    await pool.query(
-      `DELETE FROM project_features WHERE id = $1`,
-      [feature_id]
-    );
+    await pool.query(`DELETE FROM project_features WHERE id = $1`, [
+      feature_id,
+    ]);
 
     res.json({
       success: true,
-      message: "Feature deleted successfully"
+      message: "Feature deleted successfully",
     });
-
   } catch (error) {
     console.error("Delete feature error:", error);
 
     res.status(500).json({
       success: false,
       message: "Failed to delete feature",
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -251,23 +245,51 @@ exports.deleteFeatureItem = async (req, res) => {
   try {
     const { item_id } = req.params;
 
-    await pool.query(
-      `DELETE FROM project_feature_items WHERE id = $1`,
-      [item_id]
-    );
+    await pool.query(`DELETE FROM project_feature_items WHERE id = $1`, [
+      item_id,
+    ]);
 
     res.json({
       success: true,
-      message: "Feature item deleted successfully"
+      message: "Feature item deleted successfully",
     });
-
   } catch (error) {
     console.error("Delete feature item error:", error);
 
     res.status(500).json({
       success: false,
       message: "Failed to delete feature item",
-      error: error.message
+      error: error.message,
     });
+  }
+};
+// ----------Connectivity--------------------------
+
+exports.getConnectivity = async (req, res) => {
+  try {
+    const { project_id } = req.params;
+
+    const result = await pool.query(
+      `SELECT * FROM project_connectivity WHERE project_id = $1 ORDER BY id`,
+      [project_id],
+    );
+
+    // group by category
+    const grouped = {};
+
+    result.rows.forEach((row) => {
+      if (!grouped[row.category]) {
+        grouped[row.category] = [];
+      }
+      grouped[row.category].push(row.description);
+    });
+
+    res.json({
+      success: true,
+      data: grouped,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false });
   }
 };
