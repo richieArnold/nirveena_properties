@@ -25,7 +25,7 @@ import { Clock, LayoutGrid, Ruler } from "lucide-react";
 import { useUserRegistration } from "../context/UserRegistrationContext";
 
 import EnquiryForm from "../components/Properties/EnquiryForm";
-import PropertyNavbar from "./PropertyNavbar";
+import PropertyNavbar from "./PropertNavbar";
 
 function PropertyDetailsPage() {
   const { slug } = useParams();
@@ -120,6 +120,43 @@ function PropertyDetailsPage() {
     fetchProject();
   }, [slug]);
 
+  const [connectivity, setConnectivity] = useState({});
+
+  useEffect(() => {
+    console.log(projectDetails)
+    if (!projectDetails?.project_id) return;
+
+    const fetchConnectivity = async () => {
+      try {
+        console.log("calling connectivity API...");
+
+        const res = await axiosInstance.get(
+          `/api/projects/connectivity/${projectDetails.project_id}`,
+        );
+
+        console.log("response:", res.data);
+
+        setConnectivity(res.data.data);
+      } catch (err) {
+        console.error("connectivity error:", err);
+      }
+    };
+
+    fetchConnectivity();
+  }, [projectDetails]);
+  const allImages = project ? project.images : [];
+  const heroImages = allImages.slice(0, 3);
+  const galleryImages = allImages.slice(3);
+
+  useEffect(() => {
+    if (!heroImages.length || viewerOpen) return;
+
+    const interval = setInterval(() => {
+      setActiveImage((prev) => (prev === heroImages.length - 1 ? 0 : prev + 1));
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [heroImages, viewerOpen]);
   useEffect(() => {
     const handleKey = (e) => {
       if (e.key === "Escape") setViewerOpen(false);
@@ -155,15 +192,11 @@ function PropertyDetailsPage() {
     : null;
 
   const nextImage = () => {
-    setActiveImage((prev) =>
-      prev === project.images.length - 1 ? 0 : prev + 1,
-    );
+    setActiveImage((prev) => (prev === heroImages.length - 1 ? 0 : prev + 1));
   };
 
   const prevImage = () => {
-    setActiveImage((prev) =>
-      prev === 0 ? project.images.length - 1 : prev - 1,
-    );
+    setActiveImage((prev) => (prev === 0 ? heroImages.length - 1 : prev - 1));
   };
 
   if (loading) {
@@ -257,21 +290,21 @@ function PropertyDetailsPage() {
         </Helmet>
       )}
       <div className="min-h-screen bg-slate-50 pb-20">
-        {/* ✅ FULL WIDTH HERO */}
+        {/*  FULL WIDTH HERO */}
         <div className="relative w-full h-[45vh] sm:h-[60vh] md:h-[75vh] lg:h-[85vh] overflow-hidden bg-black">
-          {" "}
           {/* BLUR BACKGROUND */}
           <img
-            src={project.images?.[activeImage]?.image_url}
+            src={heroImages?.[activeImage]?.image_url}
             className="absolute w-full h-full object-cover blur-xl scale-110 opacity-25"
             alt=""
           />
+
           {/* MAIN IMAGE */}
           <motion.img
             key={activeImage}
-            src={project.images?.[activeImage]?.image_url}
+            src={heroImages?.[activeImage]?.image_url}
             onLoad={handleImageLoad}
-            onClick={() => setViewerOpen(true)} // ✅ ADD THIS
+            onClick={() => setViewerOpen(true)}
             className={`relative z-10 h-full mx-auto w-full cursor-zoom-in ${
               isWide ? "object-cover" : "object-contain"
             }`}
@@ -279,15 +312,18 @@ function PropertyDetailsPage() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8 }}
           />
+
           {/* OPTIONAL GRADIENT */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent z-20" />
+
           {/* LEFT */}
           <button
             onClick={prevImage}
-            className="absolute left-2 sm:left-5 top-1/2 -translate-y-1/2 z-30 bg-black/40 p-2 sm:p-3 rounded-full"
+            className="absolute left-2 sm:left-5 top-1/2 -translate-y-1/2 z-30 bg-black/40 p-2 sm:p-3 rounded-full text-white"
           >
             <ChevronLeft size={28} />
           </button>
+
           {/* RIGHT */}
           <button
             onClick={nextImage}
@@ -295,9 +331,10 @@ function PropertyDetailsPage() {
           >
             <ChevronRight size={28} />
           </button>
+
           {/* DOTS */}
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-30">
-            {project.images?.map((_, index) => (
+            {heroImages?.map((_, index) => (
               <div
                 key={index}
                 onClick={() => setActiveImage(index)}
@@ -306,6 +343,11 @@ function PropertyDetailsPage() {
                 }`}
               />
             ))}
+          </div>
+
+          {/* 🔥 BONUS: TOTAL IMAGES COUNT */}
+          <div className="absolute bottom-4 right-4 z-30 bg-black/60 text-white px-3 py-1 rounded text-sm">
+            {allImages.length} Photos
           </div>
         </div>
         {/* 🔥 FLOATING PROPERTY CARD */}
@@ -823,6 +865,97 @@ active:scale-95
               </div>
             </div>
           )}
+          {/* Connectivity */}
+          {/* CONNECTIVITY */}
+          {Object.keys(connectivity).length > 0 && (
+            <section id="connectivity" className="mt-24 text-center">
+              {/* HEADER */}
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold tracking-wide">
+                LOCATION & CONNECTIVITY
+              </h2>
+
+              <div className="flex justify-center items-center gap-2 my-3">
+                <div className="w-8 h-[1px] bg-gray-400"></div>
+                <div className="w-2 h-2 bg-black rounded-full"></div>
+                <div className="w-8 h-[1px] bg-gray-400"></div>
+              </div>
+
+              <p className="text-gray-600 mt-4">
+                Seamless access to key destinations around the city.
+              </p>
+
+              {/* GRID */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-12 text-left max-w-6xl mx-auto">
+                {Object.entries(connectivity).map(([category, items], idx) => (
+                  <div key={idx} className="space-y-3">
+                    {/* ICON (optional) */}
+                    <div className="text-3xl">📍</div>
+
+                    {/* TITLE */}
+                    <h3 className="font-semibold text-lg text-gray-900">
+                      {category.toUpperCase()}
+                    </h3>
+
+                    {/* LIST */}
+                    <ul className="space-y-2 text-gray-600 text-sm leading-relaxed">
+                      {items.map((item, i) => (
+                        <li key={i}>• {item}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+          {/* GALLERY */}
+          {galleryImages.length > 0 && (
+            <section id="gallery" className="mt-24 text-center">
+              {/* HEADER (MATCHING AMENITIES STYLE) */}
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold tracking-wide">
+                GALLERY
+              </h2>
+
+              <div className="flex justify-center items-center gap-2 my-3">
+                <div className="w-8 h-[1px] bg-gray-400"></div>
+                <div className="w-2 h-2 bg-black rounded-full"></div>
+                <div className="w-8 h-[1px] bg-gray-400"></div>
+              </div>
+
+              <p className="text-gray-600 mt-4">
+                Discover more visuals of this premium project.
+              </p>
+
+              {/* GRID */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-12 px-2">
+                {galleryImages.map((img, index) => (
+                  <div
+                    key={index}
+                    className="relative overflow-hidden rounded-xl cursor-pointer group"
+                    onClick={() => {
+                      setActiveImage(index + 3); // offset because first 3 are hero
+                      setViewerOpen(true);
+                    }}
+                  >
+                    {/* IMAGE */}
+                    <img
+                      src={img.image_url}
+                      className="w-full h-48 sm:h-52 md:h-56 object-cover 
+                       group-hover:scale-110 transition duration-500"
+                    />
+
+                    {/* OVERLAY */}
+                    <div
+                      className="absolute inset-0 bg-black/40 opacity-0 
+                          group-hover:opacity-100 transition 
+                          flex items-center justify-center text-white text-sm font-medium"
+                    >
+                      View Image
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
         </main>
         {/* FULLSCREEN IMAGE VIEWER */}
         {viewerOpen && (
@@ -894,6 +1027,7 @@ active:scale-95
           </div>
         )}
       </div>
+
       <motion.div
         initial={{ x: -60 }}
         animate={{ x: 0 }}
