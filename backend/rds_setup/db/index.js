@@ -9,7 +9,7 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD,
   ssl: { rejectUnauthorized: false },
 
-  max: 20, // 🔥 LIMIT CONNECTIONS (VERY IMPORTANT)
+  max: 50, // 🔥 LIMIT CONNECTIONS (VERY IMPORTANT)
   idleTimeoutMillis: 30000, // close idle clients after 30s
   connectionTimeoutMillis: 2000, // timeout if cannot connect
 });
