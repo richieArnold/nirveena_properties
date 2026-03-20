@@ -23,6 +23,7 @@ const {
   deleteProjectFeature,
   deleteFeatureItem,
   getConnectivity,
+  addConnectivity,
 } = require("../controllers/featureController");
 const {
   addConfiguration,
@@ -61,6 +62,7 @@ router.put("/features/:feature_id", updateProjectFeature);
 router.delete("/features/:feature_id", deleteProjectFeature);
 router.delete("/feature-item/:item_id", deleteFeatureItem);
 router.get("/connectivity/:project_id", getConnectivity);
+router.post("/addConnectivity", addConnectivity);
 
 router.post("/upload/icon", uploadIconMiddleware.single("icon"), uploadIcon);
 router.get("/icons", getIcons);

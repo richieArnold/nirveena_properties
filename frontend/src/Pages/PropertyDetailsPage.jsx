@@ -226,10 +226,10 @@ function PropertyDetailsPage() {
   const handleEnquirySuccess = () => {
     alert("Thank you! Our team will contact you soon.");
   };
-  const whatsappNumber = "919731658272"; // change to admin number
+  const whatsappNumber = "919900468686"; // change to admin number
 
   const message = encodeURIComponent(
-    `Hi, I'm interested in ${projectDetails.project_name} located at ${projectDetails.project_location}. Please share more details. ${window.location.href}`,
+    `Hi, I'm interested in ${projectDetails.project_name} located at ${projectDetails.project_location}`,
   );
 
   const whatsappLink = `https://wa.me/${whatsappNumber}?text=${message}`;
@@ -612,8 +612,9 @@ whitespace-nowrap
             </div>
           )}
 
+{}
           {/* AMENITIES & FEATURES */}
-          <section id="amenities" className="mt-24 text-center">
+          { project.features.length > 0 && <section id="amenities" className="mt-24 text-center">
             <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold tracking-wide">
               AMENITIES
             </h2>
@@ -702,10 +703,10 @@ max-w-[240px] sm:max-w-[280px] md:max-w-[300px] flex-shrink-0 snap-start snap-al
                 ))}
               </div>
             </div>
-          </section>
+          </section>}
 
           {/* configurations */}
-          <section id="config" className="mt-24 text-center">
+          {project.configurations.length > 0 && <section id="config" className="mt-24 text-center">
             {/* HEADING */}
             <h2 className="texttext-xl sm:text-2xl md:text-3xl font-semibold tracking-wide text-gray-900">
               CONFIGURATIONS
@@ -781,10 +782,10 @@ active:scale-95
                 </div>
               ))}
             </div>
-          </section>
+          </section>}
 
           {/* FLOOR PLANS */}
-          <section id="plans" className="mt-24 text-center">
+          {project.floorplans.length > 0 &&<section id="plans" className="mt-24 text-center">
             <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold tracking-wide">
               FLOOR PLANS & LAYOUTS
             </h2>
@@ -856,7 +857,7 @@ active:scale-95
                 </div>
               ))}
             </div>
-          </section>
+          </section>}
 
           {embedUrl && (
             <div className="bg-white rounded-xl shadow-lg p-6 mt-6">
@@ -872,7 +873,7 @@ active:scale-95
               </div>
             </div>
           )}
-          {/* Connectivity */}
+
           {/* CONNECTIVITY */}
           {Object.keys(connectivity).length > 0 && (
             <section id="connectivity" className="mt-24 text-center">
@@ -1043,7 +1044,7 @@ active:scale-95
       >
         {/* Phone */}
         <a
-          href="tel:+91 9731658272"
+          href="tel:+91 9900468686"
           className="group flex items-center bg-gray-900 hover:bg-indigo-600 text-white w-12 hover:w-40 overflow-hidden transition-all duration-300 rounded-r-lg"
         >
           <div className="flex items-center justify-center w-12 h-12 shrink-0">

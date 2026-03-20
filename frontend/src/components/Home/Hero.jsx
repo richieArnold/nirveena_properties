@@ -165,7 +165,7 @@ const Hero = () => {
 
 
 
-  const whatsappNumber = "919731658272"; // change to admin number
+  const whatsappNumber = "919900468686"; // change to admin number
 
   const message = encodeURIComponent(
     "Hello, I am interested in your properties.",
@@ -621,7 +621,7 @@ const Hero = () => {
         >
           {/* Phone */}
           <a
-            href="tel:+919731658272"
+            href="tel:+919900468686"
             className="group flex items-center bg-gray-900 hover:bg-indigo-600 text-white w-12 hover:w-40 overflow-hidden transition-all duration-300 rounded-r-lg"
           >
             <div className="flex items-center justify-center w-12 h-12 shrink-0">

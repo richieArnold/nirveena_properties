@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 const PropertyNavbar = ({ project }) => {
   const navigate = useNavigate();
@@ -14,25 +14,40 @@ const PropertyNavbar = ({ project }) => {
       const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
 
       window.scrollTo({ top: y, behavior: "smooth" });
+      window.history.pushState(null, "", `#${id}`);
     }
   };
 
+  useEffect(() => {
+    const hash = window.location.hash.replace("#", "");
+    if (hash) {
+      setTimeout(() => {
+        scrollToSection(hash);
+      }, 300);
+    }
+  }, []);
   const menu = [
     { id: "overview", label: "Overview" },
     { id: "config", label: "Configuration" },
     { id: "amenities", label: "Amenities" },
     { id: "plans", label: "Plans" },
     { id: "gallery", label: "Gallery" },
-    { id: "developer", label: "Developer" },
   ];
 
   return (
     <div className="sticky top-0 z-50 bg-white border-b shadow-sm">
+      {console.log(window.history.length)}
       <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
         {/* LEFT → LOGO + NAME */}
         <div className="flex items-center gap-3">
           <button
-            onClick={() => navigate(-1)}
+            onClick={() => {
+              if (window.history.length > 1) {
+                navigate(-1);
+              } else {``
+                navigate("/property"); // or "/projects"
+              }
+            }}
             className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition"
           >
             <ArrowLeft size={18} className="text-gray-700" />
@@ -72,10 +87,10 @@ const PropertyNavbar = ({ project }) => {
 
         {/* RIGHT → CTA */}
         <a
-          href={`tel:${project?.contact_number || "9731658272"}`}
+          href={`tel:${project?.contact_number || "9900468686"}`}
           className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-5 py-2 rounded-full text-sm font-semibold shadow-md hover:scale-105 transition"
         >
-          📞 {project?.contact_number || "9731658272"}
+          📞 {project?.contact_number || "9900468686"}
         </a>
       </div>
     </div>

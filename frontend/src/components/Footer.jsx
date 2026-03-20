@@ -27,8 +27,8 @@ const Footer = () => {
   const contactInfo = [
     {
       icon: <Phone size={18} />,
-      text: "+91 9731658272",
-      href: "tel:+91 9731658272",
+      text: "+91 9900468686",
+      href: "tel:+91 9900468686",
     },
     {
       icon: <Mail size={18} />,

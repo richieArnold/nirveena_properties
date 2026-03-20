@@ -252,7 +252,7 @@ const Terms = () => {
             Nirveena Realty Pvt Ltd <br/>
             Address: #202, Share Space, Borewell Road, Whitefield,
             Bangalore – 560066 <br/>
-            Phone: 9731658272 <br/>
+            Phone: 9900468686 <br/>
             Email: info@nirveena.com
           </p>
 
