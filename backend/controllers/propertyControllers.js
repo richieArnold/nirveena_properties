@@ -242,7 +242,7 @@ exports.getAllPropertiesUnfiltered = async (req, res) => {
           ELSE 1 
         END,
         p.display_order ASC,
-        p.id DESC`;
+        p.project_id DESC`;
 
     const result = await pool.query(query, queryParams);
 

@@ -7,9 +7,11 @@ const pool = new Pool({
   database: process.env.DB_NAME,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  ssl: {rejectUnauthorized : false}
+  ssl: { rejectUnauthorized: false },
+
+  max: 20, // 🔥 LIMIT CONNECTIONS (VERY IMPORTANT)
+  idleTimeoutMillis: 30000, // close idle clients after 30s
+  connectionTimeoutMillis: 2000, // timeout if cannot connect
 });
-
-
 
 module.exports = pool;
