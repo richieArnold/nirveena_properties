@@ -293,3 +293,88 @@ exports.getConnectivity = async (req, res) => {
     res.status(500).json({ success: false });
   }
 };
+
+exports.addConnectivity = async (req, res) => {
+  const client = await pool.connect();
+
+  try {
+    const { project_id, connectivity } = req.body;
+
+    /*
+    Expected format from frontend:
+
+    {
+      project_id: 124,
+      connectivity: [
+        {
+          category: "Strategic Connectivity",
+          items: [
+            "Sarjapur Main Road / Project Entrance – 2 Mins",
+            "Outer Ring Road (ORR) – 15 Mins"
+          ]
+        },
+        {
+          category: "Leisure & Lifestyle",
+          items: [
+            "Supermarkets nearby – 3 Mins"
+          ]
+        }
+      ]
+    }
+    */
+
+    if (!project_id || !connectivity) {
+      return res.status(400).json({
+        success: false,
+        message: "project_id and connectivity are required",
+      });
+    }
+
+    await client.query("BEGIN");
+
+    // Optional: delete existing connectivity (if updating)
+    await client.query(
+      "DELETE FROM project_connectivity WHERE project_id = $1",
+      [project_id]
+    );
+
+    for (const section of connectivity) {
+      const { category, items } = section;
+
+      for (const item of items) {
+        await client.query(
+          `
+          INSERT INTO project_connectivity (project_id, category, title, description)
+          VALUES ($1, $2, $3, $4)
+          `,
+          [
+            project_id,
+            category,
+            null, // title is null as per your DB
+            item,
+          ]
+        );
+      }
+    }
+
+    await client.query("COMMIT");
+
+    res.json({
+      success: true,
+      message: "Connectivity added successfully",
+    });
+
+  } catch (error) {
+    await client.query("ROLLBACK");
+
+    console.error("Connectivity insert error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to add connectivity",
+      error: error.message,
+    });
+  } finally {
+    client.release();
+  }
+};

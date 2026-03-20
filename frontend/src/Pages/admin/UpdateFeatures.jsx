@@ -16,12 +16,41 @@ const UpdateFeatures = () => {
   const [floorPlans, setFloorPlans] = useState([]);
   const [fetchLoading, setFetchLoading] = useState(true);
 
+  const [connectivity, setConnectivity] = useState([]);
+
   const [newFloorPlan, setNewFloorPlan] = useState({
     title: "",
     area: "",
     configuration_id: "",
     image: null,
   });
+
+  const fetchConnectivity = async () => {
+    try {
+      const res = await axiosInstance.get(
+        `/api/projects/connectivity/${project.project_id}`,
+      );
+
+      // Transform API → UI format
+      const grouped = {};
+
+      res.data.data.forEach((item) => {
+        if (!grouped[item.category]) {
+          grouped[item.category] = [];
+        }
+        grouped[item.category].push(item.description);
+      });
+
+      const formatted = Object.keys(grouped).map((cat) => ({
+        category: cat,
+        items: grouped[cat],
+      }));
+
+      setConnectivity(formatted);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   /* ---------------- FETCH PROJECT ---------------- */
 
@@ -53,6 +82,7 @@ const UpdateFeatures = () => {
         fetchIcons(),
         fetchConfigurations(),
         fetchFloorPlans(),
+        fetchConnectivity(),
       ]);
     } catch (err) {
       console.error(err);
@@ -263,7 +293,47 @@ const UpdateFeatures = () => {
     await axiosInstance.delete(`/api/projects/floorplan/${id}`);
     fetchFloorPlans();
   };
+  const addConnectivityGroup = () => {
+    setConnectivity([...connectivity, { category: "", items: [""] }]);
+  };
 
+  const updateConnectivityCategory = (index, value) => {
+    const updated = [...connectivity];
+    updated[index].category = value;
+    setConnectivity(updated);
+  };
+
+  const addConnectivityItem = (groupIndex) => {
+    const updated = [...connectivity];
+    updated[groupIndex].items.push("");
+    setConnectivity(updated);
+  };
+
+  const updateConnectivityItem = (groupIndex, itemIndex, value) => {
+    const updated = [...connectivity];
+    updated[groupIndex].items[itemIndex] = value;
+    setConnectivity(updated);
+  };
+
+  const removeConnectivityItem = (groupIndex, itemIndex) => {
+    const updated = [...connectivity];
+    updated[groupIndex].items.splice(itemIndex, 1);
+    setConnectivity(updated);
+  };
+
+  const saveConnectivity = async () => {
+    try {
+      await axiosInstance.post("/api/projects/addConnectivity", {
+        project_id: project.project_id,
+        connectivity,
+      });
+
+      alert("Connectivity updated");
+      fetchConnectivity();
+    } catch (err) {
+      console.error(err);
+    }
+  };
   /* ---------------- UI ---------------- */
 
   if (fetchLoading) {
@@ -568,6 +638,74 @@ const UpdateFeatures = () => {
               </div>
             ))}
           </div>
+        </div>
+        {/* ================= CONNECTIVITY ================= */}
+        <div className="mb-12">
+          <h2 className="text-xl font-semibold mb-4">Connectivity</h2>
+
+          <button
+            onClick={addConnectivityGroup}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg mb-4"
+          >
+            <Plus size={16} />
+            Add Category
+          </button>
+
+          <div className="space-y-6">
+            {connectivity.map((group, groupIndex) => (
+              <div key={groupIndex} className="border rounded-xl p-5 bg-white">
+                <input
+                  type="text"
+                  value={group.category}
+                  placeholder="Category (e.g. Strategic Connectivity)"
+                  onChange={(e) =>
+                    updateConnectivityCategory(groupIndex, e.target.value)
+                  }
+                  className="w-full px-3 py-2 border rounded-lg mb-4"
+                />
+
+                {group.items.map((item, itemIndex) => (
+                  <div key={itemIndex} className="flex gap-3 mb-2">
+                    <input
+                      value={item}
+                      placeholder="e.g. Sarjapur Road – 2 mins"
+                      onChange={(e) =>
+                        updateConnectivityItem(
+                          groupIndex,
+                          itemIndex,
+                          e.target.value,
+                        )
+                      }
+                      className="flex-1 border px-3 py-2 rounded"
+                    />
+
+                    <button
+                      onClick={() =>
+                        removeConnectivityItem(groupIndex, itemIndex)
+                      }
+                      className="text-red-500"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+                ))}
+
+                <button
+                  onClick={() => addConnectivityItem(groupIndex)}
+                  className="text-blue-600 text-sm mt-2"
+                >
+                  + Add Item
+                </button>
+              </div>
+            ))}
+          </div>
+
+          <button
+            onClick={saveConnectivity}
+            className="mt-4 bg-green-600 text-white px-5 py-2 rounded"
+          >
+            Save Connectivity
+          </button>
         </div>
       </div>
     </AdminLayout>

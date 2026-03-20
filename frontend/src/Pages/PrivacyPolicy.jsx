@@ -206,7 +206,7 @@ const PrivacyPolicy = () => {
             Address: #202, Share Space, Palm Meadows, Borewell Road,
             Whitefield, Bangalore – 560066
             <br />
-            Phone: 9731658272
+            Phone: 9900468686
             <br />
             Email: info@nirveena.com
           </p>

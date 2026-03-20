@@ -26,50 +26,34 @@ exports.importProjects = async (req, res) => {
     const rawData = fs.readFileSync(filePath, "utf-8");
     const projects = JSON.parse(rawData);
 
-    for (const project of projects) {
-      const slug = generateSlug(project.project_name);
+    for (let i = 0; i < projects.length; i += 10) {
+      const batch = projects.slice(i, i + 10);
 
-      await pool.query(
-        `
-        INSERT INTO projects (
-          project_id,
-          project_name,
-          slug,
-          project_type,
-          project_status,
-          project_location,
-          total_acres,
-          no_of_units,
-          club_house_size,
-          structure,
-          typology,
-          sba,
-          price,
-          rera_completion,
-          property_description
-        )
-        VALUES (
-          $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15  // ADD $15
-        )
-        ON CONFLICT (project_id) DO NOTHING
-        `,
-        [
-          Number(project.project_id),
-          project.project_name.trim(),
-          slug,
-          project.project_type?.trim() || null,
-          project.project_status?.trim() || null,
-          project.project_location?.trim() || null,
-          toNumber(project.total_acres),
-          toNumber(project.no_of_units),
-          project.club_house_size?.trim() || null,
-          project.structure?.trim() || null,
-          project.typology?.trim() || null,
-          project.sba?.trim() || null,
-          project.price?.trim() || null,
-          project.rera_completion?.trim() || null,
-          project.property_description?.trim() || null,
-        ],
+      await Promise.all(
+        batch.map((project) => {
+          const slug = generateSlug(project.project_name);
+
+          return pool.query(
+            `INSERT INTO projects (...) VALUES (...) ON CONFLICT DO NOTHING`,
+            [
+              Number(project.project_id),
+              project.project_name.trim(),
+              slug,
+              project.project_type?.trim() || null,
+              project.project_status?.trim() || null,
+              project.project_location?.trim() || null,
+              toNumber(project.total_acres),
+              toNumber(project.no_of_units),
+              project.club_house_size?.trim() || null,
+              project.structure?.trim() || null,
+              project.typology?.trim() || null,
+              project.sba?.trim() || null,
+              project.price?.trim() || null,
+              project.rera_completion?.trim() || null,
+              project.property_description?.trim() || null,
+            ],
+          );
+        }),
       );
     }
 
@@ -86,8 +70,6 @@ exports.importProjects = async (req, res) => {
     });
   }
 };
-
-
 
 // Update getAllProjects to include display_order in SELECT and ORDER BY
 exports.getAllProjects = async (req, res) => {
@@ -340,6 +322,115 @@ exports.getAllPropertiesUnfiltered = async (req, res) => {
 
 // Update addProject to include display_order
 
+// exports.getProjectBySlug = async (req, res) => {
+//   try {
+//     const { slug } = req.params;
+
+//     const projectResult = await pool.query(
+//       `SELECT * FROM projects WHERE slug = $1`,
+//       [slug],
+//     );
+
+//     if (projectResult.rows.length === 0) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "Project not found",
+//       });
+//     }
+
+//     const project = projectResult.rows[0];
+//     const projectId = project.project_id;
+
+//     // Format main price
+//     project.price = formatPrice(project.price);
+
+//     const [
+//       imagesResult,
+//       featuresResult,
+//       featureItemsResult,
+//       configurationsResult,
+//       floorPlansResult,
+//     ] = await Promise.all([
+//       pool.query(
+//         `
+//         SELECT image_url, sort_order
+//         FROM project_images
+//         WHERE project_id = $1
+//         ORDER BY sort_order ASC
+//         `,
+//         [projectId],
+//       ),
+
+//       pool.query(
+//         `
+//         SELECT id, feature_name
+//         FROM project_features
+//         WHERE project_id = $1
+//         ORDER BY sort_order
+//         `,
+//         [projectId],
+//       ),
+
+//       pool.query(`SELECT * FROM project_feature_items`),
+
+//       pool.query(
+//         `
+//         SELECT *
+//         FROM project_configurations
+//         WHERE project_id = $1
+//         ORDER BY id
+//         `,
+//         [projectId],
+//       ),
+
+//       pool.query(
+//         `
+//         SELECT *
+//         FROM project_floor_plans
+//         WHERE project_id = $1
+//         ORDER BY sort_order
+//         `,
+//         [projectId],
+//       ),
+//     ]);
+
+//     const validImages = imagesResult.rows.filter((img) =>
+//       isValidImage(img.image_url),
+//     );
+
+//     const features = featuresResult.rows.map((feature) => ({
+//       ...feature,
+//       items: featureItemsResult.rows.filter(
+//         (item) => item.feature_id === feature.id,
+//       ),
+//     }));
+
+//     const configurations = configurationsResult.rows.map((config) => ({
+//       ...config,
+//       price: formatPrice(config.price),
+//     }));
+
+//     res.json({
+//       success: true,
+//       data: {
+//         project,
+//         images: validImages,
+//         features,
+//         configurations,
+//         floorplans: floorPlansResult.rows,
+//       },
+//     });
+//   } catch (error) {
+//     console.error("Fetch project error:", error);
+
+//     res.status(500).json({
+//       success: false,
+//       message: "Failed to fetch project",
+//       error: error.message,
+//     });
+//   }
+// };
+
 exports.getProjectBySlug = async (req, res) => {
   try {
     const { slug } = req.params;
@@ -359,58 +450,44 @@ exports.getProjectBySlug = async (req, res) => {
     const project = projectResult.rows[0];
     const projectId = project.project_id;
 
-    // Format main price
     project.price = formatPrice(project.price);
 
-    const [
-      imagesResult,
-      featuresResult,
-      featureItemsResult,
-      configurationsResult,
-      floorPlansResult,
-    ] = await Promise.all([
-      pool.query(
-        `
-        SELECT image_url, sort_order
-        FROM project_images
-        WHERE project_id = $1
-        ORDER BY sort_order ASC
-        `,
-        [projectId],
-      ),
+    // ✅ SEQUENTIAL (NOT Promise.all)
+    const imagesResult = await pool.query(
+      `SELECT image_url, sort_order
+       FROM project_images
+       WHERE project_id = $1
+       ORDER BY sort_order ASC`,
+      [projectId],
+    );
 
-      pool.query(
-        `
-        SELECT id, feature_name
-        FROM project_features
-        WHERE project_id = $1
-        ORDER BY sort_order
-        `,
-        [projectId],
-      ),
+    const featuresResult = await pool.query(
+      `SELECT id, feature_name
+       FROM project_features
+       WHERE project_id = $1
+       ORDER BY sort_order`,
+      [projectId],
+    );
 
-      pool.query(`SELECT * FROM project_feature_items`),
+    const featureItemsResult = await pool.query(
+      `SELECT * FROM project_feature_items`,
+    );
 
-      pool.query(
-        `
-        SELECT *
-        FROM project_configurations
-        WHERE project_id = $1
-        ORDER BY id
-        `,
-        [projectId],
-      ),
+    const configurationsResult = await pool.query(
+      `SELECT *
+       FROM project_configurations
+       WHERE project_id = $1
+       ORDER BY id`,
+      [projectId],
+    );
 
-      pool.query(
-        `
-        SELECT *
-        FROM project_floor_plans
-        WHERE project_id = $1
-        ORDER BY sort_order
-        `,
-        [projectId],
-      ),
-    ]);
+    const floorPlansResult = await pool.query(
+      `SELECT *
+       FROM project_floor_plans
+       WHERE project_id = $1
+       ORDER BY sort_order`,
+      [projectId],
+    );
 
     const validImages = imagesResult.rows.filter((img) =>
       isValidImage(img.image_url),
@@ -530,13 +607,13 @@ exports.addProject = async (req, res) => {
     );
 
     // Insert images if provided
-    for (let i = 0; i < images.length; i++) {
+    if (images.length > 0) {
+      const values = images.map((_, i) => `($1, $${i + 2}, ${i})`).join(",");
+
       await client.query(
-        `
-        INSERT INTO project_images (project_id, image_url, sort_order)
-        VALUES ($1, $2, $3)
-        `,
-        [Number(project_id), images[i], i],
+        `INSERT INTO project_images (project_id, image_url, sort_order)
+     VALUES ${values}`,
+        [Number(project_id), ...images],
       );
     }
 
@@ -912,14 +989,16 @@ exports.updateProject = async (req, res) => {
 
       // Add new images
       let nextSortOrder = existing_images.length;
-      for (let i = 0; i < new_images.length; i++) {
+      if (new_images.length > 0) {
+        const values = new_images
+          .map((_, i) => `($1, $${i + 2}, ${existing_images.length + i})`)
+          .join(",");
+
         await client.query(
-          `
-          INSERT INTO project_images (project_id, image_url, sort_order)
-          VALUES ($1, $2, $3)
-          ON CONFLICT DO NOTHING
-          `,
-          [Number(project_id), new_images[i], nextSortOrder + i],
+          `INSERT INTO project_images (project_id, image_url, sort_order)
+     VALUES ${values}
+     ON CONFLICT DO NOTHING`,
+          [Number(project_id), ...new_images],
         );
       }
     }
