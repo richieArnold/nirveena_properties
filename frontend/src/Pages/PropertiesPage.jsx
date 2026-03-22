@@ -105,7 +105,7 @@ function PropertiesPage() {
       const res = await axiosInstance.get(
         `/api/projects/getSingleProject/${slug}`,
       );
-      console.log(res);
+      // console.log(res);
     } catch (err) {
       console.error("Failed to fetch project:", err);
     }

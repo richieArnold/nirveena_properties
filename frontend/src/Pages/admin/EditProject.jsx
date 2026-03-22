@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   Save,
@@ -19,7 +18,7 @@ import axiosInstance from "../../utils/Instance";
 const EditProject = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  console.log(id);
+
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [fetchLoading, setFetchLoading] = useState(true);
@@ -31,12 +30,16 @@ const EditProject = () => {
     message: "",
     details: {},
   });
+
   const [newImages, setNewImages] = useState([]);
   const [existingImages, setExistingImages] = useState([]);
   const [imagesToKeep, setImagesToKeep] = useState([]);
+
   const [logo, setLogo] = useState(null);
   const [existingLogo, setExistingLogo] = useState("");
-  const [project,setProject] = useState(null)
+
+  const [project, setProject] = useState(null);
+
   const [formData, setFormData] = useState({
     project_id: "",
     project_name: "",
@@ -55,27 +58,31 @@ const EditProject = () => {
     property_description: "",
   });
 
+  /* ================= INIT ================= */
+
   useEffect(() => {
     const token = localStorage.getItem("adminToken");
     const userData = localStorage.getItem("adminUser");
 
-    if (!token) {
-      navigate("/admin/login");
-    } else {
-      setUser(JSON.parse(userData));
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      fetchProject();
-    }
-  }, [navigate, id]);
+    if (!token) return navigate("/admin/login");
+
+    setUser(JSON.parse(userData));
+    fetchProject();
+  }, [id]);
+
+  /* ================= FETCH ================= */
 
   const fetchProject = async () => {
     try {
-      const response = await axiosInstance.get(
+      const { data } = await axiosInstance.get(
         `/api/projects/getProject/${id}`,
       );
-      const project = response.data.data;
-      setProject(response.data.data)
+
+      const project = data.data;
+
+      setProject(project);
       setExistingLogo(project.builder_logo || "");
+
       setFormData({
         project_id: project.project_id || "",
         project_name: project.project_name || "",
@@ -98,100 +105,59 @@ const EditProject = () => {
       setExistingImages(images);
       setImagesToKeep(images.map((img) => img.image_url));
     } catch (error) {
-      console.log(error);
       setMessage({ type: "error", text: "Failed to fetch project details" });
     } finally {
       setFetchLoading(false);
     }
   };
 
+  /* ================= HANDLERS ================= */
+
   const handleDescriptionChange = (value) => {
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       property_description: value,
-    });
+    }));
   };
 
   const handleInputChange = (e) => {
-    console.log(e.target.value);
-    console.log(e.target.name);
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleImageChange = (e) => {
-    setNewImages([...e.target.files]);
+    setNewImages(Array.from(e.target.files));
   };
 
   const handleRemoveExistingImage = (index) => {
-    const removedImage = existingImages[index];
+    const removed = existingImages[index];
+
     setExistingImages((prev) => prev.filter((_, i) => i !== index));
-    setImagesToKeep((prev) =>
-      prev.filter((url) => url !== removedImage.image_url),
-    );
+    setImagesToKeep((prev) => prev.filter((url) => url !== removed.image_url));
   };
 
   const handleRemoveNewImage = (index) => {
     setNewImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const showSuccessNotification = (projectName, stats) => {
-    let message = `"${projectName}" has been updated.`;
-    if (stats.images_added > 0) {
-      message += ` Added ${stats.images_added} new image(s).`;
-    }
-    if (stats.images_deleted > 0) {
-      message += ` Removed ${stats.images_deleted} old image(s).`;
-    }
-
-    setNotification({
-      type: "success",
-      title: "Project Updated Successfully!",
-      message: message,
-      details: stats,
-    });
-    setShowNotification(true);
-
-    setTimeout(() => {
-      setShowNotification(false);
-    }, 5000);
-  };
-
-  const showErrorNotification = (errorMsg) => {
-    setNotification({
-      type: "error",
-      title: "Failed to Update Project",
-      message: errorMsg || "An error occurred while updating the project.",
-    });
-    setShowNotification(true);
-
-    setTimeout(() => {
-      setShowNotification(false);
-    }, 5000);
-  };
   const handleLogoChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      setLogo(file);
-    }
+    if (file) setLogo(file);
   };
+
+  /* ================= LOGO ================= */
+
   const uploadLogo = async () => {
     if (!logo) return null;
 
-    const formData = new FormData();
-    formData.append("logo", logo);
+    const fd = new FormData();
+    fd.append("logo", logo);
 
     try {
       const res = await axiosInstance.post(
         `/api/projects/logo/${project.project_id}/logo`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/formData",
-          },
-        },
+        fd,
+        { headers: { "Content-Type": "multipart/form-data" } },
       );
 
       return res.data.logo_url;
@@ -200,103 +166,135 @@ const EditProject = () => {
       return null;
     }
   };
+
+  /* ================= SUBMIT ================= */
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    const data = new FormData();
-    Object.keys(formData).forEach((key) => {
-      data.append(key, formData[key]);
-    });
-
-    data.append("existing_images", JSON.stringify(imagesToKeep));
-
-    newImages.forEach((image) => {
-      data.append("images", image);
-    });
-    let logoUrl = existingLogo;
-
-    if (logo) {
-      const uploadedLogo = await uploadLogo();
-      if (uploadedLogo) {
-        logoUrl = uploadedLogo;
-      }
-    }
-    data.append("builder_logo", logoUrl);
     try {
-      const response = await axiosInstance.put(
+      const data = new FormData();
+
+      Object.entries(formData).forEach(([key, value]) => {
+        data.append(key, value);
+      });
+
+      data.append("existing_images", JSON.stringify(imagesToKeep));
+
+      newImages.forEach((img) => data.append("images", img));
+
+      let logoUrl = existingLogo;
+
+      if (logo) {
+        const uploaded = await uploadLogo();
+        if (uploaded) logoUrl = uploaded;
+      }
+
+      data.append("builder_logo", logoUrl);
+
+      const res = await axiosInstance.put(
         `/api/projects/updateProject/${id}`,
         data,
         { headers: { "Content-Type": "multipart/form-data" } },
       );
 
-      if (response.data.success) {
+      if (res.data.success) {
         setMessage({ type: "success", text: "Project updated successfully!" });
 
         showSuccessNotification(
           formData.project_name,
-          response.data.data?.images_updated || {},
+          res.data.data?.images_updated || {},
         );
 
-        setTimeout(() => navigate("/admin/list"), 2000);
+        setTimeout(() => navigate(`/admin/features/${id}`), 1500);
       }
     } catch (error) {
-      console.log(error);
-      const errorMsg =
-        error.response?.data?.message || "Failed to update project";
-      setMessage({ type: "error", text: errorMsg });
-      showErrorNotification(errorMsg);
+      const msg = error.response?.data?.message || "Failed to update project";
+
+      setMessage({ type: "error", text: msg });
+      showErrorNotification(msg);
     } finally {
       setLoading(false);
     }
   };
 
+  /* ================= DELETE ================= */
+
   const handleDelete = async () => {
-    if (
-      !window.confirm(
-        "Are you sure you want to delete this project? This action cannot be undone.",
-      )
-    )
+    if (!window.confirm("Are you sure you want to delete this project?"))
       return;
 
     try {
-      const response = await axiosInstance.delete(
+      const res = await axiosInstance.delete(
         `/api/projects/deleteProject/${id}`,
       );
-      if (response.data.success) {
-        setMessage({ type: "success", text: "Project deleted successfully!" });
 
+      if (res.data.success) {
         setNotification({
           type: "success",
           title: "Project Deleted",
           message: `"${formData.project_name}" has been permanently deleted.`,
         });
-        setShowNotification(true);
 
+        setShowNotification(true);
         setTimeout(() => navigate("/admin/list"), 1500);
       }
     } catch (error) {
       setMessage({
         type: "error",
-        text: error.response?.data?.message || "Failed to delete project",
+        text: error.response?.data?.message || "Delete failed",
       });
     }
   };
 
+  /* ================= NOTIFICATIONS ================= */
+
+  const showSuccessNotification = (name, stats) => {
+    let msg = `"${name}" updated.`;
+
+    if (stats.images_added) msg += ` Added ${stats.images_added} image(s).`;
+
+    if (stats.images_deleted)
+      msg += ` Removed ${stats.images_deleted} image(s).`;
+
+    setNotification({
+      type: "success",
+      title: "Success",
+      message: msg,
+      details: stats,
+    });
+
+    setShowNotification(true);
+    setTimeout(() => setShowNotification(false), 5000);
+  };
+
+  const showErrorNotification = (msg) => {
+    setNotification({
+      type: "error",
+      title: "Error",
+      message: msg,
+    });
+
+    setShowNotification(true);
+    setTimeout(() => setShowNotification(false), 5000);
+  };
+
+  /* ================= UI ================= */
   const inputClasses =
     "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition";
+
   const labelClasses = "block text-sm font-medium text-gray-700 mb-1";
 
   if (fetchLoading) {
     return (
       <AdminLayout user={user}>
         <div className="flex justify-center py-20">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <div className="animate-spin h-8 w-8 border-b-2 border-blue-600 rounded-full"></div>
         </div>
       </AdminLayout>
     );
   }
-
   return (
     <AdminLayout user={user}>
       {/* Custom Notification */}

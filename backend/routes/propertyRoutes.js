@@ -1,95 +1,148 @@
 const express = require("express");
 const router = express.Router();
+
+/* ---------------- CONTROLLERS ---------------- */
+
+// Property
 const {
   importProjects,
   getAllProjects,
   getProjectBySlug,
   getProjectById,
-  getAllPropertiesUnfiltered, // ADD THIS
-  updateProject, // ADD THIS
+  getAllPropertiesUnfiltered,
+  updateProject,
   deleteProject,
   updateDisplayOrder,
   getPropertyTypes,
   savePropertyType,
+  getProjectFullDetails,
 } = require("../controllers/propertyControllers");
+
+// Images
 const { importProjectImages } = require("../controllers/imageControllers");
+
+// Upload (Project Images)
 const uploadController = require("../controllers/uploadController");
+
+// Features & Connectivity
 const {
-  addProjectFeature,
-  getProjectFeatures,
+  bulkUpsertFeatures,
+  bulkUpsertConnectivity,
   uploadIcon,
   uploadIconMiddleware,
-  updateProjectFeature,
-  deleteProjectFeature,
-  deleteFeatureItem,
-  getConnectivity,
-  addConnectivity,
 } = require("../controllers/featureController");
-const {
-  addConfiguration,
-  getProjectConfigurations,
-  addFloorPlan,
-  uploadFloorPlan,
-  getProjectFloorPlans,
-  deleteConfiguration,
-  deleteFloorPlan,
-} = require("../controllers/floorConfigController");
-const { getIcons } = require("../controllers/iconController");
-const { uploadAndSaveProjectLogo, uploadProjectLogoMiddleware } = require("../controllers/logoController");
 
-// Imports
+// Configurations & Floor Plans
+// Configurations & Floor Plans
+const {
+  bulkUpsertConfigurations,
+  bulkInsertFloorPlans,
+  uploadFloorPlan,
+} = require("../controllers/floorConfigController");
+
+// Icons
+const { getIcons } = require("../controllers/iconController");
+
+// Logo
+const {
+  uploadAndSaveProjectLogo,
+  uploadProjectLogoMiddleware,
+} = require("../controllers/logoController");
+
+/* =========================================================
+   ======================= IMPORT ===========================
+   ========================================================= */
+
 router.post("/importProjects", importProjects);
 router.post("/import-images", importProjectImages);
+
+/* =========================================================
+   ======================= LOGO =============================
+   ========================================================= */
 
 router.post(
   "/logo/:project_id/logo",
   uploadProjectLogoMiddleware.single("logo"),
-  uploadAndSaveProjectLogo
+  uploadAndSaveProjectLogo,
 );
 
-// Fetch routes
+/* =========================================================
+   ======================= FETCH ============================
+   ========================================================= */
+
 router.get("/getAllProjects", getAllProjects);
 router.get("/getAllPropertiesUnfiltered", getAllPropertiesUnfiltered);
-router.get("/getSingleProject/:slug", getProjectBySlug);
-router.get("/getProject/:id", getProjectById);
-router.put("/:id/update-display-order", updateDisplayOrder);
-router.get("/property-types", getPropertyTypes);
-router.post("/property-types", savePropertyType); // ADD THIS - Get project by ID for editing
 
-router.post("/:project_id/features", addProjectFeature);
-router.get("/:project_id/features", getProjectFeatures);
-router.put("/features/:feature_id", updateProjectFeature);
-router.delete("/features/:feature_id", deleteProjectFeature);
-router.delete("/feature-item/:item_id", deleteFeatureItem);
-router.get("/connectivity/:project_id", getConnectivity);
-router.post("/addConnectivity", addConnectivity);
+router.get("/getSingleProject/:slug", getProjectBySlug);
+router.get("/full-details/:slug", getProjectFullDetails);
+
+router.get("/getProject/:id", getProjectById);
+
+router.put("/:id/update-display-order", updateDisplayOrder);
+
+router.get("/property-types", getPropertyTypes);
+router.post("/property-types", savePropertyType);
+
+/* =========================================================
+   =================== BULK APIs (🔥 CORE) ==================
+   ========================================================= */
+
+/**
+ * FEATURES (Bulk Insert/Update/Delete)
+ */
+router.post("/:project_id/bulk-features", bulkUpsertFeatures);
+
+/**
+ * CONFIGURATIONS (Bulk)
+ */
+router.post("/:project_id/bulk-configurations", bulkUpsertConfigurations);
+
+/**
+ * FLOOR PLANS (Bulk + Images)
+ */
+router.post(
+  "/:project_id/bulk-floorplans",
+  uploadFloorPlan.array("images"),
+  bulkInsertFloorPlans,
+);
+/**
+ * CONNECTIVITY (Bulk)
+ */
+router.post("/:project_id/bulk-connectivity", bulkUpsertConnectivity);
+
+/* =========================================================
+   ======================= ICONS ============================
+   ========================================================= */
 
 router.post("/upload/icon", uploadIconMiddleware.single("icon"), uploadIcon);
-router.get("/icons", getIcons);
-router.post("/:project_id/addConfiguration", addConfiguration);
-router.get("/:project_id/getProjectConfigurations", getProjectConfigurations);
-router.delete("/configuration/:id", deleteConfiguration);
 
-router.post(
-  "/:project_id/floorplans",
-  uploadFloorPlan.single("image"),
-  addFloorPlan,
-);
-router.get("/:project_id/floorplans", getProjectFloorPlans);
-router.delete("/floorplan/:id", deleteFloorPlan);
-// Admin routes
+router.get("/icons", getIcons);
+
+/* =========================================================
+   ======================= ADMIN ============================
+   ========================================================= */
+
+/**
+ * ADD PROJECT
+ */
 router.post(
   "/addProject",
   uploadController.uploadImages,
   uploadController.addProjectWithImages,
 );
 
+/**
+ * UPDATE PROJECT
+ */
 router.put(
   "/updateProject/:id",
   uploadController.uploadImages,
-  uploadController.updateProjectWithImages, // We'll create this next
+  uploadController.updateProjectWithImages,
 );
 
+/**
+ * DELETE PROJECT
+ */
 router.delete("/deleteProject/:id", deleteProject);
 
 module.exports = router;

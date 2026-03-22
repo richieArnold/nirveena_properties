@@ -739,62 +739,18 @@ exports.deleteProject = async (req, res) => {
   }
 };
 
-/////////////////////////////   BELOW IS THE UPDATE PROPERTIES CONTROLLER ////////////////////////////////////////////////
-
-// Get single project by ID for editing
-// exports.getProjectById = async (req, res) => {
-//   try {
-//     const { id } = req.params;
-
-//     const projectResult = await pool.query(
-//       `SELECT * FROM projects WHERE id = $1`,
-//       [id],
-//     );
-
-//     if (projectResult.rows.length === 0) {
-//       return res.status(404).json({
-//         success: false,
-//         message: "Project not found",
-//       });
-//     }
-
-//     const project = projectResult.rows[0];
-
-//     // Get project images
-//     const imagesResult = await pool.query(
-//       `SELECT id, image_url, sort_order
-//        FROM project_images
-//        WHERE project_id = $1
-//        ORDER BY sort_order ASC`,
-//       [project.project_id],
-//     );
-
-//     project.images = imagesResult.rows;
-
-//     res.json({
-//       success: true,
-//       data: project,
-//     });
-//   } catch (error) {
-//     console.error("Get project by ID error:", error);
-//     res.status(500).json({
-//       success: false,
-//       message: "Failed to fetch project",
-//       error: error.message,
-//     });
-//   }
-// };
-
-// Get single project by ID for editing / viewing
 exports.getProjectById = async (req, res) => {
   try {
     const { id } = req.params;
-    /* ---------------- PROJECT ---------------- */
+    console.log(id);
+    /* ---------------- PARALLEL QUERIES ---------------- */
 
-    const projectResult = await pool.query(
-      `SELECT * FROM projects WHERE id = $1`,
-      [id],
-    );
+    const projectQuery = pool.query(`SELECT * FROM projects WHERE id = $1`, [
+      id,
+    ]);
+
+    const [projectResult] = await Promise.all([projectQuery]);
+    // console.log(projectResult)
     if (projectResult.rows.length === 0) {
       return res.status(404).json({
         success: false,
@@ -803,59 +759,75 @@ exports.getProjectById = async (req, res) => {
     }
 
     const project = projectResult.rows[0];
+    console.log(project);
     const projectId = project.project_id;
 
-    /* ---------------- IMAGES ---------------- */
+    /* ---------------- FETCH ALL RELATED DATA IN PARALLEL ---------------- */
 
-    const imagesResult = await pool.query(
-      `SELECT id, image_url, sort_order
-       FROM project_images
-       WHERE project_id = $1
-       ORDER BY sort_order ASC`,
-      [projectId],
-    );
+    const [
+      imagesResult,
+      featuresResult,
+      featureItemsResult,
+      configurationsResult,
+      floorPlansResult,
+    ] = await Promise.all([
+      pool.query(
+        `SELECT id, image_url, sort_order
+         FROM project_images
+         WHERE project_id = $1
+         ORDER BY sort_order ASC`,
+        [projectId],
+      ),
 
-    /* ---------------- FEATURES ---------------- */
+      pool.query(
+        `SELECT id, feature_name
+         FROM project_features
+         WHERE project_id = $1
+         ORDER BY sort_order`,
+        [projectId],
+      ),
 
-    const featuresResult = await pool.query(
-      `SELECT id, feature_name
-       FROM project_features
-       WHERE project_id = $1
-       ORDER BY sort_order`,
-      [projectId],
-    );
+      // ✅ FIXED (IMPORTANT)
+      pool.query(
+        `SELECT pfi.*
+   FROM project_feature_items pfi
+   JOIN project_features pf ON pfi.feature_id = pf.id
+   WHERE pf.project_id = $1`,
+        [projectId],
+      ),
 
-    const featureItemsResult = await pool.query(
-      `SELECT *
-       FROM project_feature_items`,
-    );
+      pool.query(
+        `SELECT *
+         FROM project_configurations
+         WHERE project_id = $1
+         ORDER BY sort_order`,
+        [projectId],
+      ),
+
+      pool.query(
+        `SELECT *
+         FROM project_floor_plans
+         WHERE project_id = $1
+         ORDER BY sort_order`,
+        [projectId],
+      ),
+    ]);
+
+    /* ---------------- OPTIMIZED FEATURE MAPPING ---------------- */
+
+    const featureItemsMap = {};
+
+    featureItemsResult.rows.forEach((item) => {
+      if (!featureItemsMap[item.feature_id]) {
+        featureItemsMap[item.feature_id] = [];
+      }
+      featureItemsMap[item.feature_id].push(item);
+    });
 
     const features = featuresResult.rows.map((feature) => ({
       ...feature,
-      items: featureItemsResult.rows.filter(
-        (item) => item.feature_id === feature.id,
-      ),
+      items: featureItemsMap[feature.id] || [],
     }));
-
-    /* ---------------- CONFIGURATIONS ---------------- */
-
-    const configurationsResult = await pool.query(
-      `SELECT *
-       FROM project_configurations
-       WHERE project_id = $1
-       ORDER BY sort_order`,
-      [projectId],
-    );
-
-    /* ---------------- FLOORPLANS ---------------- */
-
-    const floorPlansResult = await pool.query(
-      `SELECT *
-       FROM project_floor_plans
-       WHERE project_id = $1
-       ORDER BY sort_order`,
-      [projectId],
-    );
 
     /* ---------------- ATTACH DATA ---------------- */
 
@@ -1089,4 +1061,120 @@ exports.savePropertyType = async (req, res) => {
   // This is optional - you might not need to save types separately
   // They'll be saved when you create a project with that type
   res.json({ success: true });
+};
+
+exports.getProjectFullDetails = async (req, res) => {
+  try {
+    const { slug } = req.params;
+
+    // 1️⃣ Get project first
+    const projectRes = await pool.query(
+      `SELECT * FROM projects WHERE slug = $1`,
+      [slug],
+    );
+
+    if (projectRes.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Project not found",
+      });
+    }
+
+    const project = projectRes.rows[0];
+    const projectId = project.project_id;
+
+    // Format price
+    project.price = formatPrice(project.price);
+
+    // 2️⃣ Run ALL dependent queries in parallel
+    const [
+      imagesRes,
+      featuresRes,
+      configurationsRes,
+      floorPlansRes,
+      connectivityRes,
+    ] = await Promise.all([
+      pool.query(
+        `SELECT image_url, sort_order
+         FROM project_images
+         WHERE project_id = $1
+         ORDER BY sort_order ASC`,
+        [projectId],
+      ),
+
+      pool.query(
+        `SELECT f.id, f.feature_name,
+                json_agg(fi.*) AS items
+         FROM project_features f
+         LEFT JOIN project_feature_items fi
+         ON fi.feature_id = f.id
+         WHERE f.project_id = $1
+         GROUP BY f.id
+         ORDER BY f.sort_order`,
+        [projectId],
+      ),
+
+      pool.query(
+        `SELECT *,
+                price AS raw_price
+         FROM project_configurations
+         WHERE project_id = $1
+         ORDER BY sort_order`,
+        [projectId],
+      ),
+
+      pool.query(
+        `SELECT *
+         FROM project_floor_plans
+         WHERE project_id = $1
+         ORDER BY sort_order`,
+        [projectId],
+      ),
+      // 👇 ADD THIS BLOCK
+      pool.query(
+        `SELECT category, description
+     FROM project_connectivity
+     WHERE project_id = $1
+     ORDER BY id`,
+        [projectId],
+      ),
+    ]);
+
+    // 3️⃣ Clean images
+    const images = imagesRes.rows.filter((img) => isValidImage(img.image_url));
+
+    // 4️⃣ Format configurations
+    const configurations = configurationsRes.rows.map((config) => ({
+      ...config,
+      price: formatPrice(config.raw_price),
+    }));
+    const connectivity = {};
+
+    connectivityRes.rows.forEach((row) => {
+      if (!connectivity[row.category]) {
+        connectivity[row.category] = [];
+      }
+      connectivity[row.category].push(row.description);
+    });
+    // 5️⃣ Final response
+    res.json({
+      success: true,
+      data: {
+        project,
+        images,
+        features: featuresRes.rows,
+        configurations,
+        floorplans: floorPlansRes.rows,
+        connectivity,
+      },
+    });
+  } catch (error) {
+    console.error("Full project fetch error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch project",
+      error: error.message,
+    });
+  }
 };

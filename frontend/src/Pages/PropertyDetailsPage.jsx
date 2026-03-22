@@ -72,19 +72,6 @@ function PropertyDetailsPage() {
 
     return () => clearTimeout(timer);
   }, []);
-
-  // useEffect(() => {
-  //   if (!project?.images?.length || viewerOpen) return;
-
-  //   const interval = setInterval(() => {
-  //     setActiveImage((prev) =>
-  //       prev === project.images.length - 1 ? 0 : prev + 1,
-  //     );
-  //   }, 4000);
-
-  //   return () => clearInterval(interval);
-  // }, [project, viewerOpen]);
-
   useEffect(() => {
     const handleExitIntent = (e) => {
       if (popupClosed) return;
@@ -105,11 +92,14 @@ function PropertyDetailsPage() {
     async function fetchProject() {
       try {
         const res = await axiosInstance.get(
-          `/api/projects/getSingleProject/${slug}`,
+          `/api/projects/full-details/${slug}`, // ✅ NEW API
         );
-        console.log(res);
-        setProject(res.data.data);
-        setProjectDetais(res.data.data.project);
+
+        const data = res.data.data;
+        // console.log(data);
+        setProject(data); // full object
+        setProjectDetais(data.project); // actual project
+        setConnectivity(data.connectivity || {}); // ✅ now comes from same API
       } catch (err) {
         console.error(err);
       } finally {
@@ -122,29 +112,7 @@ function PropertyDetailsPage() {
 
   const [connectivity, setConnectivity] = useState({});
 
-  useEffect(() => {
-    console.log(projectDetails);
-    if (!projectDetails?.project_id) return;
-
-    const fetchConnectivity = async () => {
-      try {
-        console.log("calling connectivity API...");
-
-        const res = await axiosInstance.get(
-          `/api/projects/connectivity/${projectDetails.project_id}`,
-        );
-
-        console.log("response:", res.data);
-
-        setConnectivity(res.data.data);
-      } catch (err) {
-        console.error("connectivity error:", err);
-      }
-    };
-
-    fetchConnectivity();
-  }, [projectDetails]);
-  const allImages = project ? project.images : [];
+  const allImages = project?.images || [];
   const heroImages =
     allImages.length >= 3
       ? allImages.slice(0, 3)
@@ -612,159 +580,171 @@ whitespace-nowrap
             </div>
           )}
 
-{}
+          {}
           {/* AMENITIES & FEATURES */}
-          { project.features.length > 0 && <section id="amenities" className="mt-24 text-center">
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold tracking-wide">
-              AMENITIES
-            </h2>
+          {project.features.length > 0 && (
+            <section id="amenities" className="mt-24 text-center">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold tracking-wide">
+                AMENITIES
+              </h2>
 
-            <div className="flex justify-center items-center gap-2 my-3">
-              <div className="w-8 h-[1px] bg-gray-400"></div>
-              <div className="w-2 h-2 bg-black rounded-full"></div>
-              <div className="w-8 h-[1px] bg-gray-400"></div>
-            </div>
+              <div className="flex justify-center items-center gap-2 my-3">
+                <div className="w-8 h-[1px] bg-gray-400"></div>
+                <div className="w-2 h-2 bg-black rounded-full"></div>
+                <div className="w-8 h-[1px] bg-gray-400"></div>
+              </div>
 
-            <p className="text-gray-600 mt-4">
-              Designed for comfort, crafted for lifestyle.
-            </p>
+              <p className="text-gray-600 mt-4">
+                Designed for comfort, crafted for lifestyle.
+              </p>
 
-            {/* CAROUSEL */}
-            {/* CAROUSEL WRAPPER */}
-            <div className="relative mt-12 max-w-6xl mx-auto">
-              {/* LEFT FADE */}
-              <div className="pointer-events-none absolute left-0 top-0 h-full w-16 bg-gradient-to-r from-slate-50 to-transparent z-10" />
+              {/* CAROUSEL */}
+              {/* CAROUSEL WRAPPER */}
+              <div className="relative mt-12 max-w-6xl mx-auto">
+                {/* LEFT FADE */}
+                <div className="pointer-events-none absolute left-0 top-0 h-full w-16 bg-gradient-to-r from-slate-50 to-transparent z-10" />
 
-              {/* RIGHT FADE */}
-              <div className="pointer-events-none absolute right-0 top-0 h-full w-16 bg-gradient-to-l from-slate-50 to-transparent z-10" />
+                {/* RIGHT FADE */}
+                <div className="pointer-events-none absolute right-0 top-0 h-full w-16 bg-gradient-to-l from-slate-50 to-transparent z-10" />
 
-              {/* LEFT BUTTON */}
-              <button
-                onClick={() => {
-                  if (!scrollRef.current) return;
-                  scrollRef.current.scrollBy({
-                    left: -340,
-                    behavior: "smooth",
-                  });
-                }}
-                className="absolute left-0 top-1/2 -translate-y-1/2 z-20 
+                {/* LEFT BUTTON */}
+                <button
+                  onClick={() => {
+                    if (!scrollRef.current) return;
+                    scrollRef.current.scrollBy({
+                      left: -340,
+                      behavior: "smooth",
+                    });
+                  }}
+                  className="absolute left-0 top-1/2 -translate-y-1/2 z-20 
     bg-white/90 backdrop-blur shadow-lg p-3 rounded-full hover:scale-110 transition"
-              >
-                <ChevronLeft size={20} />
-              </button>
+                >
+                  <ChevronLeft size={20} />
+                </button>
 
-              {/* RIGHT BUTTON */}
-              <button
-                onClick={() => {
-                  if (!scrollRef.current) return;
-                  scrollRef.current.scrollBy({ left: 340, behavior: "smooth" });
-                }}
-                className="absolute right-0 top-1/2 -translate-y-1/2 z-20 
+                {/* RIGHT BUTTON */}
+                <button
+                  onClick={() => {
+                    if (!scrollRef.current) return;
+                    scrollRef.current.scrollBy({
+                      left: 340,
+                      behavior: "smooth",
+                    });
+                  }}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 z-20 
     bg-white/90 backdrop-blur shadow-lg p-3 rounded-full hover:scale-110 transition"
-              >
-                <ChevronRight size={20} />
-              </button>
+                >
+                  <ChevronRight size={20} />
+                </button>
 
-              {/* SCROLL CONTAINER */}
-              <div
-                ref={scrollRef}
-                className="
+                {/* SCROLL CONTAINER */}
+                <div
+                  ref={scrollRef}
+                  className="
   flex gap-4 sm:gap-6 px-4 sm:px-6
   overflow-x-auto scroll-smooth
   snap-x snap-mandatory scroll-pl-6
   no-scrollbar
 "
-              >
-                {amenities.map((item) => (
-                  <div
-                    key={item.id}
-                    className="min-w-[240px] sm:min-w-[280px] md:min-w-[300px]
+                >
+                  {amenities.map((item) => (
+                    <div
+                      key={item.id}
+                      className="min-w-[240px] sm:min-w-[280px] md:min-w-[300px]
 max-w-[240px] sm:max-w-[280px] md:max-w-[300px] flex-shrink-0 snap-start snap-always"
-                  >
-                    <div className="relative group overflow-hidden rounded-xl shadow-md">
-                      <img
-                        src={item.image_url || item.icon_url}
-                        className="w-full h-[240px] object-cover 
+                    >
+                      <div className="relative group overflow-hidden rounded-xl shadow-md">
+                        <img
+                          src={item.image_url || item.icon_url}
+                          className="w-full h-[240px] object-cover 
             group-hover:scale-110 transition duration-500"
-                      />
+                        />
 
-                      <div
-                        className="absolute inset-0 bg-black/50 opacity-0 
-          group-hover:opacity-100 transition duration-300 
-          flex flex-col justify-end p-4 text-white"
-                      >
-                        <h3 className="text-lg font-semibold">{item.label}</h3>
-                        <p className="text-sm opacity-80">
-                          {item.description || ""}
-                        </p>
+                        <div
+                          className="
+    absolute inset-0 bg-black/50 
+    opacity-100 sm:opacity-0 
+    sm:group-hover:opacity-100 
+    transition duration-300 
+    flex flex-col justify-end p-4 text-white
+  "
+                        >
+                          <h3 className="text-lg font-semibold">
+                            {item.label}
+                          </h3>
+                          <p className="text-sm opacity-80">
+                            {item.description || ""}
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          </section>}
+            </section>
+          )}
 
           {/* configurations */}
-          {project.configurations.length > 0 && <section id="config" className="mt-24 text-center">
-            {/* HEADING */}
-            <h2 className="texttext-xl sm:text-2xl md:text-3xl font-semibold tracking-wide text-gray-900">
-              CONFIGURATIONS
-            </h2>
+          {project.configurations.length > 0 && (
+            <section id="config" className="mt-24 text-center">
+              {/* HEADING */}
+              <h2 className="texttext-xl sm:text-2xl md:text-3xl font-semibold tracking-wide text-gray-900">
+                CONFIGURATIONS
+              </h2>
 
-            <div className="flex justify-center items-center gap-2 my-3">
-              <div className="w-10 h-[1px] bg-gray-300"></div>
-              <div className="w-1.5 h-1.5 bg-gray-500 rounded-full"></div>
-              <div className="w-10 h-[1px] bg-gray-300"></div>
-            </div>
+              <div className="flex justify-center items-center gap-2 my-3">
+                <div className="w-10 h-[1px] bg-gray-300"></div>
+                <div className="w-1.5 h-1.5 bg-gray-500 rounded-full"></div>
+                <div className="w-10 h-[1px] bg-gray-300"></div>
+              </div>
 
-            <p className="text-gray-500 mt-4 text-sm tracking-wide">
-              Thoughtfully designed residences for modern living.
-            </p>
+              <p className="text-gray-500 mt-4 text-sm tracking-wide">
+                Thoughtfully designed residences for modern living.
+              </p>
 
-            {/* GRID */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mt-14">
-              {project.configurations.map((config, index) => (
-                <div
-                  key={index}
-                  className={`relative group rounded-2xl overflow-hidden transition-all duration-500
+              {/* GRID */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mt-14">
+                {project.configurations.map((config, index) => (
+                  <div
+                    key={index}
+                    className={`relative group rounded-2xl overflow-hidden transition-all duration-500
   ${index === 1 ? "scale-105 shadow-2xl" : "shadow-md hover:shadow-xl hover:-translate-y-2"}
   bg-[#f8f7f5]`}
-                >
-                  {/* INNER */}
-                  <div className="p-6 sm:p-7 flex flex-col justify-between h-full space-y-2">
-                    {/* TITLE */}
-                    <div>
-                      <h3 className="text-lg sm:text-xl font-semibold text-gray-900 tracking-tight">
-                        {config.configuration}
-                      </h3>
+                  >
+                    {/* INNER */}
+                    <div className="p-6 sm:p-7 flex flex-col justify-between h-full space-y-2">
+                      {/* TITLE */}
+                      <div>
+                        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 tracking-tight">
+                          {config.configuration}
+                        </h3>
 
-                      <div className="w-8 h-[1px] bg-gray-300 my-3"></div>
+                        <div className="w-8 h-[1px] bg-gray-300 my-3"></div>
 
-                      {/* SIZE */}
-                      <p className="text-sm text-gray-500 flex items-center justify-center gap-2 text-center">
-                        {" "}
-                        <Ruler size={14} className="text-gray-400" />
-                        {config.size_range} Sq.Ft.
-                      </p>
-                    </div>
+                        {/* SIZE */}
+                        <p className="text-sm text-gray-500 flex items-center justify-center gap-2 text-center">
+                          {" "}
+                          <Ruler size={14} className="text-gray-400" />
+                          {config.size_range} Sq.Ft.
+                        </p>
+                      </div>
 
-                    {/* PRICE */}
-                    <div className="mt-6 text-center flex flex-col items-center">
-                      <p className="text-[11px] uppercase tracking-[0.2em] text-gray-400 mb-1">
-                        Starting Price
-                      </p>
+                      {/* PRICE */}
+                      <div className="mt-6 text-center flex flex-col items-center">
+                        <p className="text-[11px] uppercase tracking-[0.2em] text-gray-400 mb-1">
+                          Starting Price
+                        </p>
 
-                      <p className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-1 mt-1">
-                        <IndianRupee size={18} />
-                        {config.price}
-                      </p>
-                    </div>
+                        <p className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-1 mt-1">
+                          <IndianRupee size={18} />
+                          {config.price}
+                        </p>
+                      </div>
 
-                    {/* CTA */}
-                    <button
-                      onClick={() => setShowPopup(true)}
-                      className="
+                      {/* CTA */}
+                      <button
+                        onClick={() => setShowPopup(true)}
+                        className="
 mt-8 w-full py-3 rounded-lg 
 bg-gray-900 text-white font-medium
 transition-all duration-300 
@@ -772,69 +752,71 @@ hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600
 hover:scale-105 hover:shadow-lg
 active:scale-95
 "
-                    >
-                      Get Detailed Pricing
-                    </button>
-                  </div>
+                      >
+                        Get Detailed Pricing
+                      </button>
+                    </div>
 
-                  {/* TOP BORDER ACCENT */}
-                  <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-gray-400 to-transparent opacity-40" />
-                </div>
-              ))}
-            </div>
-          </section>}
+                    {/* TOP BORDER ACCENT */}
+                    <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-gray-400 to-transparent opacity-40" />
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
 
           {/* FLOOR PLANS */}
-          {project.floorplans.length > 0 &&<section id="plans" className="mt-24 text-center">
-            <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold tracking-wide">
-              FLOOR PLANS & LAYOUTS
-            </h2>
+          {project.floorplans.length > 0 && (
+            <section id="plans" className="mt-24 text-center">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold tracking-wide">
+                FLOOR PLANS & LAYOUTS
+              </h2>
 
-            <div className="flex justify-center items-center gap-2 my-3">
-              <div className="w-8 h-[1px] bg-gray-400"></div>
-              <div className="w-2 h-2 bg-black rounded-full"></div>
-              <div className="w-8 h-[1px] bg-gray-400"></div>
-            </div>
+              <div className="flex justify-center items-center gap-2 my-3">
+                <div className="w-8 h-[1px] bg-gray-400"></div>
+                <div className="w-2 h-2 bg-black rounded-full"></div>
+                <div className="w-8 h-[1px] bg-gray-400"></div>
+              </div>
 
-            <p className="text-gray-600 mt-4">
-              Smartly designed spaces for modern living.
-            </p>
+              <p className="text-gray-600 mt-4">
+                Smartly designed spaces for modern living.
+              </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10 mt-12">
-              {project.floorplans.map((plan, index) => (
-                <div
-                  key={index}
-                  onClick={() => {
-                    if (isRegistered) {
-                      setActiveFloorPlan(plan.image_url);
-                      setFloorPlanViewer(true);
-                    } else {
-                      setShowPopup(true);
-                    }
-                  }}
-                  className="relative group overflow-hidden rounded-xl shadow-lg cursor-pointer"
-                >
-                  {/* IMAGE */}
-                  <img
-                    src={plan.image_url}
-                    className={`w-full h-[260px] object-cover scale-105 transition-all duration-700
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10 mt-12">
+                {project.floorplans.map((plan, index) => (
+                  <div
+                    key={index}
+                    onClick={() => {
+                      if (isRegistered) {
+                        setActiveFloorPlan(plan.image_url);
+                        setFloorPlanViewer(true);
+                      } else {
+                        setShowPopup(true);
+                      }
+                    }}
+                    className="relative group overflow-hidden rounded-xl shadow-lg cursor-pointer"
+                  >
+                    {/* IMAGE */}
+                    <img
+                      src={plan.image_url}
+                      className={`w-full h-[260px] object-cover scale-105 transition-all duration-700
       ${!isRegistered ? "blur-sm group-hover:blur-md" : "blur-0"}`}
-                  />
+                    />
 
-                  {/* DARK OVERLAY (only when locked) */}
-                  {!isRegistered && (
-                    <div className="absolute inset-0 bg-black/40 group-hover:bg-black/60 transition duration-300" />
-                  )}
+                    {/* DARK OVERLAY (only when locked) */}
+                    {!isRegistered && (
+                      <div className="absolute inset-0 bg-black/40 group-hover:bg-black/60 transition duration-300" />
+                    )}
 
-                  {/* CTA (only when locked) */}
-                  {!isRegistered && (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation(); // prevent card click
-                          setShowPopup(true);
-                        }}
-                        className="
+                    {/* CTA (only when locked) */}
+                    {!isRegistered && (
+                      <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation(); // prevent card click
+                            setShowPopup(true);
+                          }}
+                          className="
           backdrop-blur-md 
           bg-white/20 text-white border border-white/30
           px-6 py-2 rounded-full text-sm font-medium
@@ -844,20 +826,21 @@ active:scale-95
           hover:scale-105 hover:shadow-lg
           active:scale-95
           "
-                      >
-                        Enquire now
-                      </button>
-                    </div>
-                  )}
+                        >
+                          Enquire now
+                        </button>
+                      </div>
+                    )}
 
-                  {/* BOTTOM INFO */}
-                  <div className="absolute bottom-0 w-full bg-black/80 text-white py-2 text-sm text-center">
-                    {plan.title}
+                    {/* BOTTOM INFO */}
+                    <div className="absolute bottom-0 w-full bg-black/80 text-white py-2 text-sm text-center">
+                      {plan.title}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          </section>}
+                ))}
+              </div>
+            </section>
+          )}
 
           {embedUrl && (
             <div className="bg-white rounded-xl shadow-lg p-6 mt-6">

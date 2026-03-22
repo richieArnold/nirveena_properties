@@ -294,85 +294,280 @@ exports.getConnectivity = async (req, res) => {
   }
 };
 
-exports.addConnectivity = async (req, res) => {
+// exports.addConnectivity = async (req, res) => {
+//   const client = await pool.connect();
+
+//   try {
+//     const { project_id, connectivity } = req.body;
+
+//     /*
+//     Expected format from frontend:
+
+//     {
+//       project_id: 124,
+//       connectivity: [
+//         {
+//           category: "Strategic Connectivity",
+//           items: [
+//             "Sarjapur Main Road / Project Entrance – 2 Mins",
+//             "Outer Ring Road (ORR) – 15 Mins"
+//           ]
+//         },
+//         {
+//           category: "Leisure & Lifestyle",
+//           items: [
+//             "Supermarkets nearby – 3 Mins"
+//           ]
+//         }
+//       ]
+//     }
+//     */
+
+//     if (!project_id || !connectivity) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "project_id and connectivity are required",
+//       });
+//     }
+
+//     await client.query("BEGIN");
+
+//     // Optional: delete existing connectivity (if updating)
+//     await client.query(
+//       "DELETE FROM project_connectivity WHERE project_id = $1",
+//       [project_id],
+//     );
+
+//     for (const section of connectivity) {
+//       const { category, items } = section;
+
+//       for (const item of items) {
+//         await client.query(
+//           `
+//           INSERT INTO project_connectivity (project_id, category, title, description)
+//           VALUES ($1, $2, $3, $4)
+//           `,
+//           [
+//             project_id,
+//             category,
+//             null, // title is null as per your DB
+//             item,
+//           ],
+//         );
+//       }
+//     }
+
+//     await client.query("COMMIT");
+
+//     res.json({
+//       success: true,
+//       message: "Connectivity added successfully",
+//     });
+//   } catch (error) {
+//     await client.query("ROLLBACK");
+
+//     console.error("Connectivity insert error:", error);
+
+//     res.status(500).json({
+//       success: false,
+//       message: "Failed to add connectivity",
+//       error: error.message,
+//     });
+//   } finally {
+//     client.release();
+//   }
+// };
+
+exports.bulkUpsertFeatures = async (req, res) => {
   const client = await pool.connect();
 
   try {
-    const { project_id, connectivity } = req.body;
-
-    /*
-    Expected format from frontend:
-
-    {
-      project_id: 124,
-      connectivity: [
-        {
-          category: "Strategic Connectivity",
-          items: [
-            "Sarjapur Main Road / Project Entrance – 2 Mins",
-            "Outer Ring Road (ORR) – 15 Mins"
-          ]
-        },
-        {
-          category: "Leisure & Lifestyle",
-          items: [
-            "Supermarkets nearby – 3 Mins"
-          ]
-        }
-      ]
-    }
-    */
-
-    if (!project_id || !connectivity) {
-      return res.status(400).json({
-        success: false,
-        message: "project_id and connectivity are required",
-      });
-    }
+    const { project_id } = req.params;
+    const { features } = req.body;
 
     await client.query("BEGIN");
 
-    // Optional: delete existing connectivity (if updating)
+    // 1. Delete existing features + items
     await client.query(
-      "DELETE FROM project_connectivity WHERE project_id = $1",
-      [project_id]
+      `DELETE FROM project_feature_items 
+       WHERE feature_id IN (
+         SELECT id FROM project_features WHERE project_id = $1
+       )`,
+      [project_id],
     );
 
-    for (const section of connectivity) {
-      const { category, items } = section;
+    await client.query(`DELETE FROM project_features WHERE project_id = $1`, [
+      project_id,
+    ]);
 
-      for (const item of items) {
-        await client.query(
-          `
-          INSERT INTO project_connectivity (project_id, category, title, description)
-          VALUES ($1, $2, $3, $4)
-          `,
-          [
-            project_id,
-            category,
-            null, // title is null as per your DB
-            item,
-          ]
+    // 2. Insert features
+    const featureInsertQuery = `
+      INSERT INTO project_features (project_id, feature_name, sort_order)
+      VALUES ${features.map((_, i) => `($1, $${i + 2}, ${i})`).join(",")}
+      RETURNING id
+    `;
+
+    const featureValues = [project_id, ...features.map((f) => f.feature_name)];
+
+    const featureResult = await client.query(featureInsertQuery, featureValues);
+
+    // 3. Prepare bulk items insert
+    const itemsValues = [];
+    const itemsQueryParts = [];
+
+    let paramIndex = 1;
+
+    featureResult.rows.forEach((featureRow, i) => {
+      const items = features[i].items || [];
+
+      items.forEach((item, j) => {
+        itemsQueryParts.push(
+          `($${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++})`,
         );
-      }
+
+        itemsValues.push(
+          featureRow.id,
+          item.label || null,
+          item.icon_url || null,
+          item.image_url || null,
+          item.description || null,
+          j,
+        );
+      });
+    });
+
+    if (itemsValues.length > 0) {
+      await client.query(
+        `
+        INSERT INTO project_feature_items
+        (feature_id, label, icon_url, image_url, description, sort_order)
+        VALUES ${itemsQueryParts.join(",")}
+        `,
+        itemsValues,
+      );
     }
 
     await client.query("COMMIT");
 
     res.json({
       success: true,
-      message: "Connectivity added successfully",
+      message: "Features updated successfully",
     });
-
-  } catch (error) {
+  } catch (err) {
     await client.query("ROLLBACK");
 
-    console.error("Connectivity insert error:", error);
+    console.error(err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to update features",
+      error: err.message,
+    });
+  } finally {
+    client.release();
+  }
+};
+
+exports.addConnectivity = async (req, res) => {
+  const client = await pool.connect();
+
+  try {
+    const { project_id, connectivity } = req.body;
+
+    await client.query("BEGIN");
+
+    await client.query(
+      "DELETE FROM project_connectivity WHERE project_id = $1",
+      [project_id],
+    );
+
+    const values = [];
+    const placeholders = [];
+    let paramIndex = 1;
+
+    connectivity.forEach((section) => {
+      section.items.forEach((item) => {
+        placeholders.push(
+          `($${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++})`,
+        );
+
+        values.push(project_id, section.category, null, item);
+      });
+    });
+
+    if (values.length > 0) {
+      await client.query(
+        `
+        INSERT INTO project_connectivity (project_id, category, title, description)
+        VALUES ${placeholders.join(",")}
+        `,
+        values,
+      );
+    }
+
+    await client.query("COMMIT");
+
+    res.json({ success: true });
+  } catch (err) {
+    await client.query("ROLLBACK");
+    console.error(err);
+
+    res.status(500).json({ success: false });
+  } finally {
+    client.release();
+  }
+};
+exports.bulkUpsertConnectivity = async (req, res) => {
+  const client = await pool.connect();
+
+  try {
+    const { project_id } = req.params;
+    const { connectivity } = req.body;
+
+    await client.query("BEGIN");
+
+    // delete existing
+    await client.query(
+      "DELETE FROM project_connectivity WHERE project_id = $1",
+      [project_id],
+    );
+
+    const values = [];
+    const placeholders = [];
+    let paramIndex = 1;
+
+    connectivity.forEach((section) => {
+      section.items.forEach((item) => {
+        placeholders.push(
+          `($${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++})`
+        );
+
+        values.push(project_id, section.category, null, item);
+      });
+    });
+
+    if (values.length > 0) {
+      await client.query(
+        `
+        INSERT INTO project_connectivity (project_id, category, title, description)
+        VALUES ${placeholders.join(",")}
+        `,
+        values
+      );
+    }
+
+    await client.query("COMMIT");
+
+    res.json({
+      success: true,
+      message: "Connectivity updated",
+    });
+  } catch (err) {
+    await client.query("ROLLBACK");
+    console.error(err);
 
     res.status(500).json({
       success: false,
-      message: "Failed to add connectivity",
-      error: error.message,
+      message: "Failed to update connectivity",
     });
   } finally {
     client.release();

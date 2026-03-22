@@ -25,33 +25,6 @@ const UpdateFeatures = () => {
     image: null,
   });
 
-  const fetchConnectivity = async () => {
-    try {
-      const res = await axiosInstance.get(
-        `/api/projects/connectivity/${project.project_id}`,
-      );
-
-      // Transform API → UI format
-      const grouped = {};
-
-      res.data.data.forEach((item) => {
-        if (!grouped[item.category]) {
-          grouped[item.category] = [];
-        }
-        grouped[item.category].push(item.description);
-      });
-
-      const formatted = Object.keys(grouped).map((cat) => ({
-        category: cat,
-        items: grouped[cat],
-      }));
-
-      setConnectivity(formatted);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   /* ---------------- FETCH PROJECT ---------------- */
 
   useEffect(() => {
@@ -67,23 +40,23 @@ const UpdateFeatures = () => {
     }
   };
 
-  /* ---------------- FETCH DEPENDENT DATA ---------------- */
-
-  useEffect(() => {
-    if (project?.project_id) {
-      fetchAllData();
-    }
-  }, [project]);
+  /* ---------------- FETCH DATA ---------------- */
 
   const fetchAllData = async () => {
     try {
-      await Promise.all([
-        fetchFeatures(),
-        fetchIcons(),
-        fetchConfigurations(),
-        fetchFloorPlans(),
-        fetchConnectivity(),
-      ]);
+      const res = await axiosInstance.get(
+        `/api/projects/getProject/${project.project_id}`,
+      );
+
+      const data = res.data.data;
+
+      setFeatures(data.features || []);
+      setConfigurations(data.configurations || []);
+      setFloorPlans(data.floorplans || []);
+      setConnectivity(data.connectivity || []);
+
+      const iconsRes = await axiosInstance.get(`/api/projects/icons`);
+      setAvailableIcons(iconsRes.data.data || []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -91,31 +64,11 @@ const UpdateFeatures = () => {
     }
   };
 
-  const fetchFeatures = async () => {
-    const res = await axiosInstance.get(
-      `/api/projects/${project.project_id}/features`,
-    );
-    setFeatures(res.data.data || []);
-  };
-
-  const fetchIcons = async () => {
-    const res = await axiosInstance.get(`/api/projects/icons`);
-    setAvailableIcons(res.data.data || []);
-  };
-
-  const fetchConfigurations = async () => {
-    const res = await axiosInstance.get(
-      `/api/projects/${project.project_id}/getProjectConfigurations`,
-    );
-    setConfigurations(res.data.data || []);
-  };
-
-  const fetchFloorPlans = async () => {
-    const res = await axiosInstance.get(
-      `/api/projects/${project.project_id}/floorplans`,
-    );
-    setFloorPlans(res.data.data || []);
-  };
+  useEffect(() => {
+    if (project?.project_id) {
+      fetchAllData();
+    }
+  }, [project]);
 
   /* ---------------- FEATURES ---------------- */
 
@@ -159,11 +112,7 @@ const UpdateFeatures = () => {
       const res = await axiosInstance.post(
         "/api/projects/upload/icon",
         formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        },
+        { headers: { "Content-Type": "multipart/form-data" } },
       );
 
       const updated = [...features];
@@ -174,44 +123,19 @@ const UpdateFeatures = () => {
     }
   };
 
+  // ✅ BULK SAVE FEATURES
   const saveFeatures = async () => {
     try {
-      for (const feature of features) {
-        if (feature.id) {
-          await axiosInstance.put(`/api/projects/features/${feature.id}`, {
-            feature_name: feature.feature_name,
-            items: feature.items,
-          });
-        } else {
-          await axiosInstance.post(
-            `/api/projects/${project.project_id}/features`,
-            {
-              feature_name: feature.feature_name,
-              items: feature.items.map((item) => ({
-                label: item.label || "",
-                icon_url: item.icon_url || null,
-                description: item.description || "",
-              })),
-            },
-          );
-        }
-      }
+      await axiosInstance.post(
+        `/api/projects/${project.project_id}/bulk-features`,
+        { features },
+      );
 
-      alert("Features updated");
-      fetchFeatures();
+      alert("Features saved");
+      fetchAllData();
     } catch (err) {
       console.error(err);
     }
-  };
-
-  const deleteFeature = async (featureId) => {
-    await axiosInstance.delete(`/api/projects/features/${featureId}`);
-    fetchFeatures();
-  };
-
-  const deleteFeatureItem = async (itemId) => {
-    await axiosInstance.delete(`/api/projects/feature-item/${itemId}`);
-    fetchFeatures();
   };
 
   /* ---------------- CONFIGURATIONS ---------------- */
@@ -229,32 +153,19 @@ const UpdateFeatures = () => {
     setConfigurations(updated);
   };
 
+  // ✅ BULK SAVE CONFIG
   const saveConfigurations = async () => {
     try {
-      for (const config of configurations) {
-        if (!config.id) {
-          await axiosInstance.post(
-            `/api/projects/${project.project_id}/addConfiguration`,
-            config,
-            {
-              headers: {
-                "Content-Type": "multipart/form-data",
-              },
-            },
-          );
-        }
-      }
+      await axiosInstance.post(
+        `/api/projects/${project.project_id}/bulk-configurations`,
+        { configurations },
+      );
 
       alert("Configurations saved");
-      fetchConfigurations();
+      fetchAllData();
     } catch (err) {
       console.error(err);
     }
-  };
-
-  const deleteConfiguration = async (id) => {
-    await axiosInstance.delete(`/api/projects/configuration/${id}`);
-    fetchConfigurations();
   };
 
   /* ---------------- FLOOR PLAN ---------------- */
@@ -263,36 +174,40 @@ const UpdateFeatures = () => {
     setNewFloorPlan({ ...newFloorPlan, image: file });
   };
 
+  // ✅ BULK FLOOR PLAN (even single upload goes as array)
   const uploadFloorPlan = async () => {
     const formData = new FormData();
 
-    formData.append("title", newFloorPlan.title);
-    formData.append("area", newFloorPlan.area);
-    formData.append("configuration_id", newFloorPlan.configuration_id);
-    formData.append("image", newFloorPlan.image);
+    formData.append(
+      "plans",
+      JSON.stringify([
+        {
+          title: newFloorPlan.title,
+          area: newFloorPlan.area,
+          configuration_id: newFloorPlan.configuration_id,
+        },
+      ]),
+    );
+
+    formData.append("images", newFloorPlan.image);
 
     try {
       await axiosInstance.post(
-        `/api/projects/${project.project_id}/floorplans`,
+        `/api/projects/${project.project_id}/bulk-floorplans`,
         formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        },
+        { headers: { "Content-Type": "multipart/form-data" } },
       );
 
       alert("Floor plan uploaded");
-      fetchFloorPlans();
+      fetchAllData();
     } catch (err) {
+      alert("error");
       console.error(err);
     }
   };
 
-  const deleteFloorPlan = async (id) => {
-    await axiosInstance.delete(`/api/projects/floorplan/${id}`);
-    fetchFloorPlans();
-  };
+  /* ---------------- CONNECTIVITY ---------------- */
+
   const addConnectivityGroup = () => {
     setConnectivity([...connectivity, { category: "", items: [""] }]);
   };
@@ -321,19 +236,21 @@ const UpdateFeatures = () => {
     setConnectivity(updated);
   };
 
+  // ✅ BULK CONNECTIVITY
   const saveConnectivity = async () => {
     try {
-      await axiosInstance.post("/api/projects/addConnectivity", {
-        project_id: project.project_id,
-        connectivity,
-      });
+      await axiosInstance.post(
+        `/api/projects/${project.project_id}/bulk-connectivity`,
+        { connectivity },
+      );
 
       alert("Connectivity updated");
-      fetchConnectivity();
+      fetchAllData();
     } catch (err) {
       console.error(err);
     }
   };
+
   /* ---------------- UI ---------------- */
 
   if (fetchLoading) {
@@ -347,7 +264,6 @@ const UpdateFeatures = () => {
   return (
     <AdminLayout>
       <div className="max-w-6xl mx-auto px-4 py-6">
-        {/* HEADER */}
         <div className="flex items-center gap-4 mb-6">
           <button
             onClick={() => navigate(-1)}
@@ -359,7 +275,7 @@ const UpdateFeatures = () => {
           <h1 className="text-2xl font-bold">Update Project Amenities</h1>
         </div>
 
-        {/* ================= FEATURES ================= */}
+        {/* FEATURES */}
         <div className="mb-12">
           <h2 className="text-xl font-semibold mb-4">Amenities / Features</h2>
 
@@ -371,6 +287,7 @@ const UpdateFeatures = () => {
             Add Feature Category
           </button>
 
+          {/* UI unchanged */}
           <div className="space-y-6">
             {features.map((feature, groupIndex) => (
               <div key={groupIndex} className="border rounded-xl p-5 bg-white">
