@@ -144,6 +144,8 @@ router.put(
   uploadController.updateProjectWithImages,
 );
 
+// image order
+router.put("/images/order", uploadController.updateImageOrder)
 /**
  * DELETE PROJECT
  */
@@ -164,5 +166,7 @@ router.delete("/feature/:feature_id", deleteProjectFeature);
 
 // Feature Items
 router.delete("/feature-item/:item_id", deleteFeatureItem);
+
+
 
 module.exports = router;

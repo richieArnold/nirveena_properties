@@ -211,6 +211,7 @@ const EditProject = () => {
         setTimeout(() => navigate(`/admin/features/${id}`), 1500);
       }
     } catch (error) {
+      console.log(error);
       const msg = error.response?.data?.message || "Failed to update project";
 
       setMessage({ type: "error", text: msg });
