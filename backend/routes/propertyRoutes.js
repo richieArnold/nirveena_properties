@@ -145,4 +145,7 @@ router.put(
  */
 router.delete("/deleteProject/:id", deleteProject);
 
+// reorder images
+router.put("/images/order", uploadController.updateImageOrder);
+
 module.exports = router;
