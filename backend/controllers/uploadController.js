@@ -2,7 +2,7 @@ const { S3Client, DeleteObjectCommand } = require("@aws-sdk/client-s3");
 const multer = require("multer");
 const multerS3 = require("multer-s3");
 const pool = require("../rds_setup/db/index");
-require('dotenv').config();
+require("dotenv").config();
 
 // Configure S3
 const s3 = new S3Client({
@@ -27,25 +27,25 @@ const upload = multer({
       if (!projectName) {
         return cb(new Error("project_name is required for image upload"));
       }
-      
+
       const slug = projectName
         .toLowerCase()
         .trim()
         .replace(/[^a-z0-9\s-]/g, "")
         .replace(/\s+/g, "-")
         .replace(/-+/g, "-");
-      
-      const cleanFileName = file.originalname.replace(/[^a-zA-Z0-9.]/g, '-');
+
+      const cleanFileName = file.originalname.replace(/[^a-zA-Z0-9.]/g, "-");
       const key = `images/${slug}/${Date.now()}-${cleanFileName}`;
       cb(null, key);
     },
-    contentType: multerS3.AUTO_CONTENT_TYPE
+    contentType: multerS3.AUTO_CONTENT_TYPE,
   }),
-  limits: { fileSize: 10 * 1024 * 1024 }
+  limits: { fileSize: 10 * 1024 * 1024 },
 });
 
 // Middleware for multiple file upload (max 10 files)
-exports.uploadImages = upload.array('images', 10);
+exports.uploadImages = upload.array("images", 10);
 
 // Controller to handle property + images upload (CREATE)
 // Controller to handle property + images upload (CREATE)
@@ -67,14 +67,14 @@ exports.addProjectWithImages = async (req, res) => {
       sba,
       price,
       rera_completion,
-      property_description  
+      property_description,
     } = req.body;
 
     // Basic validation
     if (!project_id || !project_name) {
       return res.status(400).json({
         success: false,
-        message: "project_id and project_name are required"
+        message: "project_id and project_name are required",
       });
     }
 
@@ -126,7 +126,7 @@ exports.addProjectWithImages = async (req, res) => {
         price || null,
         rera_completion || null,
         property_description || null,
-      ]
+      ],
     );
 
     // Rest of the function remains the same...
@@ -141,7 +141,7 @@ exports.addProjectWithImages = async (req, res) => {
           INSERT INTO project_images (project_id, image_url, sort_order)
           VALUES ($1, $2, $3)
           `,
-          [Number(project_id), imageUrl, i]
+          [Number(project_id), imageUrl, i],
         );
       }
     }
@@ -154,17 +154,16 @@ exports.addProjectWithImages = async (req, res) => {
       data: {
         project_id: Number(project_id),
         slug: slug,
-        images_uploaded: req.files ? req.files.length : 0
-      }
+        images_uploaded: req.files ? req.files.length : 0,
+      },
     });
-
   } catch (error) {
     await client.query("ROLLBACK");
     console.error("Create project error:", error);
     res.status(500).json({
       success: false,
       message: "Project creation failed",
-      error: error.message
+      error: error.message,
     });
   } finally {
     client.release();
@@ -193,28 +192,28 @@ exports.updateProjectWithImages = async (req, res) => {
       price,
       rera_completion,
       youtube_video_url,
-      property_description, 
-      existing_images
+      property_description,
+      existing_images,
     } = req.body;
 
     // Basic validation
     if (!project_id || !project_name) {
       return res.status(400).json({
         success: false,
-        message: "project_id and project_name are required"
+        message: "project_id and project_name are required",
       });
     }
 
     // Check if project exists
     const projectCheck = await client.query(
       "SELECT * FROM projects WHERE id = $1",
-      [id]
+      [id],
     );
 
     if (projectCheck.rows.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "Project not found"
+        message: "Project not found",
       });
     }
 
@@ -225,9 +224,10 @@ exports.updateProjectWithImages = async (req, res) => {
     let imagesToKeep = [];
     if (existing_images) {
       try {
-        imagesToKeep = typeof existing_images === 'string' 
-          ? JSON.parse(existing_images) 
-          : existing_images;
+        imagesToKeep =
+          typeof existing_images === "string"
+            ? JSON.parse(existing_images)
+            : existing_images;
       } catch (e) {
         console.error("Error parsing existing_images:", e);
         imagesToKeep = [];
@@ -237,12 +237,12 @@ exports.updateProjectWithImages = async (req, res) => {
     // Get current images from database
     const currentImages = await client.query(
       "SELECT image_url FROM project_images WHERE project_id = $1",
-      [projectIdValue]
+      [projectIdValue],
     );
 
     // Find images to delete (ones in DB but not in imagesToKeep)
     const imagesToDelete = currentImages.rows.filter(
-      row => !imagesToKeep.includes(row.image_url)
+      (row) => !imagesToKeep.includes(row.image_url),
     );
 
     console.log(`Found ${imagesToDelete.length} images to delete from S3`);
@@ -252,14 +252,14 @@ exports.updateProjectWithImages = async (req, res) => {
       try {
         const url = new URL(img.image_url);
         const key = url.pathname.substring(1);
-        
+
         console.log("Attempting to delete from S3:", key);
-        
+
         const deleteCommand = new DeleteObjectCommand({
           Bucket: process.env.AWS_BUCKET_NAME,
-          Key: key
+          Key: key,
         });
-        
+
         await s3.send(deleteCommand);
         console.log("✅ Successfully deleted from S3:", key);
         s3DeleteResults.success.push(key);
@@ -267,7 +267,7 @@ exports.updateProjectWithImages = async (req, res) => {
         console.error("❌ Error deleting from S3:", s3Error.message);
         s3DeleteResults.failed.push({
           url: img.image_url,
-          error: s3Error.message
+          error: s3Error.message,
         });
       }
     }
@@ -321,9 +321,9 @@ exports.updateProjectWithImages = async (req, res) => {
         price || null,
         rera_completion || null,
         youtube_video_url || null,
-        property_description || null, 
-        id
-      ]
+        property_description || null,
+        id,
+      ],
     );
 
     // Rest of the function remains the same...
@@ -331,19 +331,18 @@ exports.updateProjectWithImages = async (req, res) => {
     if (imagesToKeep.length > 0) {
       await client.query(
         "DELETE FROM project_images WHERE project_id = $1 AND image_url != ALL($2::text[])",
-        [projectIdValue, imagesToKeep]
+        [projectIdValue, imagesToKeep],
       );
     } else {
-      await client.query(
-        "DELETE FROM project_images WHERE project_id = $1",
-        [projectIdValue]
-      );
+      await client.query("DELETE FROM project_images WHERE project_id = $1", [
+        projectIdValue,
+      ]);
     }
 
     // Get current max sort order
     const sortResult = await client.query(
       "SELECT COALESCE(MAX(sort_order), -1) as max_sort FROM project_images WHERE project_id = $1",
-      [projectIdValue]
+      [projectIdValue],
     );
     let nextSortOrder = sortResult.rows[0].max_sort + 1;
 
@@ -358,7 +357,7 @@ exports.updateProjectWithImages = async (req, res) => {
           INSERT INTO project_images (project_id, image_url, sort_order)
           VALUES ($1, $2, $3)
           `,
-          [projectIdValue, imageUrl, nextSortOrder + i]
+          [projectIdValue, imageUrl, nextSortOrder + i],
         );
       }
     }
@@ -385,12 +384,11 @@ exports.updateProjectWithImages = async (req, res) => {
           deleted_from_db: imagesToDelete.length,
           deleted_from_s3: {
             success: s3DeleteResults.success.length,
-            failed: s3DeleteResults.failed
-          }
-        }
-      }
+            failed: s3DeleteResults.failed,
+          },
+        },
+      },
     });
-
   } catch (error) {
     await client.query("ROLLBACK");
     console.error("Update project error:", error);
@@ -398,9 +396,36 @@ exports.updateProjectWithImages = async (req, res) => {
       success: false,
       message: "Failed to update project",
       error: error.message,
-      s3_deletion: s3DeleteResults
+      s3_deletion: s3DeleteResults,
     });
   } finally {
     client.release();
+  }
+};
+
+exports.updateImageOrder = async (req, res) => {
+  try {
+    const { images } = req.body;
+
+    const values = [];
+    const cases = [];
+
+    images.forEach((img, index) => {
+      values.push(img.id);
+      cases.push(`WHEN id = ${img.id} THEN ${index}`);
+    });
+
+    await pool.query(`
+      UPDATE project_images
+      SET sort_order = CASE
+        ${cases.join(" ")}
+      END
+      WHERE id IN (${values.join(",")})
+    `);
+      console.log(images)
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false });
   }
 };

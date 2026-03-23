@@ -200,6 +200,7 @@ const EditProject = () => {
       );
 
       if (res.data.success) {
+        await updateImageOrder();
         setMessage({ type: "success", text: "Project updated successfully!" });
 
         showSuccessNotification(
@@ -295,6 +296,28 @@ const EditProject = () => {
       </AdminLayout>
     );
   }
+  // ============ image ordering =====================
+  const moveImage = (index, direction) => {
+    const updated = [...existingImages];
+
+    const swapIndex = direction === "up" ? index - 1 : index + 1;
+
+    if (swapIndex < 0 || swapIndex >= updated.length) return;
+
+    [updated[index], updated[swapIndex]] = [updated[swapIndex], updated[index]];
+
+    setExistingImages(updated);
+  };
+  const updateImageOrder = async () => {
+    const payload = existingImages.map((img, index) => ({
+      id: img.id,
+      sort_order: index,
+    }));
+
+    await axiosInstance.put("/api/projects/images/order", {
+      images: payload,
+    });
+  };
   return (
     <AdminLayout user={user}>
       {/* Custom Notification */}
@@ -634,7 +657,7 @@ const EditProject = () => {
                 </p>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {existingImages.map((img, index) => (
-                    <div key={index} className="relative group">
+                    <div key={img.id} className="relative group">
                       <img
                         src={img.image_url}
                         alt={`Project ${index + 1}`}
@@ -648,6 +671,26 @@ const EditProject = () => {
                       >
                         <X className="w-3 h-3" />
                       </button>
+                      {/* SORT BUTTONS 👇 */}
+                      <div className="absolute bottom-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100">
+                        <button
+                          type="button"
+                          disabled={index === 0}
+                          onClick={() => moveImage(index, "up")}
+                          className="bg-white text-xs px-1 rounded shadow"
+                        >
+                          ↑
+                        </button>
+
+                        <button
+                          type="button"
+                          disabled={index === existingImages.length - 1}
+                          onClick={() => moveImage(index, "down")}
+                          className="bg-white text-xs px-1 rounded shadow"
+                        >
+                          ↓
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
