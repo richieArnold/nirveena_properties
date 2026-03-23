@@ -45,7 +45,7 @@ const UpdateFeatures = () => {
   const fetchAllData = async () => {
     try {
       const res = await axiosInstance.get(
-        `/api/projects/getProject/${project.project_id}`,
+        `/api/projects/getProject/${project.id}`,
       );
 
       const data = res.data.data;
@@ -65,10 +65,10 @@ const UpdateFeatures = () => {
   };
 
   useEffect(() => {
-    if (project?.project_id) {
+    if (project?.id) {
       fetchAllData();
     }
-  }, [project]);
+  }, [project?.id]);
 
   /* ---------------- FEATURES ---------------- */
 
@@ -251,6 +251,51 @@ const UpdateFeatures = () => {
     }
   };
 
+  /* ---------------- DELETE APIs ---------------- */
+
+  // Delete Configuration
+  const deleteConfiguration = async (id) => {
+    try {
+      await axiosInstance.delete(`/api/projects/configuration/${id}`);
+      alert("Configuration deleted");
+      fetchAllData();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // Delete Floor Plan
+  const deleteFloorPlan = async (id) => {
+    try {
+      await axiosInstance.delete(`/api/projects/floorplan/${id}`);
+      alert("Floor plan deleted");
+      fetchAllData();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // Delete Feature
+  const deleteFeature = async (id) => {
+    try {
+      await axiosInstance.delete(`/api/projects/feature/${id}`);
+      alert("Feature deleted");
+      fetchAllData();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // Delete Feature Item
+  const deleteFeatureItem = async (id) => {
+    try {
+      await axiosInstance.delete(`/api/projects/feature-item/${id}`);
+      alert("Item deleted");
+      fetchAllData();
+    } catch (err) {
+      console.error(err);
+    }
+  };
   /* ---------------- UI ---------------- */
 
   if (fetchLoading) {
@@ -527,10 +572,23 @@ const UpdateFeatures = () => {
               ))}
             </select>
 
-            <input
-              type="file"
-              onChange={(e) => handleFloorPlanImage(e.target.files[0])}
-            />
+            <div className="flex items-center gap-4">
+              <label className="cursor-pointer bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+                Choose File
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleFloorPlanImage(e.target.files[0])}
+                  className="hidden"
+                />
+              </label>
+
+              <span className="text-sm text-gray-600">
+                {newFloorPlan.image
+                  ? newFloorPlan.image.name
+                  : "No file chosen"}
+              </span>
+            </div>
 
             <button
               onClick={uploadFloorPlan}
