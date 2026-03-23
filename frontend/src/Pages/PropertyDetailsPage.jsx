@@ -799,10 +799,9 @@ active:scale-95
                     {/* IMAGE */}
                     <img
                       src={plan.image_url}
-                      className={`w-full h-[260px] object-cover scale-105 transition-all duration-700
-      ${!isRegistered ? "blur-sm group-hover:blur-md" : "blur-0"}`}
+                      className={`w-full h-auto object-contain bg-white transition-all duration-500
+  ${!isRegistered ? "blur-[2px] group-hover:blur-sm" : ""}`}
                     />
-
                     {/* DARK OVERLAY (only when locked) */}
                     {!isRegistered && (
                       <div className="absolute inset-0 bg-black/40 group-hover:bg-black/60 transition duration-300" />
