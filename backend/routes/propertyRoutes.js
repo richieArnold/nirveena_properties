@@ -30,6 +30,8 @@ const {
   bulkUpsertConnectivity,
   uploadIcon,
   uploadIconMiddleware,
+    deleteProjectFeature,    // ✅ ADD THIS
+  deleteFeatureItem,   
 } = require("../controllers/featureController");
 
 // Configurations & Floor Plans
@@ -38,6 +40,8 @@ const {
   bulkUpsertConfigurations,
   bulkInsertFloorPlans,
   uploadFloorPlan,
+   deleteConfiguration,     // ✅ ADD THIS
+  deleteFloorPlan,  
 } = require("../controllers/floorConfigController");
 
 // Icons
@@ -144,5 +148,21 @@ router.put(
  * DELETE PROJECT
  */
 router.delete("/deleteProject/:id", deleteProject);
+
+/* =========================================================
+   ======================= DELETE ===========================
+   ========================================================= */
+
+// Configurations
+router.delete("/configuration/:id", deleteConfiguration);
+
+// Floor Plans
+router.delete("/floorplan/:id", deleteFloorPlan);
+
+// Features
+router.delete("/feature/:feature_id", deleteProjectFeature);
+
+// Feature Items
+router.delete("/feature-item/:item_id", deleteFeatureItem);
 
 module.exports = router;

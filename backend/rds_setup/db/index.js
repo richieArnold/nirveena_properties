@@ -14,4 +14,16 @@ const pool = new Pool({
   connectionTimeoutMillis: 2000, // timeout if cannot connect
 });
 
+pool.on("connect", () => {
+  console.log("🟢 New DB connection");
+});
+
+pool.on("acquire", () => {
+  console.log("📥 Connection acquired");
+});
+
+pool.on("remove", () => {
+  console.log("🔴 Connection removed");
+});
+
 module.exports = pool;

@@ -712,12 +712,76 @@ const EditProject = () => {
               )}
 
               {/* UPLOAD BUTTON */}
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleLogoChange}
-                className="block w-full text-sm text-gray-500"
-              />
+              {/* PROJECT LOGO */}
+              <div className="md:col-span-2">
+                <label className={labelClasses}>Project Logo</label>
+
+                <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 hover:border-blue-500 transition bg-gray-50">
+                  {/* PREVIEW */}
+                  <div className="flex flex-col items-center justify-center text-center">
+                    {/* EXISTING LOGO */}
+                    {existingLogo && !logo && (
+                      <>
+                        <p className="text-sm text-gray-500 mb-2">
+                          Current Logo
+                        </p>
+                        <img
+                          src={existingLogo}
+                          className="h-20 object-contain mb-3"
+                        />
+                      </>
+                    )}
+
+                    {/* NEW LOGO */}
+                    {logo && (
+                      <>
+                        <p className="text-sm text-green-600 mb-2">
+                          New Logo Selected
+                        </p>
+                        <img
+                          src={URL.createObjectURL(logo)}
+                          className="h-20 object-contain mb-3 border rounded p-2 bg-white"
+                        />
+                      </>
+                    )}
+
+                    {/* ICON */}
+                    {!logo && !existingLogo && (
+                      <Upload className="h-10 w-10 text-gray-400 mb-2" />
+                    )}
+
+                    {/* TEXT */}
+                    <p className="text-sm text-gray-600">
+                      {logo
+                        ? "Logo ready to upload"
+                        : "Upload project logo (PNG, JPG)"}
+                    </p>
+
+                    {/* BUTTON */}
+                    <label className="mt-3 cursor-pointer bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition inline-flex items-center gap-2">
+                      <Upload size={16} />
+                      {logo ? "Change Logo" : "Upload Logo"}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleLogoChange}
+                        className="hidden"
+                      />
+                    </label>
+
+                    {/* REMOVE BUTTON */}
+                    {logo && (
+                      <button
+                        type="button"
+                        onClick={() => setLogo(null)}
+                        className="mt-2 text-sm text-red-500 hover:underline"
+                      >
+                        Remove selected logo
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
             {/* Upload New Images */}
             <div className="md:col-span-2">
