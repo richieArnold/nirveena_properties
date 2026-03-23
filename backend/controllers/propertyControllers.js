@@ -759,7 +759,7 @@ exports.getProjectById = async (req, res) => {
     }
 
     const project = projectResult.rows[0];
-    console.log(project);
+    // console.log(project);
     const projectId = project.project_id;
 
     /* ---------------- FETCH ALL RELATED DATA IN PARALLEL ---------------- */
