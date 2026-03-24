@@ -770,6 +770,7 @@ exports.getProjectById = async (req, res) => {
       featureItemsResult,
       configurationsResult,
       floorPlansResult,
+      connectivityRes,
     ] = await Promise.all([
       pool.query(
         `SELECT id, image_url, sort_order
@@ -811,6 +812,11 @@ exports.getProjectById = async (req, res) => {
          ORDER BY sort_order`,
         [projectId],
       ),
+      pool.query(
+        `SELECT * FROM 
+      project_connectivity WHERE project_id= $1`,
+        [projectId],
+      ),
     ]);
 
     /* ---------------- OPTIMIZED FEATURE MAPPING ---------------- */
@@ -835,7 +841,24 @@ exports.getProjectById = async (req, res) => {
     project.features = features;
     project.configurations = configurationsResult.rows;
     project.floorplans = floorPlansResult.rows;
+    const connectivityGrouped = Object.values(
+      connectivityRes.rows.reduce((acc, item) => {
+        if (!acc[item.category]) {
+          acc[item.category] = {
+            category: item.category,
+            items: [],
+          };
+        }
 
+        acc[item.category].items.push(
+          item.description, // adjust column name
+        );
+
+        return acc;
+      }, {}),
+    );
+
+    project.connectivity = connectivityGrouped;
     /* ---------------- RESPONSE ---------------- */
 
     res.json({

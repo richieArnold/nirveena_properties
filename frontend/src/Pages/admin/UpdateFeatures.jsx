@@ -49,7 +49,7 @@ const UpdateFeatures = () => {
       );
 
       const data = res.data.data;
-
+      console.log(data)
       setFeatures(data.features || []);
       setConfigurations(data.configurations || []);
       setFloorPlans(data.floorplans || []);
