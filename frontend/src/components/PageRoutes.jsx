@@ -3,7 +3,6 @@ import { Routes, Route } from "react-router-dom";
 import Layout from "./Layout";
 import Login from "./Login";
 import ProtectedRoute from "./ProtectedRoute";
-import SessionTracker from "./admin/SessionTracker"; // Import SessionTracker
 import { useState } from "react";
 
 // Public Pages
@@ -40,6 +39,7 @@ import Cookies from "../Pages/Cookies";
 import Consent from "../Pages/Consent";
 import ReraDisclosure from "../Pages/ReraDisclosure";
 
+import ThankYouPage from "../Pages/ThankYouPage";
 
 import ChangePassword from "../components/admin/ChangePassword";
 import UpdateFeatures from "../Pages/admin/UpdateFeatures";
@@ -81,9 +81,7 @@ const PageRoutes = () => {
         path="/admin/change-password"
         element={
           <ProtectedRoute>
-            <SessionTracker>
               <ChangePassword />
-            </SessionTracker>
           </ProtectedRoute>
         }
       />
@@ -92,9 +90,7 @@ const PageRoutes = () => {
         path="/admin"
         element={
           <ProtectedRoute>
-            <SessionTracker>
               <AdminDashboard />
-            </SessionTracker>
           </ProtectedRoute>
         }
       />
@@ -103,9 +99,7 @@ const PageRoutes = () => {
         path="/admin/add"
         element={
           <ProtectedRoute>
-            <SessionTracker>
               <AddProject />
-            </SessionTracker>
           </ProtectedRoute>
         }
       />
@@ -114,9 +108,7 @@ const PageRoutes = () => {
         path="/admin/list"
         element={
           <ProtectedRoute>
-            <SessionTracker>
               <ProjectsList />
-            </SessionTracker>
           </ProtectedRoute>
         }
       />
@@ -125,9 +117,7 @@ const PageRoutes = () => {
         path="/admin/edit/:id"
         element={
           <ProtectedRoute>
-            <SessionTracker>
               <EditProject />
-            </SessionTracker>
           </ProtectedRoute>
         }
       />
@@ -135,9 +125,7 @@ const PageRoutes = () => {
         path="/admin/features/:id"
         element={
           <ProtectedRoute>
-            <SessionTracker>
               <UpdateFeatures />
-            </SessionTracker>
           </ProtectedRoute>
         }
       />
@@ -145,9 +133,7 @@ const PageRoutes = () => {
         path="/admin/view/:id"
         element={
           <ProtectedRoute>
-            <SessionTracker>
               <ViewProject />
-            </SessionTracker>
           </ProtectedRoute>
         }
       />
@@ -157,9 +143,7 @@ const PageRoutes = () => {
         path="/admin/leads"
         element={
           <ProtectedRoute>
-            <SessionTracker>
               <LeadsList />
-            </SessionTracker>
           </ProtectedRoute>
         }
       />
@@ -167,9 +151,7 @@ const PageRoutes = () => {
         path="/admin/leads/:id"
         element={
           <ProtectedRoute>
-            <SessionTracker>
               <LeadDetails />
-            </SessionTracker>
           </ProtectedRoute>
         }
       />
@@ -179,9 +161,7 @@ const PageRoutes = () => {
         path="/admin/customers"
         element={
           <ProtectedRoute>
-            <SessionTracker>
               <CustomersList />
-            </SessionTracker>
           </ProtectedRoute>
         }
       />
@@ -189,9 +169,7 @@ const PageRoutes = () => {
         path="/admin/customers/:id"
         element={
           <ProtectedRoute>
-            <SessionTracker>
               <CustomerDetails />
-            </SessionTracker>
           </ProtectedRoute>
         }
       />
@@ -201,9 +179,7 @@ const PageRoutes = () => {
         path="/admin/blogs/create"
         element={
           <ProtectedRoute>
-            <SessionTracker>
               <AddBlog />
-            </SessionTracker>
           </ProtectedRoute>
         }
       />
@@ -211,9 +187,7 @@ const PageRoutes = () => {
         path="/admin/blogs"
         element={
           <ProtectedRoute>
-            <SessionTracker>
               <BlogsList />
-            </SessionTracker>
           </ProtectedRoute>
         }
       />
@@ -221,9 +195,7 @@ const PageRoutes = () => {
         path="/admin/blogs/edit/:id"
         element={
           <ProtectedRoute>
-            <SessionTracker>
               <EditBlog />
-            </SessionTracker>
           </ProtectedRoute>
         }
       />
@@ -231,9 +203,7 @@ const PageRoutes = () => {
         path="/admin/blogs/view/:slug"
         element={
           <ProtectedRoute>
-            <SessionTracker>
               <ViewBlog />
-            </SessionTracker>
           </ProtectedRoute>
         }
       />
@@ -243,17 +213,19 @@ const PageRoutes = () => {
         path="/admin/*"
         element={
           <ProtectedRoute>
-            <SessionTracker>
               <AdminDashboard />
-            </SessionTracker>
           </ProtectedRoute>
         }
       />
+
+          <Route path="/thank-you" element={<ThankYouPage />} />
 
       {/* Public Blog Routes */}
       <Route path="/blogs" element={<BlogsPage />} />
       <Route path="/blogs/:slug" element={<BlogDetails />} />
     </Routes>
+
+
     </>
   );
 };

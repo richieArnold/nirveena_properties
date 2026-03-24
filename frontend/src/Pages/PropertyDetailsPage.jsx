@@ -52,29 +52,38 @@ function PropertyDetailsPage() {
 
   const { isRegistered } = useUserRegistration();
 
+  const isProjectRegistered = project
+    ? isRegistered(projectDetails.id)
+    : false;
+
   const [isWide, setIsWide] = useState(true);
 
   const [showWABubble, setShowWABubble] = useState(false);
   const [hideBubble, setHideBubble] = useState(false);
 
   useEffect(() => {
+    if (isProjectRegistered) return;
+
     const timer = setTimeout(() => {
       if (!hideBubble) setShowWABubble(true);
     }, 2500);
 
     return () => clearTimeout(timer);
-  }, [hideBubble]);
+  }, [hideBubble, isProjectRegistered]);
 
   useEffect(() => {
+    if (isProjectRegistered) return;
+
     const timer = setTimeout(() => {
       setShowPopup(true);
-    }, 5000); // 5 seconds
+    }, 5000);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [isProjectRegistered]);
+
   useEffect(() => {
     const handleExitIntent = (e) => {
-      if (popupClosed) return;
+      if (popupClosed || isProjectRegistered || showExitPopup) return;
 
       if (e.clientY <= 10) {
         setShowExitPopup(true);
@@ -86,7 +95,7 @@ function PropertyDetailsPage() {
     return () => {
       document.removeEventListener("mouseleave", handleExitIntent);
     };
-  }, [popupClosed]);
+  }, [popupClosed, isProjectRegistered, showExitPopup]);
 
   useEffect(() => {
     async function fetchProject() {
@@ -192,7 +201,11 @@ function PropertyDetailsPage() {
   }
 
   const handleEnquirySuccess = () => {
-    alert("Thank you! Our team will contact you soon.");
+    navigate("/thank-you", {
+      state: {
+        projectName: projectDetails.project_name,
+      },
+    });
   };
   const whatsappNumber = "919900468686"; // change to admin number
 
@@ -229,6 +242,7 @@ function PropertyDetailsPage() {
 
   return (
     <>
+    {console.log(project)}
       <PropertyNavbar project={projectDetails} />
       {project && (
         <Helmet>
@@ -264,6 +278,7 @@ function PropertyDetailsPage() {
           )}
         </Helmet>
       )}
+
       <div className="min-h-screen bg-slate-50 pb-20">
         {/*  FULL WIDTH HERO */}
         <div className="relative w-full h-[45vh] sm:h-[60vh] md:h-[75vh] lg:h-[85vh] overflow-hidden bg-black">
@@ -362,7 +377,11 @@ function PropertyDetailsPage() {
             <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
               {/* Get Details */}
               <button
-                onClick={() => setShowPopup(true)}
+                onClick={() => {
+                  if (!isProjectRegistered) {
+                    setShowPopup(true);
+                  }
+                }}
                 className="
 group flex items-center gap-2 
 bg-black text-white 
@@ -376,7 +395,9 @@ active:scale-95
 whitespace-nowrap
 "
               >
-                <span className="flex items-center gap-2">Get Details →</span>
+                <span className="flex items-center gap-2">
+                  {isProjectRegistered ? "View Details 🔓" : "Get Details →"}
+                </span>
               </button>
 
               {/* WhatsApp */}
@@ -490,7 +511,7 @@ whitespace-nowrap
             </div>
           </section>
           {/* ENTRY POPUP */}
-          {!isRegistered && showPopup && (
+          {!isProjectRegistered && showPopup && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
               <div className="relative bg-white w-[95%] max-w-md p-4 sm:p-6 rounded-2xl shadow-2xl">
                 <button
@@ -505,7 +526,7 @@ whitespace-nowrap
                 </h3>
 
                 <EnquiryForm
-                  projectId={project.project_id}
+                  projectId={projectDetails.id}
                   onSuccess={() => {
                     setShowPopup(false);
                     handleEnquirySuccess();
@@ -515,7 +536,7 @@ whitespace-nowrap
             </div>
           )}
           {/* EXIT POPUP */}
-          {!isRegistered && showExitPopup && (
+          {!isProjectRegistered && showExitPopup && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
               <div className="relative bg-white w-[95%] max-w-md p-4 sm:p-6 rounded-2xl shadow-2xl">
                 <button
@@ -533,7 +554,7 @@ whitespace-nowrap
                 </h3>
 
                 <EnquiryForm
-                  projectId={project.project_id}
+                  projectId={projectDetails.id}
                   onSuccess={() => {
                     setShowExitPopup(false);
                     handleEnquirySuccess();
@@ -542,7 +563,7 @@ whitespace-nowrap
               </div>
             </div>
           )}
-          {!isRegistered && showBackPopup && (
+          {!isProjectRegistered && showBackPopup && (
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
               <div className="relative bg-white w-[95%] max-w-md p-4 sm:p-6 rounded-2xl shadow-2xl">
                 {/* Close */}
@@ -563,7 +584,7 @@ whitespace-nowrap
                 </p>
 
                 <EnquiryForm
-                  projectId={project.id}
+                  projectId={projectDetails.id}
                   onSuccess={() => {
                     setShowBackPopup(false);
                     handleEnquirySuccess();
@@ -743,17 +764,29 @@ max-w-[240px] sm:max-w-[280px] md:max-w-[300px] flex-shrink-0 snap-start snap-al
 
                       {/* CTA */}
                       <button
-                        onClick={() => setShowPopup(true)}
+                        onClick={() => {
+                          if (!isProjectRegistered) {
+                            setShowPopup(true);
+                          }
+                        }}
                         className="
-mt-8 w-full py-3 rounded-lg 
-bg-gray-900 text-white font-medium
+group flex items-center gap-2 
+bg-black text-white 
+w-full sm:w-auto px-6 py-3 rounded-full 
+font-medium 
+shadow-md 
 transition-all duration-300 
 hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600
 hover:scale-105 hover:shadow-lg
 active:scale-95
+whitespace-nowrap
 "
                       >
-                        Get Detailed Pricing
+                        <span className="flex items-center gap-2">
+                          {isProjectRegistered
+                            ? "View Details 🔓"
+                            : "Get Details →"}
+                        </span>
                       </button>
                     </div>
 
@@ -787,7 +820,7 @@ active:scale-95
                   <div
                     key={index}
                     onClick={() => {
-                      if (isRegistered) {
+                      if (isProjectRegistered) {
                         setActiveFloorPlan(plan.image_url);
                         setFloorPlanViewer(true);
                       } else {
@@ -800,15 +833,15 @@ active:scale-95
                     <img
                       src={plan.image_url}
                       className={`w-full h-auto object-contain bg-white transition-all duration-500
-  ${!isRegistered ? "blur-[2px] group-hover:blur-sm" : ""}`}
+  ${!isProjectRegistered ? "blur-[2px] group-hover:blur-sm" : ""}`}
                     />
                     {/* DARK OVERLAY (only when locked) */}
-                    {!isRegistered && (
+                    {!isProjectRegistered && (
                       <div className="absolute inset-0 bg-black/40 group-hover:bg-black/60 transition duration-300" />
                     )}
 
                     {/* CTA (only when locked) */}
-                    {!isRegistered && (
+                    {!isProjectRegistered && (
                       <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
                         <button
                           onClick={(e) => {
@@ -1056,7 +1089,7 @@ active:scale-95
       </motion.div>
 
       {/* 💬 WhatsApp Chat Bubble */}
-      {!isRegistered && showWABubble && !hideBubble && (
+      {!isProjectRegistered && showWABubble && !hideBubble && (
         <div className="fixed bottom-24 right-6 z-50 max-w-xs animate-fadeIn">
           <div className="bg-white shadow-xl rounded-2xl p-4 relative border">
             {/* Close */}

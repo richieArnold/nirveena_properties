@@ -3,6 +3,7 @@ import axiosInstance from "../../utils/Instance";
 import { useUserRegistration } from "../../context/UserRegistrationContext";
 
 function EnquiryForm({ projectId, onSuccess }) {
+  
   const [formData, setFormData] = useState({
     full_name: "",
     contact: "",
@@ -38,7 +39,7 @@ function EnquiryForm({ projectId, onSuccess }) {
       });
 
       if (res.data.success) {
-        registerUser(formData.contact);
+        registerUser(projectId);
         onSuccess();
       }
     } catch (err) {

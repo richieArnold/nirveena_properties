@@ -3,40 +3,43 @@ import { createContext, useContext, useEffect, useState } from "react";
 const UserRegistrationContext = createContext();
 
 export const UserRegistrationProvider = ({ children }) => {
-  const [isRegistered, setIsRegistered] = useState(false);
+  const [registeredProjects, setRegisteredProjects] = useState({});
 
-  useEffect(() => {
-    const stored = localStorage.getItem("user_registered");
+useEffect(() => {
+  const stored = localStorage.getItem("user_registered_projects");
 
-    if (stored) {
-      const parsed = JSON.parse(stored);
+  if (stored) {
+    setRegisteredProjects(JSON.parse(stored));
+  }
+}, []);
 
-      const expiry = 2 * 24 * 60 * 60 * 1000; // 7 days
 
-      if (Date.now() - parsed.time < expiry) {
-        setIsRegistered(true);
-      } else {
-        localStorage.removeItem("user_registered");
-        setIsRegistered(false);
-      }
-    }
-  }, []);
+const registerUser = (projectId) => {
+  const updated = {
+    ...registeredProjects,
+    [projectId]: true,
+  };
 
-  const registerUser = (phone) => {
-    const data = {
-      phone,
-      time: Date.now(),
-    };
+  localStorage.setItem(
+    "user_registered_projects",
+    JSON.stringify(updated)
+  );
 
-    localStorage.setItem("user_registered", JSON.stringify(data));
-    setIsRegistered(true);
+  setRegisteredProjects(updated);
+};
+
+  const isRegistered = (projectId) => {
+    return !!registeredProjects[projectId];
   };
 
   return (
-    <UserRegistrationContext.Provider value={{ isRegistered, registerUser }}>
+    <UserRegistrationContext.Provider
+      value={{ isRegistered, registerUser }}
+    >
       {children}
     </UserRegistrationContext.Provider>
   );
 };
 
-export const useUserRegistration = () => useContext(UserRegistrationContext);
+export const useUserRegistration = () =>
+  useContext(UserRegistrationContext);
