@@ -51,30 +51,28 @@ const EditBlog = () => {
     setImages(newImages);
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  try {
-    setSaving(true);
+    try {
+      setSaving(true);
 
-    const payload = {
-      title,
-      author,
-      body,
-      images,
-    };
+      const payload = {
+        title,
+        author,
+        body,
+        images,
+      };
 
-    await axiosInstance.put(`/api/blogs/${id}`, payload);
+      await axiosInstance.put(`/api/blogs/${id}`, payload);
 
-
-    navigate("/admin/blogs");
-
-  } catch (error) {
-    console.error("Update failed", error);
-  } finally {
-    setSaving(false);
-  }
-};
+      navigate("/admin/blogs");
+    } catch (error) {
+      console.error("Update failed", error);
+    } finally {
+      setSaving(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -125,15 +123,28 @@ const handleSubmit = async (e) => {
                 Blog Images
               </label>
 
-              <input
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="mb-3"
-              />
+              {/* 🔥 Custom Upload Button */}
+              <label className="inline-block cursor-pointer">
+                <span className="bg-black text-white px-4 py-2 rounded-md text-sm hover:bg-gray-800 transition">
+                  Upload Images
+                </span>
 
-              <div className="flex flex-wrap gap-3">
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+              </label>
+
+              {/* 🔥 Helper text */}
+              <p className="text-xs text-gray-500 mt-2">
+                Max file size: 1MB per image
+              </p>
+
+              {/* Preview */}
+              <div className="flex flex-wrap gap-3 mt-4">
                 {images.map((img, index) => (
                   <div key={index} className="relative">
                     <img
@@ -145,9 +156,9 @@ const handleSubmit = async (e) => {
                     <button
                       type="button"
                       onClick={() => removeImage(index)}
-                      className="absolute top-0 right-0 bg-red-500 text-white text-xs px-1 rounded"
+                      className="absolute top-1 right-1 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded"
                     >
-                      X
+                      ✕
                     </button>
                   </div>
                 ))}

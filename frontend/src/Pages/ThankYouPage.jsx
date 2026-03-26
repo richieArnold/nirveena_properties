@@ -1,16 +1,11 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import {
-  CheckCircle,
-  ArrowLeft,
-  Clock,
-} from "lucide-react";
+import { CheckCircle, ArrowLeft, Clock } from "lucide-react";
 import { useEffect, useState } from "react";
 
 /* ---------------- CONFETTI ---------------- */
 const Confetti = () => {
   const [particles] = useState(() => {
     const colors = ["#22c55e", "#3b82f6", "#eab308", "#ec4899"];
-
     return Array.from({ length: 25 }).map((_, i) => ({
       id: i,
       top: Math.random() * 100,
@@ -45,18 +40,45 @@ const Confetti = () => {
 export default function ThankYouPage() {
   const navigate = useNavigate();
   const location = useLocation();
-
   const [countdown, setCountdown] = useState(5);
 
-  const projectName =
-    location.state?.projectName || "your selected property";
+  const projectName = location.state?.projectName || "your selected property";
+
+/* 🔥 GOOGLE TAG INTEGRATION */
+  useEffect(() => {
+    const script1 = document.createElement("script");
+    script1.async = true;
+    // Use the AW ID as the primary source
+    script1.src = "https://www.googletagmanager.com/gtag/js?id=AW-18035172859";
+    document.head.appendChild(script1);
+
+    const script2 = document.createElement("script");
+    script2.innerHTML = `
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      // Track Google Ads
+      gtag('config', 'AW-18035172859');
+      // Track Analytics (The one from your screenshot)
+      gtag('config', 'G-94YL10VYV6');
+      
+      // 🔥 ADD THIS: Manual Conversion Event for Google Ads
+      gtag('event', 'conversion', {'send_to': 'AW-18035172859/CONVERSION_LABEL'});
+    `;
+    document.head.appendChild(script2);
+
+    return () => {
+      document.head.removeChild(script1);
+      document.head.removeChild(script2);
+    };
+  }, []);
 
   /* 🔥 Auto redirect */
   useEffect(() => {
     const timer = setTimeout(() => {
       navigate(-1);
     }, 5000);
-
     return () => clearTimeout(timer);
   }, [navigate]);
 
@@ -65,13 +87,11 @@ export default function ThankYouPage() {
     const interval = setInterval(() => {
       setCountdown((prev) => prev - 1);
     }, 1000);
-
     return () => clearInterval(interval);
   }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-6 relative overflow-hidden">
-      
       <Confetti />
 
       {/* Glow background */}
@@ -79,8 +99,7 @@ export default function ThankYouPage() {
       <div className="absolute bottom-[-10%] right-[-10%] w-72 h-72 bg-green-100 rounded-full blur-3xl opacity-50" />
 
       <div className="max-w-xl w-full bg-white rounded-3xl shadow-xl p-10 text-center border border-slate-100">
-
-        {/* 🔥 LOGO */}
+        {/* LOGO */}
         <div className="mb-6 flex justify-center">
           <img
             src="/NirveenaLogo.jpeg"
@@ -104,10 +123,8 @@ export default function ThankYouPage() {
         {/* Description */}
         <p className="text-slate-600 text-lg mb-6 leading-relaxed">
           Your enquiry for{" "}
-          <span className="font-semibold text-black">
-            {projectName}
-          </span>{" "}
-          has been successfully submitted.
+          <span className="font-semibold text-black">{projectName}</span> has
+          been successfully submitted.
         </p>
 
         {/* Info */}

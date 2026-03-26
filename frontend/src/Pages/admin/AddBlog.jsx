@@ -200,6 +200,8 @@ const AddBlog = () => {
                 <p className="text-xs text-gray-400 mt-1">
                   PNG, JPG, WEBP supported
                 </p>
+                <br />
+                <span>Upload images upto 1 mb</span>
 
                 <input
                   type="file"

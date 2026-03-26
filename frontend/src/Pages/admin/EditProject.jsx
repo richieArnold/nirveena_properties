@@ -847,6 +847,8 @@ const EditProject = () => {
                   </div>
                   <p className="text-xs text-gray-500 mt-2">
                     {newImages.length} new image(s) selected
+                    <br />
+                    <span>Upload upto 1 mb</span>
                   </p>
                 </div>
               </div>

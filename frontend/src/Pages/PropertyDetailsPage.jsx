@@ -162,6 +162,8 @@ function PropertyDetailsPage() {
     return () => clearInterval(interval);
   }, [project?.floorplans]);
 
+  const galleryScrollRef = useRef(null);
+
   const connectivityScrollRef = useRef(null);
 
   const [connectivity, setConnectivity] = useState({});
@@ -172,6 +174,27 @@ function PropertyDetailsPage() {
       ? allImages.slice(0, 3)
       : [...allImages, ...allImages, ...allImages].slice(0, 3);
   const galleryImages = allImages.slice(3);
+
+  useEffect(() => {
+    const scrollContainer = galleryScrollRef.current;
+
+    if (!scrollContainer || window.innerWidth > 640) return; // only mobile
+
+    const interval = setInterval(() => {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainer;
+
+      if (scrollLeft + clientWidth >= scrollWidth - 10) {
+        scrollContainer.scrollTo({ left: 0, behavior: "smooth" });
+      } else {
+        scrollContainer.scrollBy({
+          left: clientWidth * 0.8,
+          behavior: "smooth",
+        });
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [galleryImages]);
 
   useEffect(() => {
     if (!heroImages?.length || viewerOpen) return;
@@ -386,83 +409,59 @@ function PropertyDetailsPage() {
           </div>
         </div>
         {/* 🔥 FLOATING PROPERTY CARD */}
-        <div className="relative z-30 -mt-16 sm:-mt-20 px-4">
-          <div className="max-w-6xl mx-auto bg-white rounded-3xl shadow-xl px-4 sm:px-6 md:px-10 py-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            {" "}
-            {/* LEFT */}
-            <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-              {" "}
-              {/* ICON */}
-              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-gray-100 shrink-0">
-                <Building2 className="w-6 h-6 text-gray-700" />
-              </div>
-              {/* TEXT */}
-              <div className="flex flex-col">
-                <h1 className="text-2xl md:text-3xl font-semibold text-gray-900 tracking-tight">
-                  {projectDetails.project_name}
-                </h1>
+        <div className="relative z-30 -mt-20 sm:-mt-28 px-4">
+          {/* -mt-20 pulls it up halfway over the image as per your reference */}
 
-                <p className="text-sm md:text-base text-gray-500 mt-1">
-                  {projectDetails.project_location}
-                </p>
+          <div className="max-w-6xl mx-auto bg-white rounded-[2.5rem] shadow-xl border border-gray-100 p-6 md:px-10 md:py-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            {/* Left Section: Info */}
+            <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8 flex-1">
+              <div className="flex flex-col gap-2">
+                {/* Icon (Matches your box model padding) */}
+                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-slate-100 mb-2">
+                  <Building2 className="w-5 h-5 text-slate-600" />
+                </div>
+
+                <div>
+                  <h1 className="text-2xl md:text-2xl font-bold text-[#0A2540] tracking-tight">
+                    {projectDetails.project_name}
+                  </h1>
+                  <p className="text-sm md:text-base text-gray-400 font-medium">
+                    {projectDetails.project_location}
+                  </p>
+                </div>
               </div>
-              {/* DIVIDER */}
-              <div className="hidden md:block h-10 w-px bg-gray-200 mx-2" />
-              {/* PRICE */}
+
+              <div className="hidden md:block h-12 w-px bg-gray-200" />
+
               <div className="flex flex-col">
-                <p className="text-xs text-gray-400 uppercase tracking-wide">
-                  Starting from
+                <p className="text-[10px] text-gray-400 uppercase font-bold tracking-widest mb-1">
+                  Starting From
                 </p>
-                <p className="text-xl md:text-2xl font-bold text-gray-900">
+                <p className="text-xl md:text-2xl font-black text-[#0A2540]">
                   {projectDetails.price}
                 </p>
               </div>
             </div>
-            {/* CTA */}
-            <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-              {/* Get Details */}
+
+            {/* Right Section: Buttons (Full Width on Mobile) */}
+            <div className="flex flex-col gap-3 w-full md:w-auto">
+              {/* Get Details Button - Centered */}
               <button
-                onClick={() => {
-                  if (!isProjectRegistered) {
-                    setShowPopup(true);
-                  }
-                }}
-                className="
-group flex items-center gap-2 
-bg-black text-white 
-w-full sm:w-auto px-6 py-3 rounded-full 
-font-medium 
-shadow-md 
-transition-all duration-300 
-hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600
-hover:scale-105 hover:shadow-lg
-active:scale-95
-whitespace-nowrap
-"
+                onClick={() => !isProjectRegistered && setShowPopup(true)}
+                className="w-full md:w-auto bg-black text-white h-14 md:px-10 rounded-full font-bold text-base flex items-center justify-center transition-all active:scale-95"
               >
-                <span className="flex items-center gap-2">
-                  {isProjectRegistered ? "View Details 🔓" : "Get Details →"}
-                </span>
+                <span>Get Details →</span>
               </button>
 
-              {/* WhatsApp */}
+              {/* WhatsApp Button - Centered */}
               <a
                 href={whatsappLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="
-      flex items-center gap-2
-      bg-green-500 hover:bg-green-600
-      text-white
-      w-full sm:w-auto px-6 py-3 justify-center
-      rounded-full
-      shadow-md hover:shadow-xl
-      transition-all duration-300
-      hover:scale-105
-    "
+                className="w-full md:w-auto bg-[#00D952] text-white h-14 md:px-10 rounded-full font-bold text-base flex items-center justify-center gap-2 transition-all active:scale-95"
               >
-                <FaWhatsapp size={18} />
-                Chat
+                <FaWhatsapp size={20} />
+                <span>Chat</span>
               </a>
             </div>
           </div>
@@ -527,8 +526,8 @@ whitespace-nowrap
                 </div>
 
                 <div>
-                  <p className="text-gray-500 text-xs uppercase tracking-wide">
-                    Starting Price
+                  <p className="text-xs text-gray-400 uppercase tracking-wide">
+                    Starting from
                   </p>
                   <p className="font-medium text-gray-900 mt-1">
                     {projectDetails.price || "-"}
@@ -1005,28 +1004,46 @@ max-w-[240px] sm:max-w-[280px] md:max-w-[300px] flex-shrink-0 snap-start snap-al
               </p>
 
               {/* GRID */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mt-12 px-2">
+              <div
+                ref={galleryScrollRef}
+                className="
+    mt-12 px-4
+    flex gap-4
+    overflow-x-auto
+    snap-x snap-mandatory
+    no-scrollbar
+    pb-4
+  "
+              >
                 {galleryImages.map((img, index) => (
                   <div
                     key={index}
-                    className="relative overflow-hidden rounded-xl cursor-pointer group"
+                    className="
+        min-w-[70%] sm:min-w-[45%] md:min-w-[30%]
+        flex-shrink-0 snap-center
+        relative overflow-hidden rounded-xl cursor-pointer group
+      "
                     onClick={() => {
-                      setActiveImage(index + 3); // offset because first 3 are hero
+                      setActiveImage(index + 3);
                       setViewerOpen(true);
                     }}
                   >
                     {/* IMAGE */}
                     <img
                       src={img.image_url}
-                      className="w-full h-48 sm:h-52 md:h-56 object-cover 
-                       group-hover:scale-110 transition duration-500"
+                      className="
+          w-full h-48 sm:h-52 md:h-56 object-cover
+          group-hover:scale-110 transition duration-500
+        "
                     />
 
                     {/* OVERLAY */}
                     <div
-                      className="absolute inset-0 bg-black/40 opacity-0 
-                          group-hover:opacity-100 transition 
-                          flex items-center justify-center text-white text-sm font-medium"
+                      className="
+          absolute inset-0 bg-black/40 opacity-0
+          group-hover:opacity-100 transition
+          flex items-center justify-center text-white text-sm font-medium
+        "
                     >
                       View Image
                     </div>

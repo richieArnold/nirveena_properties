@@ -538,9 +538,12 @@ const AddProject = () => {
                       className="hidden"
                     />
                   </label>
+                  
                 </div>
                 <p className="text-xs text-gray-500 mt-2">
                   {images.length} image(s) selected
+                  <br />
+                  <span>Upload images upto 1mb</span>
                 </p>
               </div>
             </div>
