@@ -18,6 +18,7 @@ import {
   Building2,
   Home,
   IndianRupee,
+  Lock,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaWhatsapp, FaPhoneAlt } from "react-icons/fa";
@@ -52,9 +53,7 @@ function PropertyDetailsPage() {
 
   const { isRegistered } = useUserRegistration();
 
-  const isProjectRegistered = project
-    ? isRegistered(projectDetails.id)
-    : false;
+  const isProjectRegistered = project ? isRegistered(projectDetails.id) : false;
 
   const [isWide, setIsWide] = useState(true);
 
@@ -118,6 +117,52 @@ function PropertyDetailsPage() {
 
     fetchProject();
   }, [slug]);
+
+  const configScrollRef = useRef(null);
+  useEffect(() => {
+    const scrollContainer = configScrollRef.current;
+    if (!scrollContainer || window.innerWidth > 640) return; // Only auto-scroll on mobile
+
+    const interval = setInterval(() => {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainer;
+
+      // If at the end, jump back to start, else scroll right by one card width
+      if (scrollLeft + clientWidth >= scrollWidth - 10) {
+        scrollContainer.scrollTo({ left: 0, behavior: "smooth" });
+      } else {
+        scrollContainer.scrollBy({
+          left: clientWidth * 0.85,
+          behavior: "smooth",
+        });
+      }
+    }, 3500);
+
+    return () => clearInterval(interval);
+  }, [project?.configurations]);
+
+  const floorPlanScrollRef = useRef(null);
+  useEffect(() => {
+    const scrollContainer = floorPlanScrollRef.current;
+    if (!scrollContainer || window.innerWidth > 640) return; // Only auto-scroll on mobile
+
+    const interval = setInterval(() => {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainer;
+
+      // If at the end, jump back to start, else scroll right by one card width
+      if (scrollLeft + clientWidth >= scrollWidth - 10) {
+        scrollContainer.scrollTo({ left: 0, behavior: "smooth" });
+      } else {
+        scrollContainer.scrollBy({
+          left: clientWidth * 0.85,
+          behavior: "smooth",
+        });
+      }
+    }, 3500);
+
+    return () => clearInterval(interval);
+  }, [project?.floorplans]);
+
+  const connectivityScrollRef = useRef(null);
 
   const [connectivity, setConnectivity] = useState({});
 
@@ -242,7 +287,7 @@ function PropertyDetailsPage() {
 
   return (
     <>
-    {console.log(project)}
+      {console.log(project)}
       <PropertyNavbar project={projectDetails} />
       {project && (
         <Helmet>
@@ -708,8 +753,7 @@ max-w-[240px] sm:max-w-[280px] md:max-w-[300px] flex-shrink-0 snap-start snap-al
           {/* configurations */}
           {project.configurations.length > 0 && (
             <section id="config" className="mt-24 text-center">
-              {/* HEADING */}
-              <h2 className="texttext-xl sm:text-2xl md:text-3xl font-semibold tracking-wide text-gray-900">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold tracking-wide text-gray-900">
                 CONFIGURATIONS
               </h2>
 
@@ -719,78 +763,61 @@ max-w-[240px] sm:max-w-[280px] md:max-w-[300px] flex-shrink-0 snap-start snap-al
                 <div className="w-10 h-[1px] bg-gray-300"></div>
               </div>
 
-              <p className="text-gray-500 mt-4 text-sm tracking-wide">
-                Thoughtfully designed residences for modern living.
-              </p>
-
-              {/* GRID */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mt-14">
+              {/* SCROLLABLE CONTAINER */}
+              <div
+                className="
+        mt-10 px-4
+        flex gap-6 
+        overflow-x-auto 
+        snap-x snap-mandatory 
+        no-scrollbar 
+        pb-8
+        sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:overflow-visible sm:snap-none
+      "
+              >
                 {project.configurations.map((config, index) => (
                   <div
                     key={index}
-                    className={`relative group rounded-2xl overflow-hidden transition-all duration-500
-  ${index === 1 ? "scale-105 shadow-2xl" : "shadow-md hover:shadow-xl hover:-translate-y-2"}
-  bg-[#f8f7f5]`}
+                    className={`
+            relative group rounded-2xl overflow-hidden transition-all duration-500 flex-shrink-0
+            w-[85%] sm:w-auto snap-center
+            ${index === 1 ? "sm:scale-105 shadow-2xl" : "shadow-md hover:shadow-xl hover:-translate-y-2"}
+            bg-[#f8f7f5]
+          `}
                   >
-                    {/* INNER */}
-                    <div className="p-6 sm:p-7 flex flex-col justify-between h-full space-y-2">
-                      {/* TITLE */}
+                    <div className="p-6 sm:p-7 flex flex-col justify-between h-full space-y-4">
                       <div>
                         <h3 className="text-lg sm:text-xl font-semibold text-gray-900 tracking-tight">
                           {config.configuration}
                         </h3>
-
-                        <div className="w-8 h-[1px] bg-gray-300 my-3"></div>
-
-                        {/* SIZE */}
-                        <p className="text-sm text-gray-500 flex items-center justify-center gap-2 text-center">
-                          {" "}
+                        <div className="w-8 h-[1px] bg-gray-300 my-3 mx-auto"></div>
+                        <p className="text-sm text-gray-500 flex items-center justify-center gap-2">
                           <Ruler size={14} className="text-gray-400" />
                           {config.size_range} Sq.Ft.
                         </p>
                       </div>
 
-                      {/* PRICE */}
-                      <div className="mt-6 text-center flex flex-col items-center">
+                      <div className="mt-4 text-center">
                         <p className="text-[11px] uppercase tracking-[0.2em] text-gray-400 mb-1">
                           Starting Price
                         </p>
-
-                        <p className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-1 mt-1">
+                        <p className="text-2xl font-bold text-gray-900 flex items-center justify-center gap-1">
                           <IndianRupee size={18} />
                           {config.price}
                         </p>
                       </div>
 
-                      {/* CTA */}
                       <button
-                        onClick={() => {
-                          if (!isProjectRegistered) {
-                            setShowPopup(true);
-                          }
-                        }}
-                        className="
-group flex items-center gap-2 
-bg-black text-white 
-w-full sm:w-auto px-6 py-3 rounded-full 
-font-medium 
-shadow-md 
-transition-all duration-300 
-hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600
-hover:scale-105 hover:shadow-lg
-active:scale-95
-whitespace-nowrap
-"
+                        onClick={() =>
+                          !isProjectRegistered && setShowPopup(true)
+                        }
+                        className="mt-4 bg-black text-white px-6 py-3 rounded-full font-medium hover:bg-slate-800 transition-all"
                       >
-                        <span className="flex items-center gap-2">
-                          {isProjectRegistered
-                            ? "View Details 🔓"
-                            : "Get Details →"}
-                        </span>
+                        {isProjectRegistered
+                          ? "View Details 🔓"
+                          : "Get Details →"}
                       </button>
                     </div>
-
-                    {/* TOP BORDER ACCENT */}
                     <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-gray-400 to-transparent opacity-40" />
                   </div>
                 ))}
@@ -798,6 +825,7 @@ whitespace-nowrap
             </section>
           )}
 
+          {/* FLOOR PLANS */}
           {/* FLOOR PLANS */}
           {project.floorplans.length > 0 && (
             <section id="plans" className="mt-24 text-center">
@@ -811,11 +839,19 @@ whitespace-nowrap
                 <div className="w-8 h-[1px] bg-gray-400"></div>
               </div>
 
-              <p className="text-gray-600 mt-4">
+              <p className="text-gray-600 mt-4 px-4 text-sm sm:text-base">
                 Smartly designed spaces for modern living.
               </p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10 mt-12">
+              {/* SCROLLABLE GRID */}
+              <div
+                ref={floorPlanScrollRef} // Add a new ref at the top of your component!
+                className="
+        mt-12 px-4 
+        flex gap-6 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-6
+        sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:overflow-visible sm:snap-none
+      "
+              >
                 {project.floorplans.map((plan, index) => (
                   <div
                     key={index}
@@ -827,46 +863,47 @@ whitespace-nowrap
                         setShowPopup(true);
                       }
                     }}
-                    className="relative group overflow-hidden rounded-xl shadow-lg cursor-pointer"
-                  >
-                    {/* IMAGE */}
-                    <img
-                      src={plan.image_url}
-                      className={`w-full h-auto object-contain bg-white transition-all duration-500
-  ${!isProjectRegistered ? "blur-[2px] group-hover:blur-sm" : ""}`}
-                    />
-                    {/* DARK OVERLAY (only when locked) */}
-                    {!isProjectRegistered && (
-                      <div className="absolute inset-0 bg-black/40 group-hover:bg-black/60 transition duration-300" />
-                    )}
-
-                    {/* CTA (only when locked) */}
-                    {!isProjectRegistered && (
-                      <div className="absolute inset-0 flex flex-col items-center justify-center text-white">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation(); // prevent card click
-                            setShowPopup(true);
-                          }}
-                          className="
-          backdrop-blur-md 
-          bg-white/20 text-white border border-white/30
-          px-6 py-2 rounded-full text-sm font-medium
-          transition-all duration-300 
-          hover:bg-gradient-to-r hover:from-blue-500 hover:to-purple-600
-          hover:text-white hover:border-transparent
-          hover:scale-105 hover:shadow-lg
-          active:scale-95
+                    className="
+            relative group overflow-hidden rounded-xl shadow-lg cursor-pointer flex-shrink-0
+            w-[85%] sm:w-auto snap-center bg-white border border-gray-100
           "
-                        >
-                          Enquire now
-                        </button>
+                  >
+                    {/* IMAGE BOX */}
+                    <div className="aspect-[4/3] flex items-center justify-center p-4 bg-white">
+                      <img
+                        src={plan.image_url}
+                        alt={plan.title}
+                        className={`max-w-full max-h-full object-contain transition-all duration-700
+                ${!isProjectRegistered ? "blur-[1px] grayscale scale-110" : "group-hover:scale-110"}`}
+                      />
+                    </div>
+
+                    {/* LOCK OVERLAY */}
+                    {!isProjectRegistered && (
+                      <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition duration-300 flex items-center justify-center">
+                        <div className="flex flex-col items-center gap-3">
+                          {/* Lock Icon */}
+                          <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30">
+                            <Lock size={18} className="text-white" />
+                          </div>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setShowPopup(true);
+                            }}
+                            className="backdrop-blur-sm bg-white text-black px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider hover:bg-black hover:text-white transition-all shadow-xl"
+                          >
+                            Unlock Plan
+                          </button>
+                        </div>
                       </div>
                     )}
 
-                    {/* BOTTOM INFO */}
-                    <div className="absolute bottom-0 w-full bg-black/80 text-white py-2 text-sm text-center">
-                      {plan.title}
+                    {/* LABEL */}
+                    <div className="bg-white py-4 border-t border-gray-50">
+                      <p className="text-sm font-semibold text-gray-800 uppercase tracking-wide">
+                        {plan.title}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -890,43 +927,62 @@ whitespace-nowrap
           )}
 
           {/* CONNECTIVITY */}
+          {/* CONNECTIVITY */}
           {Object.keys(connectivity).length > 0 && (
-            <section id="connectivity" className="mt-24 text-center">
-              {/* HEADER */}
-              <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold tracking-wide">
-                LOCATION & CONNECTIVITY
-              </h2>
-
-              <div className="flex justify-center items-center gap-2 my-3">
-                <div className="w-8 h-[1px] bg-gray-400"></div>
-                <div className="w-2 h-2 bg-black rounded-full"></div>
-                <div className="w-8 h-[1px] bg-gray-400"></div>
-              </div>
-
-              <p className="text-gray-600 mt-4">
-                Seamless access to key destinations around the city.
-              </p>
-
-              {/* GRID */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-12 text-left max-w-6xl mx-auto">
-                {Object.entries(connectivity).map(([category, items], idx) => (
-                  <div key={idx} className="space-y-3">
-                    {/* ICON (optional) */}
-                    <div className="text-3xl">📍</div>
-
-                    {/* TITLE */}
-                    <h3 className="font-semibold text-lg text-gray-900">
-                      {category.toUpperCase()}
-                    </h3>
-
-                    {/* LIST */}
-                    <ul className="space-y-2 text-gray-600 text-sm leading-relaxed">
-                      {items.map((item, i) => (
-                        <li key={i}>• {item}</li>
-                      ))}
-                    </ul>
+            <section id="connectivity" className="mt-24 px-4 sm:px-6">
+              <div className="max-w-6xl mx-auto">
+                {/* HEADER */}
+                <div className="text-center mb-12">
+                  <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold tracking-wide text-gray-900 uppercase">
+                    Location & Connectivity
+                  </h2>
+                  <div className="flex justify-center items-center gap-2 my-3">
+                    <div className="w-8 h-[1px] bg-gray-400"></div>
+                    <div className="w-2 h-2 bg-black rounded-full"></div>
+                    <div className="w-8 h-[1px] bg-gray-400"></div>
                   </div>
-                ))}
+                </div>
+
+                {/* SCROLLABLE GRID */}
+                <div
+                  ref={connectivityScrollRef}
+                  className="
+          flex gap-4 overflow-x-auto snap-x snap-mandatory no-scrollbar pb-6
+          sm:grid sm:grid-cols-2 lg:grid-cols-4 sm:overflow-visible sm:snap-none
+        "
+                >
+                  {Object.entries(connectivity).map(
+                    ([category, items], idx) => (
+                      <div
+                        key={idx}
+                        className="
+              min-w-[85%] sm:min-w-0 snap-center
+              group bg-white p-6 rounded-2xl border border-gray-100 shadow-sm transition-all duration-300
+            "
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-slate-50 flex items-center justify-center mb-5 text-slate-400 group-hover:bg-black group-hover:text-white transition-colors">
+                          <MapPin size={20} />
+                        </div>
+
+                        <h3 className="font-bold text-gray-900 text-sm tracking-widest uppercase mb-4">
+                          {category.replace(/_/g, " ")}
+                        </h3>
+
+                        <ul className="space-y-3">
+                          {items.map((item, i) => (
+                            <li
+                              key={i}
+                              className="flex items-start gap-3 text-gray-600 text-sm leading-snug"
+                            >
+                              <div className="mt-1.5 w-1 h-1 rounded-full bg-slate-300 shrink-0 group-hover:bg-black" />
+                              <span>{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ),
+                  )}
+                </div>
               </div>
             </section>
           )}
