@@ -409,60 +409,109 @@ function PropertyDetailsPage() {
           </div>
         </div>
         {/* 🔥 FLOATING PROPERTY CARD */}
-        <div className="relative z-30 -mt-20 sm:-mt-28 px-4">
-          {/* -mt-20 pulls it up halfway over the image as per your reference */}
+        <div className="relative z-30 translate-y-[-30px] md:translate-y-[-60px] lg:translate-y-[-80px] px-4">
+          {" "}
+          <div className="max-w-6xl mx-auto bg-white rounded-[2rem] md:rounded-[2.5rem] shadow-xl border border-gray-100 p-5 md:px-10 md:py-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            {/* LEFT SECTION */}
+            <div className="flex flex-col flex-1">
+              {/* DESKTOP (unchanged) */}
+              <div className="hidden md:flex items-center gap-10">
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-center w-12 h-12 rounded-full bg-slate-100 mb-2">
+                    <Building2 className="w-6 h-6 text-slate-600" />
+                  </div>
 
-          <div className="max-w-6xl mx-auto bg-white rounded-[2.5rem] shadow-xl border border-gray-100 p-6 md:px-10 md:py-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
-            {/* Left Section: Info */}
-            <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8 flex-1">
-              <div className="flex flex-col gap-2">
-                {/* Icon (Matches your box model padding) */}
-                <div className="flex items-center justify-center w-10 h-10 rounded-full bg-slate-100 mb-2">
-                  <Building2 className="w-5 h-5 text-slate-600" />
+                  <div>
+                    <h1 className="text-3xl font-bold text-[#0A2540]">
+                      {projectDetails.project_name}
+                    </h1>
+                    <p className="text-lg text-gray-400">
+                      {projectDetails.project_location}
+                    </p>
+                  </div>
                 </div>
 
+                <div className="h-14 w-px bg-gray-200" />
+
                 <div>
-                  <h1 className="text-2xl md:text-2xl font-bold text-[#0A2540] tracking-tight">
-                    {projectDetails.project_name}
-                  </h1>
-                  <p className="text-sm md:text-base text-gray-400 font-medium">
-                    {projectDetails.project_location}
+                  <p className="text-xs text-gray-400 uppercase font-bold tracking-widest mb-1">
+                    Starting From
+                  </p>
+                  <p className="text-3xl font-black text-[#0A2540]">
+                    {projectDetails.price}
                   </p>
                 </div>
               </div>
 
-              <div className="hidden md:block h-12 w-px bg-gray-200" />
+              {/* MOBILE (NEW STRUCTURE) */}
+              <div className="md:hidden flex flex-col gap-4">
+                {/* Title + Icon */}
+                <div className="flex items-start gap-3">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-slate-100 shrink-0">
+                    <Building2 className="w-5 h-5 text-slate-600" />
+                  </div>
 
-              <div className="flex flex-col">
-                <p className="text-[10px] text-gray-400 uppercase font-bold tracking-widest mb-1">
-                  Starting From
-                </p>
-                <p className="text-xl md:text-2xl font-black text-[#0A2540]">
-                  {projectDetails.price}
-                </p>
+                  <div>
+                    <h1 className="text-lg font-bold text-[#0A2540] leading-tight">
+                      {projectDetails.project_name}
+                    </h1>
+                    <p className="text-sm text-gray-500">
+                      📍 {projectDetails.project_location}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Info Row (like image structure) */}
+                <div className="flex items-center justify-between border-t border-gray-100 pt-3">
+                  {/* Left Info */}
+                  <div>
+                    <p className="text-base font-semibold text-[#0A2540]">
+                      {projectDetails.bhk || "3 BHK"}
+                    </p>
+                    <p className="text-xs text-gray-400">Apartments</p>
+                  </div>
+
+                  {/* Right Price */}
+                  <div className="text-right">
+                    <p className="text-lg font-bold text-[#0A2540]">
+                      {projectDetails.price}
+                    </p>
+                    <p className="text-[10px] text-gray-400 uppercase">
+                      Starting Price
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Right Section: Buttons (Full Width on Mobile) */}
-            <div className="flex flex-col gap-3 w-full md:w-auto">
-              {/* Get Details Button - Centered */}
+            {/* DESKTOP BUTTONS (unchanged) */}
+            <div className="hidden md:flex items-center gap-4">
+              {" "}
               <button
                 onClick={() => !isProjectRegistered && setShowPopup(true)}
-                className="w-full md:w-auto bg-black text-white h-14 md:px-10 rounded-full font-bold text-base flex items-center justify-center transition-all active:scale-95"
+                className="bg-black text-white h-14 px-8 rounded-full font-semibold text-base whitespace-nowrap"
               >
-                <span>Get Details →</span>
+                Get Details →
               </button>
-
-              {/* WhatsApp Button - Centered */}
               <a
                 href={whatsappLink}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full md:w-auto bg-[#00D952] text-white h-14 md:px-10 rounded-full font-bold text-base flex items-center justify-center gap-2 transition-all active:scale-95"
+                className="bg-[#00D952] text-white h-14 px-8 rounded-full font-semibold text-base flex items-center justify-center gap-2 whitespace-nowrap"
               >
-                <FaWhatsapp size={20} />
-                <span>Chat</span>
+                <FaWhatsapp size={18} />
+                Chat
               </a>
+            </div>
+
+            {/* MOBILE CTA (same feel, not copied text) */}
+            <div className="md:hidden w-full">
+              <button
+                onClick={() => !isProjectRegistered && setShowPopup(true)}
+                className="w-full bg-black text-white h-12 rounded-xl font-semibold"
+              >
+                View Pricing Details
+              </button>
             </div>
           </div>
         </div>
@@ -667,11 +716,10 @@ function PropertyDetailsPage() {
               {/* CAROUSEL WRAPPER */}
               <div className="relative mt-12 max-w-6xl mx-auto">
                 {/* LEFT FADE */}
-                <div className="pointer-events-none absolute left-0 top-0 h-full w-16 bg-gradient-to-r from-slate-50 to-transparent z-10" />
+                <div className="hidden sm:block pointer-events-none absolute left-0 top-0 h-full w-16 bg-gradient-to-r from-slate-50 to-transparent z-10" />
 
                 {/* RIGHT FADE */}
-                <div className="pointer-events-none absolute right-0 top-0 h-full w-16 bg-gradient-to-l from-slate-50 to-transparent z-10" />
-
+                <div className="hidden sm:block pointer-events-none absolute right-0 top-0 h-full w-16 bg-gradient-to-l from-slate-50 to-transparent z-10" />
                 {/* LEFT BUTTON */}
                 <button
                   onClick={() => {
