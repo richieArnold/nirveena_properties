@@ -1,38 +1,91 @@
 const pool = require("../rds_setup/db"); // adjust if needed
-
+const { sendAdminNotification } = require("../utils/mailer"); // Import the mailer
 // Existing function - keep as is
+
+// exports.createCustomerEnquiry = async (req, res) => {
+//   const { first_name, last_name, contact, email, project_id } = req.body;
+
+//   try {
+//     // Check existing customer
+//     const existingCustomer = await pool.query(
+//       "SELECT id FROM customers WHERE contact = $1",
+//       [contact]
+//     );
+
+//     let customerId;
+
+//     if (existingCustomer.rows.length > 0) {
+//       customerId = existingCustomer.rows[0].id;
+//     } else {
+//       const newCustomer = await pool.query(
+//         `INSERT INTO customers (first_name, last_name, contact, email)
+//          VALUES ($1, $2, $3, $4)
+//          RETURNING id`,
+//         [first_name, last_name, contact, email]
+//       );
+
+//       customerId = newCustomer.rows[0].id;
+//     }
+
+//     // Insert enquiry (project optional)
+//     await pool.query(
+//       `INSERT INTO enquiries (customer_id, project_id)
+//        VALUES ($1, $2)`,
+//       [customerId, project_id || null]
+//     );
+
+//     res.json({
+//       success: true,
+//       message: "Enquiry submitted successfully",
+//     });
+
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ success: false, message: "Server error" });
+//   }
+// };
+
 
 exports.createCustomerEnquiry = async (req, res) => {
   const { first_name, last_name, contact, email, project_id } = req.body;
 
   try {
-    // Check existing customer
+    // 1. Handle Customer logic (Existing)
     const existingCustomer = await pool.query(
       "SELECT id FROM customers WHERE contact = $1",
       [contact]
     );
 
     let customerId;
-
     if (existingCustomer.rows.length > 0) {
       customerId = existingCustomer.rows[0].id;
     } else {
       const newCustomer = await pool.query(
         `INSERT INTO customers (first_name, last_name, contact, email)
-         VALUES ($1, $2, $3, $4)
-         RETURNING id`,
+         VALUES ($1, $2, $3, $4) RETURNING id`,
         [first_name, last_name, contact, email]
       );
-
       customerId = newCustomer.rows[0].id;
     }
 
-    // Insert enquiry (project optional)
+    // 2. Insert enquiry
     await pool.query(
-      `INSERT INTO enquiries (customer_id, project_id)
-       VALUES ($1, $2)`,
+      `INSERT INTO enquiries (customer_id, project_id) VALUES ($1, $2)`,
       [customerId, project_id || null]
     );
+
+    // 3. FETCH PROJECT NAME (for the email)
+    let projectName = "General Enquiry";
+    if (project_id) {
+      const projectRes = await pool.query("SELECT project_name FROM projects WHERE id = $1", [project_id]);
+      if (projectRes.rows.length > 0) {
+        projectName = projectRes.rows[0].project_name;
+      }
+    }
+
+    // 4. TRIGGER EMAIL (Non-blocking)
+    // We don't 'await' this so the user gets their response faster
+    sendAdminNotification({ first_name, last_name, contact, email }, projectName);
 
     res.json({
       success: true,
