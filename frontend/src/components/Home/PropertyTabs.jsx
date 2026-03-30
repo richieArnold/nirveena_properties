@@ -341,11 +341,6 @@ const PropertyTabs = () => {
                   transition={{ duration: 0.1, ease: "linear" }}
                 />
               </div>
-
-              {/* Minimal percentage indicator */}
-              <div className="text-xs font-mono text-gray-400 font-medium tabular-nums">
-                {Math.round(progressPercentage)}%
-              </div>
             </div>
           </div>
         )}

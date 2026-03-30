@@ -24,6 +24,7 @@ function PropertiesPage() {
       );
       setProperties(res.data.data);
     } catch (err) {
+      alert("Error Fetching Properties");
       console.log(err);
     } finally {
       setLoading(false);
@@ -105,7 +106,6 @@ function PropertiesPage() {
       const res = await axiosInstance.get(
         `/api/projects/getSingleProject/${slug}`,
       );
-      // console.log(res);
     } catch (err) {
       console.error("Failed to fetch project:", err);
     }

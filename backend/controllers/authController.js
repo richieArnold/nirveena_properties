@@ -51,7 +51,7 @@ exports.login = async (req, res) => {
         username: admin.username 
       },
       JWT_SECRET,
-      { expiresIn: '3m' } // Changed from '24h' to '3m'
+      { expiresIn: '24h' }
     );
 
     res.json({

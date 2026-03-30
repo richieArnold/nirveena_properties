@@ -3,9 +3,6 @@ import { MapPin, Home, BedDouble, Square, Maximize2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 function PropertyCard({ property }) {
-  // Debug log
-  console.log("Rendering property:", property);
-
   // Extract BHK info from typology if available
   const getBHKInfo = () => {
     if (!property.typology) return null;

@@ -104,7 +104,7 @@ function PropertyDetailsPage() {
         );
 
         const data = res.data.data;
-        console.log(data);
+        // console.log(data);
         setProject(data); // full object
         setProjectDetais(data.project); // actual project
         setConnectivity(data.connectivity || {}); // ✅ now comes from same API
@@ -310,7 +310,7 @@ function PropertyDetailsPage() {
 
   return (
     <>
-      {console.log(project)}
+      {/* {console.log(project)} */}
       <PropertyNavbar project={projectDetails} />
       {project && (
         <Helmet>
