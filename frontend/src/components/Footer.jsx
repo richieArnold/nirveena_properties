@@ -105,7 +105,19 @@ const Footer = () => {
         </div>
 
         {/* Divider */}
-        <div className="my-8 h-px bg-gray-700"></div>
+
+        {/* Disclaimer Section */}
+        <div className="my-8 text-center border-t border-b border-gray-700 py-6">
+          <p className="text-sm text-gray-400 max-w-3xl mx-auto">
+            This is not the official website of the developer. The website is
+            managed by Nirveena Realty, an authorized marketing partner, for
+            marketing and lead-generation purposes only.
+          </p>
+
+          <p className="mt-3 text-sm font-medium text-blue-400">
+            RERA Registration No: PRM/KA/RERA/1251/309/AG/251216/006621
+          </p>
+        </div>
 
         {/* Bottom Bar */}
         <div className="flex flex-col md:flex-row justify-center items-center gap-4">
