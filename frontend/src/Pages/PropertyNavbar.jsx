@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import NirveenaLogo from "../assets/NirveenaLogo.jpeg";
 
 const PropertyNavbar = ({ project }) => {
   const navigate = useNavigate();
@@ -13,9 +14,8 @@ const PropertyNavbar = ({ project }) => {
     }
   };
   return (
-
-    <div className="sticky top-0 z-50 bg-white border-b shadow-sm">
-          {console.log(window.history)}
+    <div className="sticky top-0 z-50 bg-red-500 border-b shadow-sm">
+      {console.log(window.history)}
       <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
         {/* LEFT → LOGO */}
         <div className="flex items-center gap-2">
@@ -84,12 +84,27 @@ const PropertyNavbar = ({ project }) => {
         </div>
 
         {/* RIGHT → CTA */}
-        <a
-          href={`tel:${project?.contact_number || "+9900468686"}`}
-          className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition"
-        >
-          +91 {project?.contact_number || "9900468686"}
-        </a>
+        <div className="flex items-center gap-3">
+          <a
+            href={`tel:${project?.contact_number || "+9900468686"}`}
+            className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition"
+          >
+            +91 {project?.contact_number || "9900468686"}
+          </a>
+
+          {console.log("THIS NAVBAR IS LOADED")}
+
+          <img
+            src={NirveenaLogo}
+            alt="Nirveena"
+            style={{
+              width: "120px",
+              height: "60px",
+              border: "3px solid red",
+              background: "yellow",
+            }}
+          />
+        </div>
       </div>
     </div>
   );

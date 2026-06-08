@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
+import NirveenaLogo from "../assets/NirveenaLogo.jpeg";
+
 const PropertyNavbar = ({ project }) => {
   const navigate = useNavigate();
   const [active, setActive] = useState("overview");
@@ -44,7 +46,8 @@ const PropertyNavbar = ({ project }) => {
             onClick={() => {
               if (window.history.length > 1) {
                 navigate(-1);
-              } else {``
+              } else {
+                ``;
                 navigate("/property"); // or "/projects"
               }
             }}
@@ -86,12 +89,23 @@ const PropertyNavbar = ({ project }) => {
         </div>
 
         {/* RIGHT → CTA */}
-        <a
-          href={`tel:${project?.contact_number || "9900468686"}`}
-          className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-5 py-2 rounded-full text-sm font-semibold shadow-md hover:scale-105 transition"
-        >
-          📞 {project?.contact_number || "9900468686"}
-        </a>
+        <div className="flex items-center gap-3">
+          <a
+            href={`tel:${project?.contact_number || "9900468686"}`}
+            className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-5 py-2 rounded-full text-sm font-semibold shadow-md hover:scale-105 transition"
+          >
+            📞 {project?.contact_number || "9900468686"}
+          </a>
+
+          <img
+            src={NirveenaLogo}
+            alt="Nirveena"
+            style={{
+              width: "90px",
+              height: "60px",
+            }}
+          />
+        </div>
       </div>
     </div>
   );
