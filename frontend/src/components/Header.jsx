@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Menu, X, Phone, ChevronDown } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import logo from "../assets/NirveenaLogo.jpeg";
+import logo from "../assets/NirveenaLogo.jpg";
 
 const Header = () => {
   const navigate = useNavigate();

@@ -9,7 +9,7 @@ import {
   Send,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import logo from "../assets/NirveenaLogo.jpeg";
+import logo from "../assets/NirveenaLogo.jpg";
 const Footer = () => {
   const socialLinks = [
     {

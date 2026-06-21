@@ -102,7 +102,7 @@ export default function ThankYouPage() {
         {/* LOGO */}
         <div className="mb-6 flex justify-center">
           <img
-            src="/NirveenaLogo.jpeg"
+            src="/NirveenaLogo.jpg"
             alt="Nirveena"
             className="h-12 object-contain"
           />

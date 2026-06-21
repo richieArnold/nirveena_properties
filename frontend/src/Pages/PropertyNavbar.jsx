@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import NirveenaLogo from "../assets/NirveenaLogo.jpeg";
+import NirveenaLogo from "../assets/NirveenaLogo.jpg";
 
 const PropertyNavbar = ({ project }) => {
   const navigate = useNavigate();
@@ -97,12 +97,7 @@ const PropertyNavbar = ({ project }) => {
           <img
             src={NirveenaLogo}
             alt="Nirveena"
-            style={{
-              width: "120px",
-              height: "60px",
-              border: "3px solid red",
-              background: "yellow",
-            }}
+            className="h-12 w-auto object-contain"
           />
         </div>
       </div>

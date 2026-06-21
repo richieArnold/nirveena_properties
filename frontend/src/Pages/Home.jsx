@@ -16,7 +16,7 @@ const Home = () => {
             "@type": "RealEstateAgent",
             name: "Nirveena",
             url: "https://www.nirveena.com",
-            logo: "https://www.nirveena.com/NirveenaLogo.jpeg",
+            logo: "https://www.nirveena.com/NirveenaLogo.jpg",
             areaServed: "Bangalore",
             description: "Premium apartments and villas in Bangalore."
           })}
