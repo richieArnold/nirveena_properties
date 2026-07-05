@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 
-const password = 'admin123';
+const password = 'Admin@nirveena#4419';
 const saltRounds = 10;
 
 const hash = bcrypt.hashSync(password, saltRounds);

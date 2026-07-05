@@ -64,7 +64,7 @@ const PropertyNavbar = ({ project }) => {
                 ? project.builder_logo
                 : "/NirveenaLogo.jpg"
             }
-            className="h-10 sm:h-12 object-contain"
+            className="h-10 sm:h-12 w-auto object-contain"
             alt="Builder Logo"
           />
         </div>
@@ -112,7 +112,7 @@ const PropertyNavbar = ({ project }) => {
           <img
             src={NirveenaLogo}
             alt="Nirveena"
-            className="h-12 sm:h-15 w-auto object-contain"
+            className="h-12 w-12 sm:h-15 sm:w-15 rounded-full -object-cover border border-gray-200 shadow-sm"
           />
 
           {/* Hamburger Menu Button */}
@@ -180,7 +180,7 @@ const PropertyNavbar = ({ project }) => {
                   <img
                     src={NirveenaLogo}
                     alt="Nirveena Logo"
-                    className="h-8 object-contain"
+                    className="h-8 w-8 rounded-full object-cover border border-gray-200"
                   />
                   <span className="text-xs text-gray-400">Nirveena Realty</span>
                 </div>

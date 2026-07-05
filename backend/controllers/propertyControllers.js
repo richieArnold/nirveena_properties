@@ -546,6 +546,7 @@ exports.addProject = async (req, res) => {
       rera_completion,
       property_description,
       display_order = 0, // ADD THIS with default 0
+      custom_head_html,
       images = [],
     } = req.body;
 
@@ -580,10 +581,11 @@ exports.addProject = async (req, res) => {
         price,
         rera_completion,
         property_description,
-        display_order
+        display_order,
+        custom_head_html
       )
       VALUES (
-        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16
+        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17
       )
       `,
       [
@@ -603,6 +605,7 @@ exports.addProject = async (req, res) => {
         rera_completion || null,
         property_description || null,
         display_order, // ADD THIS
+        custom_head_html || null,
       ],
     );
 
@@ -899,6 +902,7 @@ exports.updateProject = async (req, res) => {
       youtube_video_url,
       property_description,
       display_order, // ADD THIS
+      custom_head_html,
       existing_images = [],
       new_images = [],
     } = req.body;
@@ -949,8 +953,9 @@ exports.updateProject = async (req, res) => {
         youtube_video_url = $15,
         property_description = $16,
         display_order = $17,
+        custom_head_html = $18,
         updated_at = NOW()
-      WHERE id = $18
+      WHERE id = $19
       `,
       [
         Number(project_id),
@@ -970,6 +975,7 @@ exports.updateProject = async (req, res) => {
         youtube_video_url || null,
         property_description || null,
         display_order !== undefined ? display_order : 0, // ADD THIS
+        custom_head_html || null,
         id,
       ],
     );

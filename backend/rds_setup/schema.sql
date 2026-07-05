@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS projects (
   sba TEXT,
   price TEXT,
   rera_completion TEXT,
+  custom_head_html TEXT,
 
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -204,3 +205,6 @@ CREATE TABLE IF NOT EXISTS blog_images (
   sort_order INTEGER DEFAULT 0,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- Migration to add custom_head_html column to projects table
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS custom_head_html TEXT;

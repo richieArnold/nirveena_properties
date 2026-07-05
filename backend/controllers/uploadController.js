@@ -68,6 +68,7 @@ exports.addProjectWithImages = async (req, res) => {
       price,
       rera_completion,
       property_description,
+      custom_head_html,
     } = req.body;
 
     // Basic validation
@@ -106,9 +107,10 @@ exports.addProjectWithImages = async (req, res) => {
         sba,
         price,
         rera_completion,
-        property_description
+        property_description,
+        custom_head_html
       )
-      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15) 
+      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) 
       `,
       [
         Number(project_id),
@@ -126,6 +128,7 @@ exports.addProjectWithImages = async (req, res) => {
         price || null,
         rera_completion || null,
         property_description || null,
+        custom_head_html || null,
       ],
     );
 
@@ -193,6 +196,7 @@ exports.updateProjectWithImages = async (req, res) => {
       rera_completion,
       youtube_video_url,
       property_description,
+      custom_head_html,
       existing_images,
     } = req.body;
 
@@ -302,8 +306,9 @@ exports.updateProjectWithImages = async (req, res) => {
         rera_completion = $14,
         youtube_video_url = $15,
         property_description = $16, 
+        custom_head_html = $17,
         updated_at = NOW()
-      WHERE id = $17  
+      WHERE id = $18  
       `,
       [
         projectIdValue,
@@ -322,6 +327,7 @@ exports.updateProjectWithImages = async (req, res) => {
         rera_completion || null,
         youtube_video_url || null,
         property_description || null,
+        custom_head_html || null,
         id,
       ],
     );

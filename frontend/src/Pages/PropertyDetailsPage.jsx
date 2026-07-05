@@ -118,6 +118,116 @@ function PropertyDetailsPage() {
     fetchProject();
   }, [slug]);
 
+  useEffect(() => {
+    let active = true;
+
+    const cleanUpScripts = () => {
+      if (!projectDetails?.id) return;
+      const existingElements = document.querySelectorAll(
+        `[data-property-script="${projectDetails.id}"]`
+      );
+      existingElements.forEach((el) => el.remove());
+    };
+
+    cleanUpScripts();
+
+    const customHtml = projectDetails?.custom_head_html;
+    if (!customHtml || !customHtml.trim()) {
+      return;
+    }
+
+    const loadScripts = async () => {
+      try {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(customHtml, "text/html");
+
+        const allowedTags = ["script", "noscript", "meta", "link"];
+        const elementsToInject = [];
+
+        const collectElements = (node) => {
+          if (node.nodeType === Node.ELEMENT_NODE) {
+            const tagName = node.tagName.toLowerCase();
+            if (allowedTags.includes(tagName)) {
+              elementsToInject.push(node);
+            }
+          }
+        };
+
+        doc.head.childNodes.forEach(collectElements);
+        doc.body.childNodes.forEach(collectElements);
+
+        window.__propertyHeadScripts = window.__propertyHeadScripts || new Set();
+        const loadedSrcs = window.__propertyHeadScripts;
+
+        for (const node of elementsToInject) {
+          if (!active) return;
+
+          const tagName = node.tagName.toLowerCase();
+          const newEl = document.createElement(tagName);
+
+          for (let i = 0; i < node.attributes.length; i++) {
+            const attr = node.attributes[i];
+            newEl.setAttribute(attr.name, attr.value);
+          }
+          newEl.setAttribute("data-property-script", projectDetails.id);
+
+          if (tagName === "script") {
+            const src = node.getAttribute("src");
+            if (src) {
+              if (loadedSrcs.has(src)) {
+                continue;
+              }
+
+              await new Promise((resolve) => {
+                let resolved = false;
+                const handleEvent = (success) => {
+                  if (resolved) return;
+                  resolved = true;
+                  if (success) {
+                    loadedSrcs.add(src);
+                  }
+                  resolve();
+                };
+
+                newEl.onload = () => handleEvent(true);
+                newEl.onerror = () => handleEvent(false);
+
+                if (active) {
+                  document.head.appendChild(newEl);
+                } else {
+                  resolve();
+                }
+              });
+            } else {
+              newEl.textContent = node.textContent;
+              if (active) {
+                document.head.appendChild(newEl);
+              }
+            }
+          } else if (tagName === "noscript") {
+            newEl.innerHTML = node.innerHTML;
+            if (active) {
+              document.head.appendChild(newEl);
+            }
+          } else {
+            if (active) {
+              document.head.appendChild(newEl);
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error loading property head HTML:", error);
+      }
+    };
+
+    loadScripts();
+
+    return () => {
+      active = false;
+      cleanUpScripts();
+    };
+  }, [projectDetails?.id, projectDetails?.custom_head_html]);
+
   const configScrollRef = useRef(null);
   useEffect(() => {
     const scrollContainer = configScrollRef.current;

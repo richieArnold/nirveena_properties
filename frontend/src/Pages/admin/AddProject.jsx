@@ -38,6 +38,7 @@ const AddProject = () => {
     price: "",
     rera_completion: "",
     property_description: "",
+    custom_head_html: "",
   });
 
   // Fetch existing property types from backend
@@ -518,6 +519,22 @@ const AddProject = () => {
             />
             <p className="text-xs text-gray-500 mt-1">
               Use formatting tools to create beautiful, structured descriptions
+            </p>
+          </div>
+
+          {/* Custom Head HTML */}
+          <div className="md:col-span-2">
+            <label className={labelClasses}>Custom Head HTML</label>
+            <textarea
+              name="custom_head_html"
+              value={formData.custom_head_html}
+              onChange={handleInputChange}
+              className={inputClasses}
+              rows="6"
+              placeholder="Paste Google Ads, Google Analytics, Meta Pixel, Microsoft Clarity, LinkedIn Insight Tag, TikTok Pixel, or any custom <head> HTML here."
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              HTML elements (script, noscript, meta, link) injected exactly as pasted here when visitors open this property's page. Comments are ignored and script tags are loaded sequentially.
             </p>
           </div>
 
