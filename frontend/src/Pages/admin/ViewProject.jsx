@@ -244,6 +244,23 @@ const ViewProject = () => {
           </div>
           {/* )} */}
 
+          {/* Custom Head HTML */}
+          <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <div className="flex items-center gap-2 mb-3">
+              <FileText className="w-5 h-5 text-indigo-600" />
+              <h3 className="font-semibold text-gray-900">Custom Head HTML</h3>
+            </div>
+            {project.custom_head_html ? (
+              <pre className="p-3 bg-gray-950 text-green-400 font-mono text-sm rounded-lg overflow-x-auto whitespace-pre-wrap max-h-60 border border-gray-800">
+                {project.custom_head_html}
+              </pre>
+            ) : (
+              <p className="text-gray-400 italic">
+                No custom head HTML configured for this property.
+              </p>
+            )}
+          </div>
+
           {/* Additional Info */}
           <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="p-3 bg-blue-50 rounded-lg">
