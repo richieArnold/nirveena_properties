@@ -1,5 +1,6 @@
 const pool = require("../rds_setup/db"); // adjust if needed
 const { sendAdminNotification } = require("../utils/mailer"); // Import the mailer
+const axios = require("axios");
 // Existing function - keep as is
 
 // exports.createCustomerEnquiry = async (req, res) => {
@@ -46,55 +47,262 @@ const { sendAdminNotification } = require("../utils/mailer"); // Import the mail
 // };
 
 
+// exports.createCustomerEnquiry = async (req, res) => {
+//   const { first_name, last_name, contact, email, project_id } = req.body;
+
+//   try {
+//     // 1. Handle Customer logic (Existing)
+//     const existingCustomer = await pool.query(
+//       "SELECT id FROM customers WHERE contact = $1",
+//       [contact]
+//     );
+
+//     let customerId;
+//     if (existingCustomer.rows.length > 0) {
+//       customerId = existingCustomer.rows[0].id;
+//     } else {
+//       const newCustomer = await pool.query(
+//         `INSERT INTO customers (first_name, last_name, contact, email)
+//          VALUES ($1, $2, $3, $4) RETURNING id`,
+//         [first_name, last_name, contact, email]
+//       );
+//       customerId = newCustomer.rows[0].id;
+//     }
+
+//     // 2. Insert enquiry
+//     await pool.query(
+//       `INSERT INTO enquiries (customer_id, project_id) VALUES ($1, $2)`,
+//       [customerId, project_id || null]
+//     );
+
+//     // 3. FETCH PROJECT NAME (for the email)
+//     let projectName = "General Enquiry";
+//     if (project_id) {
+//       const projectRes = await pool.query("SELECT project_name FROM projects WHERE id = $1", [project_id]);
+//       if (projectRes.rows.length > 0) {
+//         projectName = projectRes.rows[0].project_name;
+//       }
+//     }
+
+//     const now = new Date();
+
+// const submittedDate = now.toLocaleDateString("en-GB").replace(/\//g, "-");
+// const submittedTime = now.toTimeString().split(" ")[0];
+
+// const leadPayload = [
+//   {
+//     name: `${first_name} ${last_name || ""}`.trim(),
+
+//     mobile: contact,
+//     email: email || "",
+
+//     project: projectName,
+
+//     // Store your project id as additional information
+//     additionalProperties: {
+//       projectId: project_id
+//     },
+
+//     notes: `Website enquiry for ${projectName}`,
+
+//     countryCode: "91",
+
+//     submittedDate,
+//     submittedTime,
+
+//     source: "Website",
+//     subSource: "Nirveena Website"
+//   }
+// ];
+
+
+// await axios.post(
+//   "https://connect.leadrat.com/api/v1/integration/Website",
+//   leadPayload,
+//   {
+//     headers: {
+//       "API-Key": "ODM5NWM4ODQtMTY1NC00YmFjLThjZjEtYTBmMjBkZDExZmM3",
+//       "Content-Type": "application/json",
+//     },
+//   }
+// );
+//     // 4. TRIGGER EMAIL (Non-blocking)
+//     // We don't 'await' this so the user gets their response faster
+//     sendAdminNotification({ first_name, last_name, contact, email }, projectName);
+
+
+
+//     res.json({
+//       success: true,
+//       message: "Enquiry submitted successfully",
+//     });
+
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ success: false, message: "Server error" });
+//   }
+// };
+
+
+
 exports.createCustomerEnquiry = async (req, res) => {
   const { first_name, last_name, contact, email, project_id } = req.body;
 
   try {
-    // 1. Handle Customer logic (Existing)
+    // ===========================
+    // CREATE / FIND CUSTOMER
+    // ===========================
+
     const existingCustomer = await pool.query(
       "SELECT id FROM customers WHERE contact = $1",
       [contact]
     );
 
     let customerId;
+
     if (existingCustomer.rows.length > 0) {
       customerId = existingCustomer.rows[0].id;
     } else {
       const newCustomer = await pool.query(
         `INSERT INTO customers (first_name, last_name, contact, email)
-         VALUES ($1, $2, $3, $4) RETURNING id`,
+         VALUES ($1, $2, $3, $4)
+         RETURNING id`,
         [first_name, last_name, contact, email]
       );
+
       customerId = newCustomer.rows[0].id;
     }
 
-    // 2. Insert enquiry
+    // ===========================
+    // SAVE ENQUIRY
+    // ===========================
+
     await pool.query(
-      `INSERT INTO enquiries (customer_id, project_id) VALUES ($1, $2)`,
+      `INSERT INTO enquiries (customer_id, project_id)
+       VALUES ($1, $2)`,
       [customerId, project_id || null]
     );
 
-    // 3. FETCH PROJECT NAME (for the email)
+    // ===========================
+    // GET PROJECT NAME
+    // ===========================
+
     let projectName = "General Enquiry";
+
     if (project_id) {
-      const projectRes = await pool.query("SELECT project_name FROM projects WHERE id = $1", [project_id]);
+      const projectRes = await pool.query(
+        "SELECT project_name FROM projects WHERE id = $1",
+        [project_id]
+      );
+
       if (projectRes.rows.length > 0) {
         projectName = projectRes.rows[0].project_name;
       }
     }
 
-    // 4. TRIGGER EMAIL (Non-blocking)
-    // We don't 'await' this so the user gets their response faster
-    sendAdminNotification({ first_name, last_name, contact, email }, projectName);
+    // ===========================
+    // SEND TO LEADRAT
+    // ===========================
 
-    res.json({
+    try {
+      const now = new Date();
+
+      const submittedDate = now
+        .toLocaleDateString("en-GB")
+        .replace(/\//g, "-");
+
+      const submittedTime = now
+        .toTimeString()
+        .split(" ")[0];
+
+      const leadPayload = [
+        {
+          name: `${first_name} ${last_name || ""}`.trim(),
+
+          mobile: contact,
+
+          email: email || "",
+
+          project: projectName,
+
+          notes: `Website enquiry for ${projectName}`,
+
+          countryCode: "91",
+
+          submittedDate,
+
+          submittedTime,
+
+          source: "Website",
+
+          subSource: "Nirveena Website",
+
+          additionalProperties: {
+            projectId: project_id || "",
+            projectName: projectName,
+          }
+        },
+      ];
+
+      const response = await axios.post(
+        process.env.LEADRAT_URL,
+        leadPayload,
+        {
+          headers: {
+            "API-Key": process.env.LEADRAT_API_KEY,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("LeadRat Success:", response.data);
+
+    } catch (leadRatError) {
+
+      console.error(
+        "LeadRat Error:",
+        leadRatError.response?.data || leadRatError.message
+      );
+
+      // Do NOT stop execution
+    }
+
+    // ===========================
+    // SEND EMAIL
+    // ===========================
+
+    try {
+      sendAdminNotification(
+        {
+          first_name,
+          last_name,
+          contact,
+          email,
+        },
+        projectName
+      );
+    } catch (mailError) {
+      console.error("Mail Error:", mailError);
+    }
+
+    // ===========================
+    // RESPONSE
+    // ===========================
+
+    return res.json({
       success: true,
       message: "Enquiry submitted successfully",
     });
 
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, message: "Server error" });
+
+    console.error("Create Enquiry Error:", err);
+
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+
   }
 };
 // ============= NEW ADMIN FUNCTIONS =============
