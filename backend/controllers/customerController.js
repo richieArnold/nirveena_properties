@@ -219,7 +219,7 @@ exports.createCustomerEnquiry = async (req, res) => {
         {
           name: `${first_name} ${last_name || ""}`.trim(),
 
-          mobile: contact,
+          mobile: String(contact),
 
           email: email || "",
 
@@ -235,14 +235,13 @@ exports.createCustomerEnquiry = async (req, res) => {
 
           source: "Website",
 
-          subSource: "Nirveena Website",
-
-          additionalProperties: {
-            projectId: project_id || "",
-            projectName: projectName,
-          }
-        },
+          subSource: "Nirveena Website"
+        }
       ];
+
+      console.log("========== LEADRAT PAYLOAD ==========");
+      console.log(JSON.stringify(leadPayload, null, 2));
+      console.log("=====================================");
 
       const response = await axios.post(
         process.env.LEADRAT_URL,
@@ -252,10 +251,12 @@ exports.createCustomerEnquiry = async (req, res) => {
             "API-Key": process.env.LEADRAT_API_KEY,
             "Content-Type": "application/json",
           },
+          timeout: 10000,
         }
       );
 
-      console.log("LeadRat Success:", response.data);
+      console.log("LeadRat Status:", response.status);
+      console.log("LeadRat Response:", response.data);
 
     } catch (leadRatError) {
 
@@ -264,7 +265,6 @@ exports.createCustomerEnquiry = async (req, res) => {
         leadRatError.response?.data || leadRatError.message
       );
 
-      // Do NOT stop execution
     }
 
     // ===========================
