@@ -203,9 +203,8 @@ const PrivacyPolicy = () => {
           <p className="text-gray-700 leading-relaxed">
             Nirveena Realty Pvt Ltd
             <br />
-            Address: #202, Share Space, Palm Meadows, Borewell Road,
-            Whitefield, Bangalore – 560066
-            <br />
+            Address: 3rd floor, Barathi Nagaraj Plaza,681, Ramagondanahalli, Whitefield,
+             Bengaluru, Karnataka 560066 <br/>
             Phone: 9900468686
             <br />
             Email: info@nirveena.com

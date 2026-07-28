@@ -35,7 +35,7 @@ const Footer = () => {
       text: "info@nirveena.com",
       href: "mailto:info@nirveena.com",
     },
-    { icon: <MapPin size={18} />, text: "Bengaluru", href: "#" },
+    { icon: <MapPin size={18} />, text: "3rd floor, Barathi Nagaraj Plaza,681, Ramagondanahalli, Whitefield, Bengaluru, Karnataka 560066", href: "#" },
   ];
 
   const legalLinks = [
