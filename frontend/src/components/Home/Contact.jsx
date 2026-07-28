@@ -202,8 +202,8 @@ const Contact = () => {
                     {
                       icon: MapPin,
                       title: "Visit Office",
-                      detail: "#202, Share Spare, Borewell Road, Whitefield",
-                      sub: "Karnataka, India",
+                      detail: "3rd floor, Barathi Nagaraj Plaza,681, Ramagondanahalli, Whitefield,",
+                      sub:"Bengaluru, Karnataka 560066",
                       color: "from-blue-500/20 to-purple-500/20",
                     },
                   ].map((item, index) => (
